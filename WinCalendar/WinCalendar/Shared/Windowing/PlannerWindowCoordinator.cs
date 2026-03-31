@@ -9,6 +9,11 @@ namespace WinCalendar.Shared.Windowing;
 
 public sealed class PlannerWindowCoordinator
 {
+    private const int CompactWindowWidth = 420;
+    private const int CompactWindowHeight = 610;
+    private const int MediumWindowWidth = 980;
+    private const int MediumWindowHeight = 760;
+
     private readonly PlannerStateStore _plannerStateStore;
     private MainWindow? _mainWindow;
     private CompactPanelWindow? _compactWindow;
@@ -63,7 +68,7 @@ public sealed class PlannerWindowCoordinator
         presenter.IsResizable = false;
 
         appWindow.SetPresenter(presenter);
-        appWindow.Resize(new SizeInt32(430, 640));
+        appWindow.Resize(new SizeInt32(CompactWindowWidth, CompactWindowHeight));
         PositionCompactWindow(appWindow);
     }
 
@@ -75,7 +80,7 @@ public sealed class PlannerWindowCoordinator
         presenter.IsMinimizable = false;
 
         appWindow.SetPresenter(presenter);
-        appWindow.Resize(new SizeInt32(980, 760));
+        appWindow.Resize(new SizeInt32(MediumWindowWidth, MediumWindowHeight));
         PositionMediumWindow(appWindow);
     }
 
@@ -84,23 +89,19 @@ public sealed class PlannerWindowCoordinator
         DisplayArea displayArea = DisplayArea.GetFromWindowId(appWindow.Id, DisplayAreaFallback.Primary);
         RectInt32 workArea = displayArea.WorkArea;
         const int margin = 18;
-        const int width = 430;
-        const int height = 640;
 
         appWindow.Move(new PointInt32(
-            workArea.X + workArea.Width - width - margin,
-            workArea.Y + workArea.Height - height - margin));
+            workArea.X + workArea.Width - CompactWindowWidth - margin,
+            workArea.Y + workArea.Height - CompactWindowHeight - margin));
     }
 
     private static void PositionMediumWindow(AppWindow appWindow)
     {
         DisplayArea displayArea = DisplayArea.GetFromWindowId(appWindow.Id, DisplayAreaFallback.Primary);
         RectInt32 workArea = displayArea.WorkArea;
-        const int width = 980;
-        const int height = 760;
 
         appWindow.Move(new PointInt32(
-            workArea.X + Math.Max(0, (workArea.Width - width) / 2),
-            workArea.Y + Math.Max(0, (workArea.Height - height) / 2)));
+            workArea.X + Math.Max(0, (workArea.Width - MediumWindowWidth) / 2),
+            workArea.Y + Math.Max(0, (workArea.Height - MediumWindowHeight) / 2)));
     }
 }

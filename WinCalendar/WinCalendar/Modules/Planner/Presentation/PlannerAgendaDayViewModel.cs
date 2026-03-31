@@ -50,6 +50,36 @@ public sealed class PlannerAgendaDayViewModel : ObservableObject
 
     public string HideButtonText => _isHidden ? "Show" : "Hide";
 
+    public string CompactExpandButtonText => _isExpanded ? "-" : "+";
+
+    public string CountBadgeText => _isHidden ? "H" : Tasks.Count.ToString();
+
+    public string CompactPreviewText
+    {
+        get
+        {
+            if (_isHidden)
+                return "Day hidden";
+
+            if (Tasks.Count == 0)
+                return "No tasks";
+
+            if (!_isExpanded)
+                return SummaryText;
+
+            PlannerTaskViewModel firstTask = Tasks[0];
+            return firstTask.HasTime
+                ? $"{firstTask.TimeText} {firstTask.Title}"
+                : firstTask.Title;
+        }
+    }
+
+    public string CompactOverflowText =>
+        !_isHidden && _isExpanded && Tasks.Count > 1 ? $"+{Tasks.Count - 1} more" : string.Empty;
+
+    public Visibility CompactOverflowVisibility =>
+        string.IsNullOrEmpty(CompactOverflowText) ? Visibility.Collapsed : Visibility.Visible;
+
     public bool IsExpanded
     {
         get => _isExpanded;
@@ -60,6 +90,10 @@ public sealed class PlannerAgendaDayViewModel : ObservableObject
 
             OnPropertyChanged(nameof(ContentVisibility));
             OnPropertyChanged(nameof(ExpandButtonText));
+            OnPropertyChanged(nameof(CompactExpandButtonText));
+            OnPropertyChanged(nameof(CompactPreviewText));
+            OnPropertyChanged(nameof(CompactOverflowText));
+            OnPropertyChanged(nameof(CompactOverflowVisibility));
         }
     }
 
@@ -75,6 +109,10 @@ public sealed class PlannerAgendaDayViewModel : ObservableObject
             OnPropertyChanged(nameof(HiddenVisibility));
             OnPropertyChanged(nameof(ExpandedToggleVisibility));
             OnPropertyChanged(nameof(HideButtonText));
+            OnPropertyChanged(nameof(CountBadgeText));
+            OnPropertyChanged(nameof(CompactPreviewText));
+            OnPropertyChanged(nameof(CompactOverflowText));
+            OnPropertyChanged(nameof(CompactOverflowVisibility));
         }
     }
 

@@ -32,6 +32,8 @@ public sealed class PlannerTaskViewModel
 
     public string DetailsText => PlannerDateTimeFormatter.FormatDateTime(Date, Time);
 
+    public string CompactTimeText => HasTime ? TimeText : "Any time";
+
     public bool HasTime => Time is not null;
 
     public Visibility CompletedVisibility => IsCompleted ? Visibility.Visible : Visibility.Collapsed;

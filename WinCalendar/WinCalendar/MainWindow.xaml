@@ -3,17 +3,61 @@
     x:Class="WinCalendar.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:WinCalendar"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Title="WinCalendar">
 
     <Window.SystemBackdrop>
-        <MicaBackdrop />
+        <MicaBackdrop Kind="BaseAlt" />
     </Window.SystemBackdrop>
 
-    <Grid>
+    <Grid x:Name="ContentRoot" Background="{ThemeResource AppPageBackgroundBrush}">
+        <controls:NavigationView
+            x:Name="ShellNavigationView"
+            IsBackEnabled="False"
+            IsBackButtonVisible="Collapsed"
+            PaneDisplayMode="Left"
+            SelectionChanged="ShellNavigationView_SelectionChanged">
+            <controls:NavigationView.MenuItems>
+                <controls:NavigationViewItem x:Name="TodayNavigationItem" Content="Today" Tag="today">
+                    <controls:NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="Calendar" />
+                    </controls:NavigationViewItem.Icon>
+                </controls:NavigationViewItem>
+                <controls:NavigationViewItem Content="Calendar" Tag="calendar">
+                    <controls:NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="AllApps" />
+                    </controls:NavigationViewItem.Icon>
+                </controls:NavigationViewItem>
+                <controls:NavigationViewItem Content="Notes" Tag="notes">
+                    <controls:NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="Edit" />
+                    </controls:NavigationViewItem.Icon>
+                </controls:NavigationViewItem>
+                <controls:NavigationViewItem Content="Settings" Tag="settings">
+                    <controls:NavigationViewItem.Icon>
+                        <SymbolIcon Symbol="Setting" />
+                    </controls:NavigationViewItem.Icon>
+                </controls:NavigationViewItem>
+            </controls:NavigationView.MenuItems>
 
+            <controls:NavigationView.PaneFooter>
+                <StackPanel Spacing="8" Padding="8,12,8,8">
+                    <Button x:Name="CompactPanelButton" Click="CompactPanelButton_Click" Content="Open Compact Panel" />
+                    <Button x:Name="MediumViewButton" Click="MediumViewButton_Click" Content="Open Medium View" />
+                </StackPanel>
+            </controls:NavigationView.PaneFooter>
+
+            <controls:NavigationView.Header>
+                <StackPanel Spacing="2">
+                    <TextBlock FontFamily="Segoe UI Variable Display" FontSize="28" FontWeight="SemiBold" Text="Planner" />
+                    <TextBlock Foreground="{ThemeResource AppTextMutedBrush}" Text="Three connected layouts on one shared state." />
+                </StackPanel>
+            </controls:NavigationView.Header>
+
+            <ContentPresenter x:Name="PageHost" />
+        </controls:NavigationView>
     </Grid>
 </Window>

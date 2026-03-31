@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="WinCalendar.Modules.Calendar.UI.CalendarPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Background="{ThemeResource AppPageBackgroundBrush}"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <Style x:Key="FlatButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
+        </Style>
+    </Page.Resources>
+
+    <Grid
+        x:Name="Root"
+        Loaded="Root_Loaded"
+        Padding="24">
+        <Grid RowSpacing="18">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Spacing="4">
+                    <TextBlock
+                        FontFamily="Segoe UI Variable Display"
+                        FontSize="34"
+                        FontWeight="SemiBold"
+                        Text="{Binding MonthLabel}" />
+                    <TextBlock
+                        Foreground="{ThemeResource AppTextMutedBrush}"
+                        Text="{Binding SelectedDateText}" />
+                </StackPanel>
+
+                <Button Grid.Column="1" Click="PreviousMonthButton_Click" Content="&#xE100;" FontFamily="Segoe Fluent Icons" />
+                <Button Grid.Column="2" Click="NextMonthButton_Click" Content="&#xE101;" FontFamily="Segoe Fluent Icons" />
+                <Button Grid.Column="3" Click="OpenCompactButton_Click" Content="Compact" />
+                <Button Grid.Column="4" Click="OpenMediumButton_Click" Content="Medium" />
+            </Grid>
+
+            <Grid
+                Grid.Row="1"
+                ColumnSpacing="18">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="360" />
+                </Grid.ColumnDefinitions>
+
+                <Border
+                    Background="{ThemeResource AppCardBackgroundBrush}"
+                    BorderBrush="{ThemeResource AppBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="18"
+                    Padding="16">
+                    <Grid RowSpacing="12">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock HorizontalAlignment="Center" Text="Mo" />
+                            <TextBlock Grid.Column="1" HorizontalAlignment="Center" Text="Tu" />
+                            <TextBlock Grid.Column="2" HorizontalAlignment="Center" Text="We" />
+                            <TextBlock Grid.Column="3" HorizontalAlignment="Center" Text="Th" />
+                            <TextBlock Grid.Column="4" HorizontalAlignment="Center" Text="Fr" />
+                            <TextBlock Grid.Column="5" HorizontalAlignment="Center" Text="Sa" />
+                            <TextBlock Grid.Column="6" HorizontalAlignment="Center" Text="Su" />
+                        </Grid>
+
+                        <GridView
+                            Grid.Row="1"
+                            ItemsSource="{Binding MonthDays}"
+                            SelectionMode="None"
+                            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                            ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                            <GridView.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <ItemsWrapGrid MaximumRowsOrColumns="7" Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </GridView.ItemsPanel>
+
+                            <GridView.ItemContainerStyle>
+                                <Style TargetType="GridViewItem">
+                                    <Setter Property="Padding" Value="0" />
+                                    <Setter Property="Margin" Value="4" />
+                                    <Setter Property="Width" Value="112" />
+                                    <Setter Property="Height" Value="88" />
+                                </Style>
+                            </GridView.ItemContainerStyle>
+
+                            <GridView.ItemTemplate>
+                                <DataTemplate>
+                                    <Button
+                                        Style="{StaticResource FlatButtonStyle}"
+                                        Click="MonthDayButton_Click">
+                                        <Grid Opacity="{Binding DayOpacity}">
+                                            <Border
+                                                Visibility="{Binding SelectionVisibility}"
+                                                Background="{ThemeResource AppAccentMutedBrush}"
+                                                CornerRadius="16" />
+                                            <Border
+                                                Visibility="{Binding TodayVisibility}"
+                                                BorderBrush="{ThemeResource AppAccentBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="16" />
+                                            <StackPanel
+                                                Padding="12"
+                                                VerticalAlignment="Stretch"
+                                                Spacing="8">
+                                                <TextBlock FontSize="18" FontWeight="SemiBold" Text="{Binding DayNumberText}" />
+                                                <StackPanel Spacing="4">
+                                                    <TextBlock
+                                                        Foreground="{ThemeResource AppTextMutedBrush}"
+                                                        Text="{Binding StateText}" />
+                                                    <Border
+                                                        Visibility="{Binding TaskIndicatorVisibility}"
+                                                        Width="10"
+                                                        Height="10"
+                                                        Background="{Binding IndicatorBrush}"
+                                                        CornerRadius="999" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Button>
+                                </DataTemplate>
+                            </GridView.ItemTemplate>
+                        </GridView>
+                    </Grid>
+                </Border>
+
+                <Border
+                    Grid.Column="1"
+                    Background="{ThemeResource AppCardBackgroundBrush}"
+                    BorderBrush="{ThemeResource AppBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="18"
+                    Padding="16">
+                    <Grid RowSpacing="12">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <StackPanel Spacing="4">
+                            <TextBlock
+                                FontSize="26"
+                                FontWeight="SemiBold"
+                                Text="{Binding SelectedDateText}" />
+                            <TextBlock
+                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Text="{Binding SelectedDateSummary}" />
+                        </StackPanel>
+
+                        <StackPanel
+                            Grid.Row="1"
+                            Spacing="8">
+                            <TextBox
+                                x:Name="QuickAddTitleTextBox"
+                                Header="Quick add"
+                                KeyDown="QuickAddTitleTextBox_KeyDown"
+                                PlaceholderText="Task title" />
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <ToggleSwitch x:Name="QuickAddUseTimeToggle" Header="Use time" />
+                                <TimePicker Grid.Column="1" x:Name="QuickAddTimePicker" IsEnabled="{Binding IsOn, ElementName=QuickAddUseTimeToggle}" />
+                                <Button Grid.Column="2" Click="QuickAddButton_Click" Content="Add" />
+                            </Grid>
+                        </StackPanel>
+
+                        <ListView
+                            Grid.Row="2"
+                            ItemsSource="{Binding SelectedDayTasks}"
+                            SelectionMode="None">
+                            <ListView.ItemContainerStyle>
+                                <Style TargetType="ListViewItem">
+                                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="Margin" Value="0,0,0,10" />
+                                    <Setter Property="Padding" Value="0" />
+                                </Style>
+                            </ListView.ItemContainerStyle>
+
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Padding="12"
+                                        Background="{ThemeResource AppCardAltBackgroundBrush}"
+                                        BorderBrush="{ThemeResource AppBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="14"
+                                        Opacity="{Binding ContentOpacity}">
+                                        <Grid ColumnSpacing="10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <CheckBox
+                                                VerticalAlignment="Top"
+                                                IsChecked="{Binding IsCompleted, Mode=OneWay}"
+                                                Click="TaskCompletionCheckBox_Click" />
+
+                                            <StackPanel
+                                                Grid.Column="1"
+                                                Spacing="2">
+                                                <TextBlock FontWeight="SemiBold" Text="{Binding Title}" />
+                                                <TextBlock Foreground="{ThemeResource AppTextMutedBrush}" Text="{Binding DetailsText}" />
+                                            </StackPanel>
+
+                                            <Button
+                                                Grid.Column="2"
+                                                Click="TaskOpenButton_Click"
+                                                Content="Open" />
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                </Border>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>

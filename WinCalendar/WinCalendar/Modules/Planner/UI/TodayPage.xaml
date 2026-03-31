@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="WinCalendar.Modules.Planner.UI.TodayPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Background="{ThemeResource AppPageBackgroundBrush}"
+    mc:Ignorable="d">
+
+    <ScrollViewer
+        x:Name="Root"
+        Loaded="Root_Loaded"
+        VerticalScrollBarVisibility="Auto">
+        <Grid Padding="24">
+            <Grid RowSpacing="18">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Spacing="4">
+                        <TextBlock
+                            FontFamily="Segoe UI Variable Display"
+                            FontSize="34"
+                            FontWeight="SemiBold"
+                            Text="Today" />
+                        <TextBlock
+                            Foreground="{ThemeResource AppTextMutedBrush}"
+                            Text="{Binding TodaySummary}" />
+                    </StackPanel>
+
+                    <Button
+                        Grid.Column="1"
+                        Click="OpenCompactButton_Click"
+                        Content="Compact panel" />
+
+                    <Button
+                        Grid.Column="2"
+                        Click="OpenMediumButton_Click"
+                        Content="Medium view" />
+                </Grid>
+
+                <Border
+                    Grid.Row="1"
+                    Background="{ThemeResource AppCardBackgroundBrush}"
+                    BorderBrush="{ThemeResource AppBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="18"
+                    Padding="16">
+                    <StackPanel Spacing="12">
+                        <TextBlock
+                            FontSize="20"
+                            FontWeight="SemiBold"
+                            Text="Quick add for today" />
+                        <TextBox
+                            x:Name="QuickAddTitleTextBox"
+                            KeyDown="QuickAddTitleTextBox_KeyDown"
+                            PlaceholderText="Task title" />
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ToggleSwitch x:Name="QuickAddUseTimeToggle" Header="Use time" />
+                            <TimePicker Grid.Column="1" x:Name="QuickAddTimePicker" IsEnabled="{Binding IsOn, ElementName=QuickAddUseTimeToggle}" />
+                            <Button Grid.Column="2" Click="QuickAddButton_Click" Content="Add" />
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <Grid
+                    Grid.Row="2"
+                    ColumnSpacing="18">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="340" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border
+                        Background="{ThemeResource AppCardBackgroundBrush}"
+                        BorderBrush="{ThemeResource AppBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="18"
+                        Padding="16">
+                        <StackPanel Spacing="12">
+                            <TextBlock
+                                FontSize="20"
+                                FontWeight="SemiBold"
+                                Text="Today tasks" />
+
+                            <ListView
+                                ItemsSource="{Binding TodayTasks}"
+                                SelectionMode="None">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                        <Setter Property="Margin" Value="0,0,0,10" />
+                                        <Setter Property="Padding" Value="0" />
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border
+                                            Padding="12"
+                                            Background="{ThemeResource AppCardAltBackgroundBrush}"
+                                            BorderBrush="{ThemeResource AppBorderBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="14"
+                                            Opacity="{Binding ContentOpacity}">
+                                            <Grid ColumnSpacing="10">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <CheckBox
+                                                    VerticalAlignment="Top"
+                                                    IsChecked="{Binding IsCompleted, Mode=OneWay}"
+                                                    Click="TodayTaskCompletionCheckBox_Click" />
+
+                                                <StackPanel
+                                                    Grid.Column="1"
+                                                    Spacing="2">
+                                                    <TextBlock FontWeight="SemiBold" Text="{Binding Title}" />
+                                                    <TextBlock Foreground="{ThemeResource AppTextMutedBrush}" Text="{Binding TimeText}" />
+                                                </StackPanel>
+
+                                                <Button
+                                                    Grid.Column="2"
+                                                    Click="TodayTaskOpenButton_Click"
+                                                    Content="Open" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
+                        </StackPanel>
+                    </Border>
+
+                    <Border
+                        Grid.Column="1"
+                        Background="{ThemeResource AppCardBackgroundBrush}"
+                        BorderBrush="{ThemeResource AppBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="18"
+                        Padding="16">
+                        <StackPanel Spacing="10">
+                            <TextBlock
+                                FontSize="20"
+                                FontWeight="SemiBold"
+                                Text="This week" />
+                            <TextBlock
+                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Text="{Binding WeekSummary}" />
+                            <ItemsControl ItemsSource="{Binding WeekAgendaDays}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border
+                                            Margin="0,0,0,8"
+                                            Padding="10"
+                                            Background="{ThemeResource AppCardAltBackgroundBrush}"
+                                            CornerRadius="12">
+                                            <StackPanel Spacing="2">
+                                                <TextBlock FontWeight="SemiBold" Text="{Binding HeaderText}" />
+                                                <TextBlock Foreground="{ThemeResource AppTextMutedBrush}" Text="{Binding SummaryText}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+        </Grid>
+    </ScrollViewer>
+</Page>

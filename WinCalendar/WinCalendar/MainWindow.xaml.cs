@@ -1,31 +1,51 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using WinCalendar.Modules.Calendar.UI;
+using WinCalendar.Modules.Planner.Presentation;
+using WinCalendar.Modules.Planner.UI;
+using WinCalendar.Shared.Windowing;
 
 namespace WinCalendar
 {
     /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
+    /// Main application window hosting the full planner shell.
     /// </summary>
-    public sealed partial class MainWindow : Window
+    public sealed partial class MainWindow : Microsoft.UI.Xaml.Window
     {
-        public MainWindow()
+        private readonly PlannerStateStore _plannerStateStore;
+        private readonly PlannerWindowCoordinator _windowCoordinator;
+
+        public MainWindow(PlannerStateStore plannerStateStore, PlannerWindowCoordinator windowCoordinator)
         {
+            _plannerStateStore = plannerStateStore;
+            _windowCoordinator = windowCoordinator;
             InitializeComponent();
+            ShellNavigationView.SelectedItem = TodayNavigationItem;
+            PageHost.Content = new TodayPage(_plannerStateStore, _windowCoordinator);
+        }
+
+        private void ShellNavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+        {
+            if (args.SelectedItemContainer is not NavigationViewItem item || item.Tag is not string tag)
+                return;
+
+            PageHost.Content = tag switch
+            {
+                "calendar" => new CalendarPage(_plannerStateStore, _windowCoordinator),
+                "notes" => new NotesPage(),
+                "settings" => new SettingsPage(),
+                _ => new TodayPage(_plannerStateStore, _windowCoordinator)
+            };
+        }
+
+        private void CompactPanelButton_Click(object sender, RoutedEventArgs e)
+        {
+            _windowCoordinator.ShowCompactPanel();
+        }
+
+        private void MediumViewButton_Click(object sender, RoutedEventArgs e)
+        {
+            _windowCoordinator.ShowMediumView();
         }
     }
 }

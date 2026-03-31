@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Planner.App.Modules.Tasks.Domain.Entities;
+namespace Planner.App.Modules.Tasks.Entities;
 
 public class TaskItem
 {

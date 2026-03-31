@@ -66,6 +66,7 @@ public sealed class PlannerWindowCoordinator
         presenter.IsMaximizable = false;
         presenter.IsMinimizable = false;
         presenter.IsResizable = false;
+        presenter.SetBorderAndTitleBar(false, false);
 
         appWindow.SetPresenter(presenter);
         appWindow.Resize(new SizeInt32(CompactWindowWidth, CompactWindowHeight));

@@ -14,8 +14,6 @@ namespace WinCalendar.Modules.Planner.Presentation;
 public sealed class PlannerStateStore : ObservableObject
 {
     private const int MonthGridCellCount = 42;
-    private const int CompactTodayPreviewLimit = 2;
-    private const int CompactSelectedDayPreviewLimit = 3;
 
     private readonly CreateTaskUseCase _createTaskUseCase;
     private readonly DeleteTaskUseCase _deleteTaskUseCase;
@@ -25,7 +23,7 @@ public sealed class PlannerStateStore : ObservableObject
     private readonly Dictionary<DateOnly, (bool IsExpanded, bool IsHidden)> _agendaState = [];
 
     private bool _isInitialized;
-    private bool _isCompactSidebarOpen;
+    private bool _isCompactSidebarOpen = true;
     private DateOnly _selectedDate;
     private DateOnly _displayMonth;
     private Guid? _selectedTaskId;
@@ -40,8 +38,6 @@ public sealed class PlannerStateStore : ObservableObject
     private bool _editorHasTime;
     private TimeSpan _editorTime = new(9, 0, 0);
     private DateTimeOffset _editorDate = DateTimeOffset.Now;
-    private int _compactTodayOverflowCount;
-    private int _compactSelectedDayOverflowCount;
 
     public PlannerStateStore(
         CreateTaskUseCase createTaskUseCase,
@@ -65,8 +61,6 @@ public sealed class PlannerStateStore : ObservableObject
         SelectedDayTasks = [];
         TodayTasks = [];
         WeekAgendaDays = [];
-        CompactTodayTasksPreview = [];
-        CompactSelectedDayTasksPreview = [];
     }
 
     public ObservableCollection<PlannerMonthDayViewModel> MonthDays { get; }
@@ -76,10 +70,6 @@ public sealed class PlannerStateStore : ObservableObject
     public ObservableCollection<PlannerTaskViewModel> TodayTasks { get; }
 
     public ObservableCollection<PlannerAgendaDayViewModel> WeekAgendaDays { get; }
-
-    public ObservableCollection<PlannerTaskViewModel> CompactTodayTasksPreview { get; }
-
-    public ObservableCollection<PlannerTaskViewModel> CompactSelectedDayTasksPreview { get; }
 
     public DateOnly SelectedDate => _selectedDate;
 
@@ -136,18 +126,6 @@ public sealed class PlannerStateStore : ObservableObject
         IsCompactSidebarOpen ? Visibility.Visible : Visibility.Collapsed;
 
     public string CompactSidebarToggleText => IsCompactSidebarOpen ? "<" : ">";
-
-    public string CompactTodayOverflowText =>
-        _compactTodayOverflowCount > 0 ? $"+{_compactTodayOverflowCount} more today" : string.Empty;
-
-    public Visibility CompactTodayOverflowVisibility =>
-        _compactTodayOverflowCount > 0 ? Visibility.Visible : Visibility.Collapsed;
-
-    public string CompactSelectedDayOverflowText =>
-        _compactSelectedDayOverflowCount > 0 ? $"+{_compactSelectedDayOverflowCount} more in day view" : string.Empty;
-
-    public Visibility CompactSelectedDayOverflowVisibility =>
-        _compactSelectedDayOverflowCount > 0 ? Visibility.Visible : Visibility.Collapsed;
 
     public PlannerTaskViewModel? SelectedTask
     {
@@ -386,20 +364,10 @@ public sealed class PlannerStateStore : ObservableObject
         SelectedDayTasks.Clear();
 
         if (!taskLookup.TryGetValue(_selectedDate, out List<PlannerTaskViewModel>? tasksForDay))
-        {
-            UpdateCompactTaskPreview(SelectedDayTasks, CompactSelectedDayTasksPreview, CompactSelectedDayPreviewLimit, 0, false);
             return;
-        }
 
         foreach (PlannerTaskViewModel task in tasksForDay)
             SelectedDayTasks.Add(task);
-
-        UpdateCompactTaskPreview(
-            SelectedDayTasks,
-            CompactSelectedDayTasksPreview,
-            CompactSelectedDayPreviewLimit,
-            tasksForDay.Count,
-            false);
     }
 
     private void BuildToday(IReadOnlyDictionary<DateOnly, List<PlannerTaskViewModel>> taskLookup, DateOnly today)
@@ -407,20 +375,10 @@ public sealed class PlannerStateStore : ObservableObject
         TodayTasks.Clear();
 
         if (!taskLookup.TryGetValue(today, out List<PlannerTaskViewModel>? tasksForToday))
-        {
-            UpdateCompactTaskPreview(TodayTasks, CompactTodayTasksPreview, CompactTodayPreviewLimit, 0, true);
             return;
-        }
 
         foreach (PlannerTaskViewModel task in tasksForToday)
             TodayTasks.Add(task);
-
-        UpdateCompactTaskPreview(
-            TodayTasks,
-            CompactTodayTasksPreview,
-            CompactTodayPreviewLimit,
-            tasksForToday.Count,
-            true);
     }
 
     private void BuildWeekAgenda(IReadOnlyDictionary<DateOnly, List<PlannerTaskViewModel>> taskLookup, DateOnly weekStart)
@@ -476,39 +434,6 @@ public sealed class PlannerStateStore : ObservableObject
     private void UpdateAgendaState(PlannerAgendaDayViewModel day)
     {
         _agendaState[day.Date] = (day.IsExpanded, day.IsHidden);
-    }
-
-    private void UpdateCompactTaskPreview(
-        ObservableCollection<PlannerTaskViewModel> source,
-        ObservableCollection<PlannerTaskViewModel> preview,
-        int previewLimit,
-        int sourceCount,
-        bool isTodayPreview)
-    {
-        preview.Clear();
-
-        foreach (PlannerTaskViewModel task in source.Take(previewLimit))
-            preview.Add(task);
-
-        int overflowCount = Math.Max(0, sourceCount - preview.Count);
-
-        if (isTodayPreview)
-        {
-            if (_compactTodayOverflowCount == overflowCount)
-                return;
-
-            _compactTodayOverflowCount = overflowCount;
-            OnPropertyChanged(nameof(CompactTodayOverflowText));
-            OnPropertyChanged(nameof(CompactTodayOverflowVisibility));
-            return;
-        }
-
-        if (_compactSelectedDayOverflowCount == overflowCount)
-            return;
-
-        _compactSelectedDayOverflowCount = overflowCount;
-        OnPropertyChanged(nameof(CompactSelectedDayOverflowText));
-        OnPropertyChanged(nameof(CompactSelectedDayOverflowVisibility));
     }
 
     private static DateOnly GetMonthGridStart(DateOnly monthStart)

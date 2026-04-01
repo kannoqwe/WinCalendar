@@ -31,7 +31,6 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="280" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
@@ -142,73 +141,6 @@
                         </GridView.ItemTemplate>
                     </GridView>
 
-                    <Border
-                        Grid.Row="4"
-                        Background="{ThemeResource AppCardAltBackgroundBrush}"
-                        CornerRadius="16"
-                        Padding="12">
-                        <Grid RowSpacing="8">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <StackPanel Spacing="2">
-                                <TextBlock FontWeight="SemiBold" Text="{Binding SelectedDateText}" />
-                                <TextBlock
-                                    Foreground="{ThemeResource AppTextMutedBrush}"
-                                    MaxLines="1"
-                                    Text="{Binding SelectedDateSummary}"
-                                    TextTrimming="CharacterEllipsis" />
-                            </StackPanel>
-
-                            <ItemsControl Grid.Row="1" ItemsSource="{Binding CompactSelectedDayTasksPreview}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border
-                                            Margin="0,0,0,6"
-                                            Padding="8"
-                                            Background="{ThemeResource AppCardBackgroundBrush}"
-                                            BorderBrush="{ThemeResource AppBorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="12"
-                                            Opacity="{Binding ContentOpacity}">
-                                            <Grid ColumnSpacing="8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="*" />
-                                                </Grid.ColumnDefinitions>
-
-                                                <CheckBox
-                                                    VerticalAlignment="Top"
-                                                    IsChecked="{Binding IsCompleted, Mode=OneWay}"
-                                                    Click="CompactTaskCompletionCheckBox_Click" />
-                                                <StackPanel Grid.Column="1" Spacing="1">
-                                                    <TextBlock
-                                                        FontWeight="SemiBold"
-                                                        MaxLines="1"
-                                                        Text="{Binding Title}"
-                                                        TextTrimming="CharacterEllipsis" />
-                                                    <TextBlock
-                                                        Foreground="{ThemeResource AppTextMutedBrush}"
-                                                        MaxLines="1"
-                                                        Text="{Binding CompactTimeText}"
-                                                        TextTrimming="CharacterEllipsis" />
-                                                </StackPanel>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-
-                            <TextBlock
-                                Grid.Row="2"
-                                Visibility="{Binding CompactSelectedDayOverflowVisibility}"
-                                Foreground="{ThemeResource AppTextMutedBrush}"
-                                Text="{Binding CompactSelectedDayOverflowText}" />
-                        </Grid>
-                    </Border>
                 </Grid>
 
                 <Border

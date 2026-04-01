@@ -80,23 +80,6 @@ public sealed partial class CompactPanelPage : Page
         _plannerStateStore.ToggleAgendaDayHidden(day);
     }
 
-    private async void CompactTaskCompletionCheckBox_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not CheckBox { DataContext: PlannerTaskViewModel task } checkBox)
-            return;
-
-        await _plannerStateStore.ToggleTaskCompletionAsync(task.Id, checkBox.IsChecked == true);
-    }
-
-    private void CompactOpenTaskButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not Button { DataContext: PlannerTaskViewModel task })
-            return;
-
-        _plannerStateStore.SelectTask(task);
-        _windowCoordinator.ShowMediumView();
-    }
-
     private void OpenMediumButton_Click(object sender, RoutedEventArgs e)
     {
         _windowCoordinator.ShowMediumView();

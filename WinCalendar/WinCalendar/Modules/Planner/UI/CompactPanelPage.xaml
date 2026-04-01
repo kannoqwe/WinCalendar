@@ -213,7 +213,6 @@
 
                 <Border
                     Width="176"
-                    Margin="0,44,0,0"
                     HorizontalAlignment="Left"
                     VerticalAlignment="Stretch"
                     Visibility="{Binding CompactSidebarVisibility}"
@@ -227,65 +226,37 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <TextBlock
-                            FontSize="12"
-                            FontWeight="SemiBold"
-                            Foreground="{ThemeResource AppTextMutedBrush}"
-                            Text="QUICK GLANCE" />
+                        <Grid ColumnSpacing="8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
-                        <StackPanel Grid.Row="1" Spacing="8">
                             <TextBlock
+                                VerticalAlignment="Center"
                                 FontSize="12"
                                 FontWeight="SemiBold"
                                 Foreground="{ThemeResource AppTextMutedBrush}"
-                                Text="TODAY" />
-                            <TextBlock Text="{Binding TodaySummary}" />
-                            <ItemsControl ItemsSource="{Binding CompactTodayTasksPreview}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border
-                                            Margin="0,0,0,6"
-                                            Padding="8"
-                                            Background="{ThemeResource AppCardBackgroundBrush}"
-                                            BorderBrush="{ThemeResource AppBorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="12"
-                                            Opacity="{Binding ContentOpacity}">
-                                            <StackPanel Spacing="1">
-                                                <TextBlock
-                                                    FontWeight="SemiBold"
-                                                    MaxLines="1"
-                                                    Text="{Binding Title}"
-                                                    TextTrimming="CharacterEllipsis" />
-                                                <TextBlock
-                                                    Foreground="{ThemeResource AppTextMutedBrush}"
-                                                    MaxLines="1"
-                                                    Text="{Binding CompactTimeText}"
-                                                    TextTrimming="CharacterEllipsis" />
-                                            </StackPanel>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                            <TextBlock
-                                Visibility="{Binding CompactTodayOverflowVisibility}"
-                                Foreground="{ThemeResource AppTextMutedBrush}"
-                                Text="{Binding CompactTodayOverflowText}" />
-                        </StackPanel>
+                                Text="QUICK GLANCE" />
+                            <Button
+                                Grid.Column="1"
+                                MinWidth="28"
+                                Click="ToggleSidebarButton_Click"
+                                Content="{Binding CompactSidebarToggleText}" />
+                        </Grid>
 
                         <TextBlock
-                            Grid.Row="2"
+                            Grid.Row="1"
                             FontSize="12"
                             FontWeight="SemiBold"
                             Foreground="{ThemeResource AppTextMutedBrush}"
                             Text="THIS WEEK" />
-                        <TextBlock Grid.Row="3" Foreground="{ThemeResource AppTextMutedBrush}" Text="{Binding WeekSummary}" />
+                        <TextBlock Grid.Row="2" Foreground="{ThemeResource AppTextMutedBrush}" Text="{Binding WeekSummary}" />
 
-                        <ItemsControl Grid.Row="4" ItemsSource="{Binding WeekAgendaDays}">
+                        <ItemsControl Grid.Row="3" ItemsSource="{Binding WeekAgendaDays}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border

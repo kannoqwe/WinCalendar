@@ -188,73 +188,79 @@
                             Text="THIS WEEK" />
                         <TextBlock Grid.Row="2" Foreground="{ThemeResource AppTextMutedBrush}" Text="{Binding WeekSummary}" />
 
-                        <ItemsControl Grid.Row="3" ItemsSource="{Binding WeekAgendaDays}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border
-                                        Margin="0,0,0,6"
-                                        Padding="8"
-                                        Background="{ThemeResource AppCardBackgroundBrush}"
-                                        BorderBrush="{ThemeResource AppBorderBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="12">
-                                        <Grid RowSpacing="4">
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                                <RowDefinition Height="Auto" />
-                                            </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
+                        <ScrollViewer
+                            Grid.Row="3"
+                            HorizontalScrollBarVisibility="Disabled"
+                            VerticalScrollBarVisibility="Auto"
+                            VerticalScrollMode="Enabled">
+                            <ItemsControl ItemsSource="{Binding WeekAgendaDays}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border
+                                            Margin="0,0,0,6"
+                                            Padding="8"
+                                            Background="{ThemeResource AppCardBackgroundBrush}"
+                                            BorderBrush="{ThemeResource AppBorderBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="12">
+                                            <Grid RowSpacing="4">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
 
-                                            <Button
-                                                Style="{StaticResource FlatButtonStyle}"
-                                                Click="AgendaDayHeaderButton_Click"
-                                                Content="{Binding HeaderText}" />
-                                            <Border
-                                                Grid.Column="1"
-                                                Margin="6,0,0,0"
-                                                Padding="6,2"
-                                                Background="{ThemeResource AppAccentMutedBrush}"
-                                                CornerRadius="999"
-                                                VerticalAlignment="Center">
-                                                <TextBlock FontSize="11" Text="{Binding CountBadgeText}" />
-                                            </Border>
-                                            <Button
-                                                Grid.Column="2"
-                                                Margin="6,0,0,0"
-                                                MinWidth="28"
-                                                Click="AgendaDayExpandButton_Click"
-                                                Content="{Binding CompactExpandButtonText}" />
-                                            <Button
-                                                Grid.Column="3"
-                                                Margin="6,0,0,0"
-                                                MinWidth="42"
-                                                Click="AgendaDayHideButton_Click"
-                                                Content="{Binding HideButtonText}" />
+                                                <Button
+                                                    Style="{StaticResource FlatButtonStyle}"
+                                                    Click="AgendaDayHeaderButton_Click"
+                                                    Content="{Binding HeaderText}" />
+                                                <Border
+                                                    Grid.Column="1"
+                                                    Margin="6,0,0,0"
+                                                    Padding="6,2"
+                                                    Background="{ThemeResource AppAccentMutedBrush}"
+                                                    CornerRadius="999"
+                                                    VerticalAlignment="Center">
+                                                    <TextBlock FontSize="11" Text="{Binding CountBadgeText}" />
+                                                </Border>
+                                                <Button
+                                                    Grid.Column="2"
+                                                    Margin="6,0,0,0"
+                                                    MinWidth="28"
+                                                    Click="AgendaDayExpandButton_Click"
+                                                    Content="{Binding CompactExpandButtonText}" />
+                                                <Button
+                                                    Grid.Column="3"
+                                                    Margin="6,0,0,0"
+                                                    MinWidth="42"
+                                                    Click="AgendaDayHideButton_Click"
+                                                    Content="{Binding HideButtonText}" />
 
-                                            <TextBlock
-                                                Grid.Row="1"
-                                                Grid.ColumnSpan="4"
-                                                Foreground="{ThemeResource AppTextMutedBrush}"
-                                                MaxLines="1"
-                                                Text="{Binding CompactPreviewText}"
-                                                TextTrimming="CharacterEllipsis" />
-                                            <TextBlock
-                                                Grid.Row="2"
-                                                Grid.ColumnSpan="4"
-                                                Visibility="{Binding CompactOverflowVisibility}"
-                                                Foreground="{ThemeResource AppTextMutedBrush}"
-                                                Text="{Binding CompactOverflowText}" />
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                                                <TextBlock
+                                                    Grid.Row="1"
+                                                    Grid.ColumnSpan="4"
+                                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                                    MaxLines="1"
+                                                    Text="{Binding CompactPreviewText}"
+                                                    TextTrimming="CharacterEllipsis" />
+                                                <TextBlock
+                                                    Grid.Row="2"
+                                                    Grid.ColumnSpan="4"
+                                                    Visibility="{Binding CompactOverflowVisibility}"
+                                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                                    Text="{Binding CompactOverflowText}" />
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
                     </Grid>
                 </Border>
             </Grid>

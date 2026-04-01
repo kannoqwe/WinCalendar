@@ -10,7 +10,7 @@ namespace WinCalendar.Shared.Windowing;
 public sealed class PlannerWindowCoordinator
 {
     private const int CompactWindowWidth = 420;
-    private const int CompactWindowHeight = 610;
+    private const int CompactWindowHeight = 500;
     private const int MediumWindowWidth = 980;
     private const int MediumWindowHeight = 760;
 

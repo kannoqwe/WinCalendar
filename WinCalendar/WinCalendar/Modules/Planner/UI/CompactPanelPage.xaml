@@ -25,244 +25,120 @@
             BorderThickness="1"
             CornerRadius="22"
             Padding="12">
-            <Grid>
-                <Grid RowSpacing="10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
-                    </Grid.RowDefinitions>
+            <Grid RowSpacing="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
 
-                    <Grid ColumnSpacing="8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-                        <Button MinWidth="34" Click="ToggleSidebarButton_Click" Content="{Binding CompactSidebarToggleText}" />
-                        <TextBlock
-                            Grid.Column="1"
-                            VerticalAlignment="Center"
-                            FontFamily="Segoe UI Variable Display"
-                            FontSize="20"
-                            FontWeight="SemiBold"
-                            Text="{Binding MonthLabel}" />
-                        <Button Grid.Column="2" MinWidth="58" Click="OpenMediumButton_Click" Content="Day" />
-                        <Button Grid.Column="3" MinWidth="54" Click="OpenFullButton_Click" Content="App" />
-                    </Grid>
-
-                    <Grid Grid.Row="1" ColumnSpacing="8">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-
-                        <Button Click="PreviousMonthButton_Click" Content="&#xE100;" FontFamily="Segoe Fluent Icons" />
-                        <Button Grid.Column="1" Click="NextMonthButton_Click" Content="&#xE101;" FontFamily="Segoe Fluent Icons" />
-                        <TextBlock
-                            Grid.Column="2"
-                            VerticalAlignment="Center"
-                            Foreground="{ThemeResource AppTextMutedBrush}"
-                            Text="{Binding SelectedDateText}" />
-                        <Button Grid.Column="3" Click="TodayButton_Click" Content="Today" />
-                    </Grid>
-
-                    <Grid Grid.Row="2">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock HorizontalAlignment="Center" Text="Mo" />
-                        <TextBlock Grid.Column="1" HorizontalAlignment="Center" Text="Tu" />
-                        <TextBlock Grid.Column="2" HorizontalAlignment="Center" Text="We" />
-                        <TextBlock Grid.Column="3" HorizontalAlignment="Center" Text="Th" />
-                        <TextBlock Grid.Column="4" HorizontalAlignment="Center" Text="Fr" />
-                        <TextBlock Grid.Column="5" HorizontalAlignment="Center" Text="Sa" />
-                        <TextBlock Grid.Column="6" HorizontalAlignment="Center" Text="Su" />
-                    </Grid>
-
-                    <GridView
-                        Grid.Row="3"
-                        ItemsSource="{Binding MonthDays}"
-                        SelectionMode="None"
-                        ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                        ScrollViewer.VerticalScrollBarVisibility="Disabled">
-                        <GridView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <ItemsWrapGrid MaximumRowsOrColumns="7" Orientation="Horizontal" />
-                            </ItemsPanelTemplate>
-                        </GridView.ItemsPanel>
-
-                        <GridView.ItemContainerStyle>
-                            <Style TargetType="GridViewItem">
-                                <Setter Property="Padding" Value="0" />
-                                <Setter Property="Margin" Value="2" />
-                                <Setter Property="Width" Value="48" />
-                                <Setter Property="Height" Value="42" />
-                            </Style>
-                        </GridView.ItemContainerStyle>
-
-                        <GridView.ItemTemplate>
-                            <DataTemplate>
-                                <Button Style="{StaticResource FlatButtonStyle}" Click="MonthDayButton_Click">
-                                    <Grid Opacity="{Binding DayOpacity}">
-                                        <Border
-                                            Visibility="{Binding SelectionVisibility}"
-                                            Background="{ThemeResource AppAccentMutedBrush}"
-                                            CornerRadius="12" />
-                                        <Border
-                                            Visibility="{Binding TodayVisibility}"
-                                            BorderBrush="{ThemeResource AppAccentBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="12" />
-                                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="3">
-                                            <TextBlock HorizontalAlignment="Center" FontWeight="SemiBold" Text="{Binding DayButtonText}" />
-                                            <Border
-                                                Visibility="{Binding TaskIndicatorVisibility}"
-                                                Width="6"
-                                                Height="6"
-                                                Background="{Binding IndicatorBrush}"
-                                                CornerRadius="999" />
-                                        </StackPanel>
-                                    </Grid>
-                                </Button>
-                            </DataTemplate>
-                        </GridView.ItemTemplate>
-                    </GridView>
-
+                    <Button MinWidth="34" Click="ToggleSidebarButton_Click" Content="{Binding CompactSidebarToggleText}" />
+                    <TextBlock
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        FontFamily="Segoe UI Variable Display"
+                        FontSize="20"
+                        FontWeight="SemiBold"
+                        Text="{Binding MonthLabel}" />
+                    <Button Grid.Column="2" MinWidth="58" Click="OpenMediumButton_Click" Content="Day" />
+                    <Button Grid.Column="3" MinWidth="54" Click="OpenFullButton_Click" Content="App" />
                 </Grid>
 
-                <Border
-                    Width="176"
-                    HorizontalAlignment="Left"
-                    VerticalAlignment="Stretch"
-                    Visibility="{Binding CompactSidebarVisibility}"
-                    Background="{ThemeResource AppSidebarBackgroundBrush}"
-                    BorderBrush="{ThemeResource AppBorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="18"
-                    Padding="10">
-                    <Grid RowSpacing="10">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+                <Grid Grid.Row="1" ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
 
-                        <Grid ColumnSpacing="8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+                    <Button Click="PreviousMonthButton_Click" Content="&#xE100;" FontFamily="Segoe Fluent Icons" />
+                    <Button Grid.Column="1" Click="NextMonthButton_Click" Content="&#xE101;" FontFamily="Segoe Fluent Icons" />
+                    <TextBlock
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        Foreground="{ThemeResource AppTextMutedBrush}"
+                        Text="{Binding SelectedDateText}" />
+                    <Button Grid.Column="3" Click="TodayButton_Click" Content="Today" />
+                </Grid>
 
-                            <TextBlock
-                                VerticalAlignment="Center"
-                                FontSize="12"
-                                FontWeight="SemiBold"
-                                Foreground="{ThemeResource AppTextMutedBrush}"
-                                Text="QUICK GLANCE" />
-                            <Button
-                                Grid.Column="1"
-                                MinWidth="28"
-                                Click="ToggleSidebarButton_Click"
-                                Content="{Binding CompactSidebarToggleText}" />
-                        </Grid>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                        <TextBlock
-                            Grid.Row="1"
-                            FontSize="12"
-                            FontWeight="SemiBold"
-                            Foreground="{ThemeResource AppTextMutedBrush}"
-                            Text="THIS WEEK" />
-                        <TextBlock Grid.Row="2" Foreground="{ThemeResource AppTextMutedBrush}" Text="{Binding WeekSummary}" />
+                    <TextBlock HorizontalAlignment="Center" Text="Mo" />
+                    <TextBlock Grid.Column="1" HorizontalAlignment="Center" Text="Tu" />
+                    <TextBlock Grid.Column="2" HorizontalAlignment="Center" Text="We" />
+                    <TextBlock Grid.Column="3" HorizontalAlignment="Center" Text="Th" />
+                    <TextBlock Grid.Column="4" HorizontalAlignment="Center" Text="Fr" />
+                    <TextBlock Grid.Column="5" HorizontalAlignment="Center" Text="Sa" />
+                    <TextBlock Grid.Column="6" HorizontalAlignment="Center" Text="Su" />
+                </Grid>
 
-                        <ScrollViewer
-                            Grid.Row="3"
-                            HorizontalScrollBarVisibility="Disabled"
-                            VerticalScrollBarVisibility="Auto"
-                            VerticalScrollMode="Enabled">
-                            <ItemsControl ItemsSource="{Binding WeekAgendaDays}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
+                <GridView
+                    Grid.Row="3"
+                    ItemsSource="{Binding MonthDays}"
+                    SelectionMode="None"
+                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                    ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid MaximumRowsOrColumns="7" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+
+                    <GridView.ItemContainerStyle>
+                        <Style TargetType="GridViewItem">
+                            <Setter Property="Padding" Value="0" />
+                            <Setter Property="Margin" Value="2" />
+                            <Setter Property="Width" Value="48" />
+                            <Setter Property="Height" Value="42" />
+                        </Style>
+                    </GridView.ItemContainerStyle>
+
+                    <GridView.ItemTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource FlatButtonStyle}" Click="MonthDayButton_Click">
+                                <Grid Opacity="{Binding DayOpacity}">
+                                    <Border
+                                        Visibility="{Binding SelectionVisibility}"
+                                        Background="{ThemeResource AppAccentMutedBrush}"
+                                        CornerRadius="12" />
+                                    <Border
+                                        Visibility="{Binding TodayVisibility}"
+                                        BorderBrush="{ThemeResource AppAccentBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="12" />
+                                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="3">
+                                        <TextBlock HorizontalAlignment="Center" FontWeight="SemiBold" Text="{Binding DayButtonText}" />
                                         <Border
-                                            Margin="0,0,0,6"
-                                            Padding="8"
-                                            Background="{ThemeResource AppCardBackgroundBrush}"
-                                            BorderBrush="{ThemeResource AppBorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="12">
-                                            <Grid RowSpacing="4">
-                                                <Grid.RowDefinitions>
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                    <RowDefinition Height="Auto" />
-                                                </Grid.RowDefinitions>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-
-                                                <Button
-                                                    Style="{StaticResource FlatButtonStyle}"
-                                                    Click="AgendaDayHeaderButton_Click"
-                                                    Content="{Binding HeaderText}" />
-                                                <Border
-                                                    Grid.Column="1"
-                                                    Margin="6,0,0,0"
-                                                    Padding="6,2"
-                                                    Background="{ThemeResource AppAccentMutedBrush}"
-                                                    CornerRadius="999"
-                                                    VerticalAlignment="Center">
-                                                    <TextBlock FontSize="11" Text="{Binding CountBadgeText}" />
-                                                </Border>
-                                                <Button
-                                                    Grid.Column="2"
-                                                    Margin="6,0,0,0"
-                                                    MinWidth="28"
-                                                    Click="AgendaDayExpandButton_Click"
-                                                    Content="{Binding CompactExpandButtonText}" />
-                                                <Button
-                                                    Grid.Column="3"
-                                                    Margin="6,0,0,0"
-                                                    MinWidth="42"
-                                                    Click="AgendaDayHideButton_Click"
-                                                    Content="{Binding HideButtonText}" />
-
-                                                <TextBlock
-                                                    Grid.Row="1"
-                                                    Grid.ColumnSpan="4"
-                                                    Foreground="{ThemeResource AppTextMutedBrush}"
-                                                    MaxLines="1"
-                                                    Text="{Binding CompactPreviewText}"
-                                                    TextTrimming="CharacterEllipsis" />
-                                                <TextBlock
-                                                    Grid.Row="2"
-                                                    Grid.ColumnSpan="4"
-                                                    Visibility="{Binding CompactOverflowVisibility}"
-                                                    Foreground="{ThemeResource AppTextMutedBrush}"
-                                                    Text="{Binding CompactOverflowText}" />
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </Grid>
-                </Border>
+                                            Visibility="{Binding TaskIndicatorVisibility}"
+                                            Width="6"
+                                            Height="6"
+                                            Background="{Binding IndicatorBrush}"
+                                            CornerRadius="999" />
+                                    </StackPanel>
+                                </Grid>
+                            </Button>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
             </Grid>
         </Border>
     </Grid>

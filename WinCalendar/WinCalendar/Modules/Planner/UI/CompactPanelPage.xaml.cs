@@ -30,7 +30,7 @@ public sealed partial class CompactPanelPage : Page
 
     private void ToggleSidebarButton_Click(object sender, RoutedEventArgs e)
     {
-        _plannerStateStore.ToggleCompactSidebar();
+        _windowCoordinator.ToggleCompactSidebar();
     }
 
     private async void PreviousMonthButton_Click(object sender, RoutedEventArgs e)
@@ -54,30 +54,6 @@ public sealed partial class CompactPanelPage : Page
             return;
 
         await _plannerStateStore.SelectDateAsync(day.Date);
-    }
-
-    private async void AgendaDayHeaderButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not Button { DataContext: PlannerAgendaDayViewModel day })
-            return;
-
-        await _plannerStateStore.SelectDateAsync(day.Date);
-    }
-
-    private void AgendaDayExpandButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not Button { DataContext: PlannerAgendaDayViewModel day })
-            return;
-
-        _plannerStateStore.ToggleAgendaDayExpanded(day);
-    }
-
-    private void AgendaDayHideButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not Button { DataContext: PlannerAgendaDayViewModel day })
-            return;
-
-        _plannerStateStore.ToggleAgendaDayHidden(day);
     }
 
     private void OpenMediumButton_Click(object sender, RoutedEventArgs e)

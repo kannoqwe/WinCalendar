@@ -125,7 +125,7 @@ public sealed class PlannerStateStore : ObservableObject
     public Visibility CompactSidebarVisibility =>
         IsCompactSidebarOpen ? Visibility.Visible : Visibility.Collapsed;
 
-    public string CompactSidebarToggleText => IsCompactSidebarOpen ? "<" : ">";
+    public string CompactSidebarToggleText => IsCompactSidebarOpen ? ">" : "<";
 
     public PlannerTaskViewModel? SelectedTask
     {
@@ -217,6 +217,11 @@ public sealed class PlannerStateStore : ObservableObject
     public void ToggleCompactSidebar()
     {
         IsCompactSidebarOpen = !IsCompactSidebarOpen;
+    }
+
+    public void SetCompactSidebarOpen(bool isOpen)
+    {
+        IsCompactSidebarOpen = isOpen;
     }
 
     public void ToggleAgendaDayExpanded(PlannerAgendaDayViewModel day)

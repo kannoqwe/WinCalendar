@@ -8,13 +8,11 @@ namespace WinCalendar.Modules.Planner.UI;
 public sealed partial class CompactSidebarPage : Page
 {
     private readonly PlannerStateStore _plannerStateStore;
-    private readonly PlannerWindowCoordinator _windowCoordinator;
     private bool _initialized;
 
     public CompactSidebarPage(PlannerStateStore plannerStateStore, PlannerWindowCoordinator windowCoordinator)
     {
         _plannerStateStore = plannerStateStore;
-        _windowCoordinator = windowCoordinator;
         InitializeComponent();
         DataContext = _plannerStateStore;
     }
@@ -28,32 +26,20 @@ public sealed partial class CompactSidebarPage : Page
         await _plannerStateStore.EnsureInitializedAsync();
     }
 
-    private void ToggleSidebarButton_Click(object sender, RoutedEventArgs e)
-    {
-        _windowCoordinator.ToggleCompactSidebar();
-    }
-
     private async void AgendaDayHeaderButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Button { DataContext: PlannerAgendaDayViewModel day })
             return;
 
+        _plannerStateStore.ToggleAgendaDayExpanded(day);
         await _plannerStateStore.SelectDateAsync(day.Date);
     }
 
-    private void AgendaDayExpandButton_Click(object sender, RoutedEventArgs e)
+    private async void AgendaTaskCompletionCheckBox_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not Button { DataContext: PlannerAgendaDayViewModel day })
+        if (sender is not CheckBox { DataContext: PlannerTaskViewModel task } checkBox)
             return;
 
-        _plannerStateStore.ToggleAgendaDayExpanded(day);
-    }
-
-    private void AgendaDayHideButton_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is not Button { DataContext: PlannerAgendaDayViewModel day })
-            return;
-
-        _plannerStateStore.ToggleAgendaDayHidden(day);
+        await _plannerStateStore.ToggleTaskCompletionAsync(task.Id, checkBox.IsChecked == true);
     }
 }

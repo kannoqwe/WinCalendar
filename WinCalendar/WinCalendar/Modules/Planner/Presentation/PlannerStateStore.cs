@@ -20,7 +20,7 @@ public sealed class PlannerStateStore : ObservableObject
     private readonly GetTasksForRangeUseCase _getTasksForRangeUseCase;
     private readonly SetTaskCompletionStatusUseCase _setTaskCompletionStatusUseCase;
     private readonly UpdateTaskUseCase _updateTaskUseCase;
-    private readonly Dictionary<DateOnly, (bool IsExpanded, bool IsHidden)> _agendaState = [];
+    private readonly Dictionary<DateOnly, bool> _agendaState = [];
 
     private bool _isInitialized;
     private bool _isCompactSidebarOpen;
@@ -108,6 +108,12 @@ public sealed class PlannerStateStore : ObservableObject
         get => _weekSummary;
         private set => SetProperty(ref _weekSummary, value);
     }
+
+    public Visibility WeekAgendaVisibility =>
+        WeekAgendaDays.Any(day => day.Tasks.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility EmptyWeekAgendaVisibility =>
+        WeekAgendaDays.Any(day => day.Tasks.Count > 0) ? Visibility.Collapsed : Visibility.Visible;
 
     public bool IsCompactSidebarOpen
     {
@@ -252,16 +258,6 @@ public sealed class PlannerStateStore : ObservableObject
         }
     }
 
-    public void ToggleAgendaDayHidden(PlannerAgendaDayViewModel day)
-    {
-        day.IsHidden = !day.IsHidden;
-
-        if (day.IsHidden)
-            day.IsExpanded = false;
-
-        UpdateAgendaState(day);
-    }
-
     public async Task AddTaskAsync(string title, DateOnly? date = null, TimeOnly? time = null)
     {
         if (string.IsNullOrWhiteSpace(title))
@@ -331,10 +327,9 @@ public sealed class PlannerStateStore : ObservableObject
         DateOnly monthGridEnd = monthGridStart.AddDays(MonthGridCellCount - 1);
         DateOnly selectedWeekStart = GetWeekStart(_selectedDate);
         DateOnly selectedWeekEnd = selectedWeekStart.AddDays(6);
-        DateOnly todayWeekStart = GetWeekStart(today);
-        DateOnly todayWeekEnd = todayWeekStart.AddDays(6);
+        DateOnly todayWeekEnd = GetWeekEnd(today);
 
-        DateOnly rangeStart = Min(monthGridStart, selectedWeekStart, todayWeekStart, today);
+        DateOnly rangeStart = Min(monthGridStart, selectedWeekStart, today);
         DateOnly rangeEnd = Max(monthGridEnd, selectedWeekEnd, todayWeekEnd, today);
 
         IReadOnlyList<TaskItem> tasks = await _getTasksForRangeUseCase.ExecuteAsync(rangeStart, rangeEnd);
@@ -349,7 +344,7 @@ public sealed class PlannerStateStore : ObservableObject
         BuildMonth(taskLookup);
         BuildSelectedDay(taskLookup);
         BuildToday(taskLookup, today);
-        BuildWeekAgenda(taskLookup, selectedWeekStart);
+        BuildWeekAgenda(taskLookup, today, todayWeekEnd);
         UpdateSummaries(selectedWeekStart, selectedWeekEnd);
         ReselectTask();
     }
@@ -398,14 +393,16 @@ public sealed class PlannerStateStore : ObservableObject
             TodayTasks.Add(task);
     }
 
-    private void BuildWeekAgenda(IReadOnlyDictionary<DateOnly, List<PlannerTaskViewModel>> taskLookup, DateOnly weekStart)
+    private void BuildWeekAgenda(
+        IReadOnlyDictionary<DateOnly, List<PlannerTaskViewModel>> taskLookup,
+        DateOnly startDate,
+        DateOnly endDate)
     {
         WeekAgendaDays.Clear();
 
-        for (int offset = 0; offset < 7; offset++)
+        for (DateOnly date = startDate; date <= endDate; date = date.AddDays(1))
         {
-            DateOnly date = weekStart.AddDays(offset);
-            _agendaState.TryGetValue(date, out (bool IsExpanded, bool IsHidden) state);
+            _agendaState.TryGetValue(date, out bool isExpanded);
             List<PlannerTaskViewModel> tasksForDay = taskLookup.TryGetValue(date, out List<PlannerTaskViewModel>? tasks)
                 ? tasks
                 : [];
@@ -413,10 +410,11 @@ public sealed class PlannerStateStore : ObservableObject
             WeekAgendaDays.Add(new PlannerAgendaDayViewModel(
                 date,
                 tasksForDay,
-                state.IsExpanded || !_agendaState.ContainsKey(date),
-                state.IsHidden,
-                date == _selectedDate));
+                isExpanded));
         }
+
+        OnPropertyChanged(nameof(WeekAgendaVisibility));
+        OnPropertyChanged(nameof(EmptyWeekAgendaVisibility));
     }
 
     private void UpdateSummaries(DateOnly weekStart, DateOnly weekEnd)
@@ -450,7 +448,7 @@ public sealed class PlannerStateStore : ObservableObject
 
     private void UpdateAgendaState(PlannerAgendaDayViewModel day)
     {
-        _agendaState[day.Date] = (day.IsExpanded, day.IsHidden);
+        _agendaState[day.Date] = day.IsExpanded;
     }
 
     private static DateOnly GetMonthGridStart(DateOnly monthStart)
@@ -463,6 +461,11 @@ public sealed class PlannerStateStore : ObservableObject
     {
         int mondayIndex = ((int)date.DayOfWeek + 6) % 7;
         return date.AddDays(-mondayIndex);
+    }
+
+    private static DateOnly GetWeekEnd(DateOnly date)
+    {
+        return GetWeekStart(date).AddDays(6);
     }
 
     private static DateOnly ClampToMonth(DateOnly monthStart, int preferredDay)

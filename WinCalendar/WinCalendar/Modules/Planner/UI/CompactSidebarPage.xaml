@@ -32,107 +32,111 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Grid ColumnSpacing="8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        FontFamily="Segoe UI Variable Display"
-                        FontSize="18"
-                        FontWeight="SemiBold"
-                        Text="Tasks" />
-                    <Button
-                        Grid.Column="1"
-                        MinWidth="54"
-                        Click="ToggleSidebarButton_Click"
-                        Content="Close" />
-                </Grid>
+                <TextBlock
+                    VerticalAlignment="Center"
+                    FontFamily="Segoe UI Variable Display"
+                    FontSize="18"
+                    FontWeight="SemiBold"
+                    Text="Tasks" />
 
                 <StackPanel Grid.Row="1" Spacing="2">
                     <TextBlock
                         FontSize="12"
                         FontWeight="SemiBold"
                         Foreground="{ThemeResource AppTextMutedBrush}"
-                        Text="THIS WEEK" />
+                        Text="FROM TODAY" />
                     <TextBlock Foreground="{ThemeResource AppTextMutedBrush}" Text="{Binding WeekSummary}" />
                 </StackPanel>
 
-                <ScrollViewer
-                    Grid.Row="2"
-                    HorizontalScrollBarVisibility="Disabled"
-                    VerticalScrollBarVisibility="Auto"
-                    VerticalScrollMode="Enabled">
-                    <ItemsControl ItemsSource="{Binding WeekAgendaDays}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border
-                                    Margin="0,0,0,6"
-                                    Padding="8"
-                                    Background="{ThemeResource AppCardBackgroundBrush}"
-                                    BorderBrush="{ThemeResource AppBorderBrush}"
-                                    BorderThickness="1"
-                                    CornerRadius="12">
-                                    <Grid RowSpacing="4">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*" />
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
-                                            <ColumnDefinition Width="Auto" />
-                                        </Grid.ColumnDefinitions>
+                <Grid Grid.Row="2">
+                    <TextBlock
+                        Visibility="{Binding EmptyWeekAgendaVisibility}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Foreground="{ThemeResource AppTextMutedBrush}"
+                        Text="No tasks scheduled for the rest of this week."
+                        TextAlignment="Center"
+                        TextWrapping="WrapWholeWords" />
 
+                    <ScrollViewer
+                        Visibility="{Binding WeekAgendaVisibility}"
+                        HorizontalScrollBarVisibility="Disabled"
+                        VerticalScrollBarVisibility="Auto"
+                        VerticalScrollMode="Enabled">
+                        <ItemsControl ItemsSource="{Binding WeekAgendaDays}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Margin="0,0,0,12" Spacing="8">
                                         <Button
                                             Style="{StaticResource FlatButtonStyle}"
-                                            Click="AgendaDayHeaderButton_Click"
-                                            Content="{Binding HeaderText}" />
-                                        <Border
-                                            Grid.Column="1"
-                                            Margin="6,0,0,0"
-                                            Padding="6,2"
-                                            Background="{ThemeResource AppAccentMutedBrush}"
-                                            CornerRadius="999"
-                                            VerticalAlignment="Center">
-                                            <TextBlock FontSize="11" Text="{Binding CountBadgeText}" />
-                                        </Border>
-                                        <Button
-                                            Grid.Column="2"
-                                            Margin="6,0,0,0"
-                                            MinWidth="28"
-                                            Click="AgendaDayExpandButton_Click"
-                                            Content="{Binding CompactExpandButtonText}" />
-                                        <Button
-                                            Grid.Column="3"
-                                            Margin="6,0,0,0"
-                                            MinWidth="42"
-                                            Click="AgendaDayHideButton_Click"
-                                            Content="{Binding HideButtonText}" />
+                                            Click="AgendaDayHeaderButton_Click">
+                                            <StackPanel Spacing="2">
+                                                <TextBlock
+                                                    FontFamily="Consolas"
+                                                    FontSize="14"
+                                                    FontWeight="SemiBold"
+                                                    Text="{Binding CompactHeaderText}" />
+                                                <TextBlock
+                                                    Margin="18,0,0,0"
+                                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                                    Text="{Binding CompactHeaderDetails}" />
+                                            </StackPanel>
+                                        </Button>
 
-                                        <TextBlock
-                                            Grid.Row="1"
-                                            Grid.ColumnSpan="4"
-                                            Foreground="{ThemeResource AppTextMutedBrush}"
-                                            MaxLines="1"
-                                            Text="{Binding CompactPreviewText}"
-                                            TextTrimming="CharacterEllipsis" />
-                                        <TextBlock
-                                            Grid.Row="2"
-                                            Grid.ColumnSpan="4"
-                                            Visibility="{Binding CompactOverflowVisibility}"
-                                            Foreground="{ThemeResource AppTextMutedBrush}"
-                                            Text="{Binding CompactOverflowText}" />
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </ScrollViewer>
+                                        <Border
+                                            Visibility="{Binding ContentVisibility}"
+                                            Margin="18,0,0,0"
+                                            Padding="10,0,0,0"
+                                            BorderBrush="{ThemeResource AppLineBrush}"
+                                            BorderThickness="1,0,0,0">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock
+                                                    Visibility="{Binding EmptyTasksVisibility}"
+                                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                                    Text="{Binding EmptyTasksText}"
+                                                    TextWrapping="WrapWholeWords" />
+                                                <ItemsControl
+                                                    Visibility="{Binding TasksVisibility}"
+                                                    ItemsSource="{Binding Tasks}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Grid
+                                                                Margin="0,0,0,8"
+                                                                ColumnSpacing="10"
+                                                                Opacity="{Binding ContentOpacity}">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                    <ColumnDefinition Width="*" />
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <CheckBox
+                                                                    VerticalAlignment="Top"
+                                                                    IsChecked="{Binding IsCompleted, Mode=OneWay}"
+                                                                    Click="AgendaTaskCompletionCheckBox_Click" />
+
+                                                                <StackPanel
+                                                                    Grid.Column="1"
+                                                                    Spacing="2">
+                                                                    <TextBlock
+                                                                        FontWeight="SemiBold"
+                                                                        Text="{Binding Title}"
+                                                                        TextWrapping="WrapWholeWords" />
+                                                                    <TextBlock
+                                                                        Foreground="{ThemeResource AppTextMutedBrush}"
+                                                                        Text="{Binding CompactTimeText}" />
+                                                                </StackPanel>
+                                                            </Grid>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
             </Grid>
         </Border>
     </Grid>

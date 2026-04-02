@@ -10,20 +10,14 @@ namespace WinCalendar.Modules.Planner.Presentation;
 public sealed class PlannerAgendaDayViewModel : ObservableObject
 {
     private bool _isExpanded;
-    private bool _isHidden;
-    private bool _isSelected;
 
     public PlannerAgendaDayViewModel(
         DateOnly date,
         IEnumerable<PlannerTaskViewModel> tasks,
-        bool isExpanded,
-        bool isHidden,
-        bool isSelected)
+        bool isExpanded)
     {
         Date = date;
         _isExpanded = isExpanded;
-        _isHidden = isHidden;
-        _isSelected = isSelected;
         Tasks = [];
 
         foreach (PlannerTaskViewModel task in tasks)
@@ -36,49 +30,21 @@ public sealed class PlannerAgendaDayViewModel : ObservableObject
 
     public string HeaderText => PlannerDateTimeFormatter.FormatShortDay(Date);
 
+    public string CompactHeaderText => $"{CompactHeaderPrefix} {PlannerDateTimeFormatter.FormatAgendaHeader(Date)}";
+
+    public string CompactHeaderDetails => $"{HeaderText} - {SummaryText}";
+
     public string SummaryText => Tasks.Count == 0 ? "No tasks" : $"{Tasks.Count} task{(Tasks.Count == 1 ? string.Empty : "s")}";
 
-    public Visibility ContentVisibility => !_isHidden && _isExpanded ? Visibility.Visible : Visibility.Collapsed;
+    public string EmptyTasksText => "No tasks scheduled.";
 
-    public Visibility HiddenVisibility => _isHidden ? Visibility.Visible : Visibility.Collapsed;
+    public string CompactHeaderPrefix => _isExpanded ? "|>" : "->";
 
-    public Visibility ExpandedToggleVisibility => _isHidden ? Visibility.Collapsed : Visibility.Visible;
+    public Visibility ContentVisibility => _isExpanded ? Visibility.Visible : Visibility.Collapsed;
 
-    public Visibility SelectionVisibility => _isSelected ? Visibility.Visible : Visibility.Collapsed;
+    public Visibility TasksVisibility => Tasks.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
 
-    public string ExpandButtonText => _isExpanded ? "Collapse" : "Expand";
-
-    public string HideButtonText => _isHidden ? "Show" : "Hide";
-
-    public string CompactExpandButtonText => _isExpanded ? "-" : "+";
-
-    public string CountBadgeText => _isHidden ? "H" : Tasks.Count.ToString();
-
-    public string CompactPreviewText
-    {
-        get
-        {
-            if (_isHidden)
-                return "Day hidden";
-
-            if (Tasks.Count == 0)
-                return "No tasks";
-
-            if (!_isExpanded)
-                return SummaryText;
-
-            PlannerTaskViewModel firstTask = Tasks[0];
-            return firstTask.HasTime
-                ? $"{firstTask.TimeText} {firstTask.Title}"
-                : firstTask.Title;
-        }
-    }
-
-    public string CompactOverflowText =>
-        !_isHidden && _isExpanded && Tasks.Count > 1 ? $"+{Tasks.Count - 1} more" : string.Empty;
-
-    public Visibility CompactOverflowVisibility =>
-        string.IsNullOrEmpty(CompactOverflowText) ? Visibility.Collapsed : Visibility.Visible;
+    public Visibility EmptyTasksVisibility => Tasks.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
     public bool IsExpanded
     {
@@ -89,42 +55,8 @@ public sealed class PlannerAgendaDayViewModel : ObservableObject
                 return;
 
             OnPropertyChanged(nameof(ContentVisibility));
-            OnPropertyChanged(nameof(ExpandButtonText));
-            OnPropertyChanged(nameof(CompactExpandButtonText));
-            OnPropertyChanged(nameof(CompactPreviewText));
-            OnPropertyChanged(nameof(CompactOverflowText));
-            OnPropertyChanged(nameof(CompactOverflowVisibility));
-        }
-    }
-
-    public bool IsHidden
-    {
-        get => _isHidden;
-        set
-        {
-            if (!SetProperty(ref _isHidden, value))
-                return;
-
-            OnPropertyChanged(nameof(ContentVisibility));
-            OnPropertyChanged(nameof(HiddenVisibility));
-            OnPropertyChanged(nameof(ExpandedToggleVisibility));
-            OnPropertyChanged(nameof(HideButtonText));
-            OnPropertyChanged(nameof(CountBadgeText));
-            OnPropertyChanged(nameof(CompactPreviewText));
-            OnPropertyChanged(nameof(CompactOverflowText));
-            OnPropertyChanged(nameof(CompactOverflowVisibility));
-        }
-    }
-
-    public bool IsSelected
-    {
-        get => _isSelected;
-        set
-        {
-            if (!SetProperty(ref _isSelected, value))
-                return;
-
-            OnPropertyChanged(nameof(SelectionVisibility));
+            OnPropertyChanged(nameof(CompactHeaderText));
+            OnPropertyChanged(nameof(CompactHeaderPrefix));
         }
     }
 }

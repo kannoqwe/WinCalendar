@@ -14,6 +14,19 @@ internal static class PlannerDateTimeFormatter
         return date.ToString("ddd dd.MM");
     }
 
+    public static string FormatAgendaHeader(DateOnly date)
+    {
+        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+
+        if (date == today)
+            return "Today";
+
+        if (date == today.AddDays(1))
+            return "Tomorrow";
+
+        return date.ToString("dddd");
+    }
+
     public static string FormatMonthTitle(DateOnly date)
     {
         return date.ToString("MMMM yyyy");

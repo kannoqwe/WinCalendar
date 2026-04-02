@@ -1,5 +1,9 @@
+using System;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
+using WinCalendar.Core.Time;
 using WinCalendar.Modules.Planner.Presentation;
 using WinCalendar.Shared.Windowing;
 
@@ -56,6 +60,15 @@ public sealed partial class CompactPanelPage : Page
         await _plannerStateStore.SelectDateAsync(day.Date);
     }
 
+    private async void MonthDayButton_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
+    {
+        if (sender is not Button { DataContext: PlannerMonthDayViewModel day })
+            return;
+
+        e.Handled = true;
+        await ShowAddTaskDialogAsync(day.Date);
+    }
+
     private void OpenMediumButton_Click(object sender, RoutedEventArgs e)
     {
         _windowCoordinator.ShowMediumView();
@@ -64,5 +77,58 @@ public sealed partial class CompactPanelPage : Page
     private void OpenFullButton_Click(object sender, RoutedEventArgs e)
     {
         _windowCoordinator.ShowFullApp();
+    }
+
+    private async Task ShowAddTaskDialogAsync(DateOnly date)
+    {
+        TextBox titleTextBox = new()
+        {
+            Header = "Task",
+            PlaceholderText = "What needs to be done?"
+        };
+
+        ToggleSwitch useTimeToggle = new()
+        {
+            Header = "Use time"
+        };
+
+        TimePicker timePicker = new()
+        {
+            Time = new TimeSpan(9, 0, 0),
+            IsEnabled = false
+        };
+
+        StackPanel content = new()
+        {
+            Spacing = 12
+        };
+        content.Children.Add(titleTextBox);
+        content.Children.Add(useTimeToggle);
+        content.Children.Add(timePicker);
+
+        ContentDialog dialog = new()
+        {
+            XamlRoot = XamlRoot,
+            Title = $"Add task for {PlannerDateTimeFormatter.FormatDate(date)}",
+            PrimaryButtonText = "Add",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary,
+            IsPrimaryButtonEnabled = false,
+            Content = content
+        };
+
+        useTimeToggle.Toggled += (_, _) => timePicker.IsEnabled = useTimeToggle.IsOn;
+        titleTextBox.TextChanged += (_, _) => dialog.IsPrimaryButtonEnabled = !string.IsNullOrWhiteSpace(titleTextBox.Text);
+        dialog.Opened += (_, _) => titleTextBox.Focus(FocusState.Programmatic);
+
+        ContentDialogResult result = await dialog.ShowAsync();
+        if (result != ContentDialogResult.Primary)
+            return;
+
+        TimeOnly? time = useTimeToggle.IsOn
+            ? TimeOnly.FromTimeSpan(timePicker.Time)
+            : null;
+
+        await _plannerStateStore.AddTaskAsync(titleTextBox.Text, date, time);
     }
 }

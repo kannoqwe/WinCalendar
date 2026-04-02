@@ -114,19 +114,29 @@
 
                     <GridView.ItemTemplate>
                         <DataTemplate>
-                            <Button Style="{StaticResource FlatButtonStyle}" Click="MonthDayButton_Click">
+                            <Button
+                                Style="{StaticResource FlatButtonStyle}"
+                                Click="MonthDayButton_Click"
+                                DoubleTapped="MonthDayButton_DoubleTapped">
                                 <Grid Opacity="{Binding DayOpacity}">
                                     <Border
-                                        Visibility="{Binding SelectionVisibility}"
+                                        Visibility="{Binding CompactSelectionVisibility}"
                                         Background="{ThemeResource AppAccentMutedBrush}"
                                         CornerRadius="12" />
-                                    <Border
-                                        Visibility="{Binding TodayVisibility}"
-                                        BorderBrush="{ThemeResource AppAccentBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="12" />
                                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="3">
-                                        <TextBlock HorizontalAlignment="Center" FontWeight="SemiBold" Text="{Binding DayButtonText}" />
+                                        <Grid>
+                                            <TextBlock
+                                                Visibility="{Binding CompactNormalNumberVisibility}"
+                                                HorizontalAlignment="Center"
+                                                FontWeight="SemiBold"
+                                                Text="{Binding DayButtonText}" />
+                                            <TextBlock
+                                                Visibility="{Binding CompactTodayNumberVisibility}"
+                                                HorizontalAlignment="Center"
+                                                FontWeight="SemiBold"
+                                                Foreground="{ThemeResource AppAccentBrush}"
+                                                Text="{Binding DayButtonText}" />
+                                        </Grid>
                                         <Border
                                             Visibility="{Binding TaskIndicatorVisibility}"
                                             Width="6"

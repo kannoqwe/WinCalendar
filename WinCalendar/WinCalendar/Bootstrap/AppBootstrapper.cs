@@ -8,7 +8,10 @@ namespace WinCalendar.Bootstrap;
 
 public sealed class AppBootstrapper
 {
-    public MainWindow CreateMainWindow()
+    private readonly PlannerStateStore _plannerStateStore;
+    private readonly PlannerWindowCoordinator _plannerWindowCoordinator;
+
+    public AppBootstrapper()
     {
         string databasePath = AppPaths.GetDatabasePath();
 
@@ -23,16 +26,20 @@ public sealed class AppBootstrapper
         DeleteTaskUseCase deleteTaskUseCase = new(taskRepository);
         UpdateTaskUseCase updateTaskUseCase = new(taskRepository);
 
-        PlannerStateStore plannerStateStore = new(
+        _plannerStateStore = new(
             createTaskUseCase,
             getTasksForRangeUseCase,
             setTaskCompletionStatusUseCase,
             deleteTaskUseCase,
             updateTaskUseCase);
 
-        PlannerWindowCoordinator plannerWindowCoordinator = new(plannerStateStore);
-        MainWindow mainWindow = new(plannerStateStore, plannerWindowCoordinator);
-        plannerWindowCoordinator.AttachMainWindow(mainWindow);
+        _plannerWindowCoordinator = new(_plannerStateStore, CreateMainWindow);
+    }
+
+    public MainWindow CreateMainWindow()
+    {
+        MainWindow mainWindow = new(_plannerStateStore, _plannerWindowCoordinator);
+        _plannerWindowCoordinator.AttachMainWindow(mainWindow);
 
         return mainWindow;
     }

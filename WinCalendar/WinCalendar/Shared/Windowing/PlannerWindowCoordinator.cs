@@ -16,20 +16,26 @@ public sealed class PlannerWindowCoordinator
     private const int MediumWindowHeight = 760;
 
     private readonly PlannerStateStore _plannerStateStore;
+    private readonly Func<MainWindow> _mainWindowFactory;
     private MainWindow? _mainWindow;
     private CompactPanelWindow? _compactWindow;
     private CompactSidebarWindow? _compactSidebarWindow;
     private MediumPlannerWindow? _mediumWindow;
     private bool _suppressCompactSidebarClosedStateUpdate;
 
-    public PlannerWindowCoordinator(PlannerStateStore plannerStateStore)
+    public PlannerWindowCoordinator(PlannerStateStore plannerStateStore, Func<MainWindow> mainWindowFactory)
     {
         _plannerStateStore = plannerStateStore;
+        _mainWindowFactory = mainWindowFactory;
     }
 
     public void AttachMainWindow(MainWindow mainWindow)
     {
+        if (_mainWindow is not null)
+            _mainWindow.Closed -= MainWindow_Closed;
+
         _mainWindow = mainWindow;
+        _mainWindow.Closed += MainWindow_Closed;
     }
 
     public void ShowFullApp()
@@ -42,7 +48,10 @@ public sealed class PlannerWindowCoordinator
             _compactWindow = null;
         }
 
-        _mainWindow?.Activate();
+        if (_mainWindow is null)
+            _mainWindow = _mainWindowFactory();
+
+        _mainWindow.Activate();
     }
 
     public void ShowCompactPanel()
@@ -208,5 +217,14 @@ public sealed class PlannerWindowCoordinator
         appWindow.Move(new PointInt32(
             workArea.X + Math.Max(0, (workArea.Width - MediumWindowWidth) / 2),
             workArea.Y + Math.Max(0, (workArea.Height - MediumWindowHeight) / 2)));
+    }
+
+    private void MainWindow_Closed(object sender, WindowEventArgs args)
+    {
+        if (sender is not MainWindow mainWindow || !ReferenceEquals(_mainWindow, mainWindow))
+            return;
+
+        _mainWindow.Closed -= MainWindow_Closed;
+        _mainWindow = null;
     }
 }

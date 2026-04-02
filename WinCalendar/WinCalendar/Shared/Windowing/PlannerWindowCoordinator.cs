@@ -12,7 +12,6 @@ public sealed class PlannerWindowCoordinator
     private const int CompactWindowWidth = 420;
     private const int CompactWindowHeight = 500;
     private const int CompactSidebarWindowWidth = 228;
-    private const int CompactWindowGap = 12;
     private const int MediumWindowWidth = 980;
     private const int MediumWindowHeight = 760;
 
@@ -188,7 +187,7 @@ public sealed class PlannerWindowCoordinator
         const int margin = 18;
         int compactWindowX = workArea.X + workArea.Width - CompactWindowWidth - margin;
         int compactWindowY = workArea.Y + workArea.Height - CompactWindowHeight - margin;
-        int sidebarX = Math.Max(workArea.X + margin, compactWindowX - CompactSidebarWindowWidth - CompactWindowGap);
+        int sidebarX = Math.Max(workArea.X + margin, compactWindowX - CompactSidebarWindowWidth);
 
         appWindow.Move(new PointInt32(sidebarX, compactWindowY));
     }

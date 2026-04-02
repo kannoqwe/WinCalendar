@@ -23,7 +23,7 @@ public sealed class PlannerStateStore : ObservableObject
     private readonly Dictionary<DateOnly, (bool IsExpanded, bool IsHidden)> _agendaState = [];
 
     private bool _isInitialized;
-    private bool _isCompactSidebarOpen = true;
+    private bool _isCompactSidebarOpen;
     private DateOnly _selectedDate;
     private DateOnly _displayMonth;
     private Guid? _selectedTaskId;
@@ -119,6 +119,9 @@ public sealed class PlannerStateStore : ObservableObject
 
             OnPropertyChanged(nameof(CompactSidebarVisibility));
             OnPropertyChanged(nameof(CompactSidebarToggleText));
+            OnPropertyChanged(nameof(CompactPanelRootPadding));
+            OnPropertyChanged(nameof(CompactPanelCornerRadius));
+            OnPropertyChanged(nameof(CompactSidebarCornerRadius));
         }
     }
 
@@ -126,6 +129,15 @@ public sealed class PlannerStateStore : ObservableObject
         IsCompactSidebarOpen ? Visibility.Visible : Visibility.Collapsed;
 
     public string CompactSidebarToggleText => IsCompactSidebarOpen ? ">" : "<";
+
+    public Thickness CompactPanelRootPadding =>
+        IsCompactSidebarOpen ? new Thickness(0, 10, 10, 10) : new Thickness(10);
+
+    public CornerRadius CompactPanelCornerRadius =>
+        IsCompactSidebarOpen ? new CornerRadius(0, 22, 22, 0) : new CornerRadius(22);
+
+    public CornerRadius CompactSidebarCornerRadius =>
+        IsCompactSidebarOpen ? new CornerRadius(22, 0, 0, 22) : new CornerRadius(22);
 
     public PlannerTaskViewModel? SelectedTask
     {

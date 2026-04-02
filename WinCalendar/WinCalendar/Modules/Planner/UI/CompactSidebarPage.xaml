@@ -18,12 +18,12 @@
         </Style>
     </Page.Resources>
 
-    <Grid x:Name="Root" Loaded="Root_Loaded" Padding="10">
+    <Grid x:Name="Root" Loaded="Root_Loaded" Padding="10,10,0,10">
         <Border
             Background="{ThemeResource AppSidebarBackgroundBrush}"
             BorderBrush="{ThemeResource AppBorderBrush}"
             BorderThickness="1"
-            CornerRadius="22"
+            CornerRadius="{Binding CompactSidebarCornerRadius}"
             Padding="12">
             <Grid RowSpacing="10">
                 <Grid.RowDefinitions>

@@ -14,12 +14,13 @@ namespace WinCalendar.Modules.Planner.Presentation;
 public sealed class PlannerStateStore : ObservableObject
 {
     private const int MonthGridCellCount = 42;
-    private const double WeekTimelineHourHeightValue = 64;
-    private const double WeekTimelineDayWidthValue = 156;
-    private const double WeekTaskHorizontalPaddingValue = 6;
-    private const double WeekTaskColumnGapValue = 6;
+    private const double WeekTimelineHourHeightValue = 38;
+    private const double WeekTimelineDayWidthValue = 120;
+    private const double WeekTimelineAnyTimeLaneHeightValue = 58;
+    private const double WeekTaskHorizontalPaddingValue = 5;
+    private const double WeekTaskColumnGapValue = 5;
     private const int WeekTaskSyntheticDurationMinutes = 45;
-    private const double WeekTaskMinimumHeightValue = 46;
+    private const double WeekTaskMinimumHeightValue = 40;
 
     private readonly CreateTaskUseCase _createTaskUseCase;
     private readonly DeleteTaskUseCase _deleteTaskUseCase;
@@ -139,11 +140,15 @@ public sealed class PlannerStateStore : ObservableObject
 
     public string QuickAddTargetText => SelectedDateText;
 
-    public double WeekTimelineHeight => WeekTimelineHours.Count * WeekTimelineHourHeightValue;
+    public double WeekTimelineHeight => WeekTimelineAnyTimeLaneHeightValue + WeekTimelineTimedHeight;
+
+    public double WeekTimelineTimedHeight => WeekTimelineHours.Count * WeekTimelineHourHeightValue;
 
     public double WeekTimelineHourHeight => WeekTimelineHourHeightValue;
 
     public double WeekTimelineDayWidth => WeekTimelineDayWidthValue;
+
+    public double WeekTimelineAnyTimeLaneHeight => WeekTimelineAnyTimeLaneHeightValue;
 
     public Visibility WeekAgendaVisibility =>
         WeekAgendaDays.Any(day => day.Tasks.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
@@ -554,7 +559,7 @@ public sealed class PlannerStateStore : ObservableObject
     {
         double usableWidth = WeekTimelineDayWidthValue - (WeekTaskHorizontalPaddingValue * 2);
         double width = (usableWidth - ((item.TotalColumns - 1) * WeekTaskColumnGapValue)) / item.TotalColumns;
-        double clampedWidth = Math.Max(42, width);
+        double clampedWidth = Math.Max(32, width);
         double top = (item.StartMinutes / 60d) * WeekTimelineHourHeightValue;
         double height = Math.Max(
             WeekTaskMinimumHeightValue,

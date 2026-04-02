@@ -16,6 +16,7 @@
     <Grid x:Name="ContentRoot" Background="{ThemeResource AppPageBackgroundBrush}">
         <controls:NavigationView
             x:Name="ShellNavigationView"
+            AlwaysShowHeader="False"
             IsBackEnabled="False"
             IsBackButtonVisible="Collapsed"
             PaneDisplayMode="Left"
@@ -49,14 +50,6 @@
                     <Button x:Name="MediumViewButton" Click="MediumViewButton_Click" Content="Open Medium View" />
                 </StackPanel>
             </controls:NavigationView.PaneFooter>
-
-            <controls:NavigationView.Header>
-                <StackPanel Spacing="2">
-                    <TextBlock FontFamily="Segoe UI Variable Display" FontSize="28" FontWeight="SemiBold" Text="Planner" />
-                    <TextBlock Foreground="{ThemeResource AppTextMutedBrush}" Text="Three connected layouts on one shared state." />
-                </StackPanel>
-            </controls:NavigationView.Header>
-
             <ContentPresenter x:Name="PageHost" />
         </controls:NavigationView>
     </Grid>

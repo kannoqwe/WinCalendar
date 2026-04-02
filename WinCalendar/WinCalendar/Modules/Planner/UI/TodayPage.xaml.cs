@@ -86,16 +86,6 @@ public sealed partial class TodayPage : Page
         await OpenTaskAsync(taskBlock.Task);
     }
 
-    private void OpenCompactButton_Click(object sender, RoutedEventArgs e)
-    {
-        _windowCoordinator.ShowCompactPanel();
-    }
-
-    private void OpenMediumButton_Click(object sender, RoutedEventArgs e)
-    {
-        _windowCoordinator.ShowMediumView();
-    }
-
     private async Task AddSelectedDayTaskAsync()
     {
         TimeOnly? time = QuickAddUseTimeToggle.IsOn

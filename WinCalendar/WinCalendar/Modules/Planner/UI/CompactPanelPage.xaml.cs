@@ -69,11 +69,6 @@ public sealed partial class CompactPanelPage : Page
         await ShowAddTaskDialogAsync(day.Date);
     }
 
-    private void OpenMediumButton_Click(object sender, RoutedEventArgs e)
-    {
-        _windowCoordinator.ShowMediumView();
-    }
-
     private void OpenFullButton_Click(object sender, RoutedEventArgs e)
     {
         _windowCoordinator.ShowFullApp();

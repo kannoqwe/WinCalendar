@@ -38,7 +38,6 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <Button MinWidth="34" Click="ToggleSidebarButton_Click" Content="{Binding CompactSidebarToggleText}" />
@@ -49,8 +48,13 @@
                         FontSize="20"
                         FontWeight="SemiBold"
                         Text="{Binding MonthLabel}" />
-                    <Button Grid.Column="2" MinWidth="58" Click="OpenMediumButton_Click" Content="Day" />
-                    <Button Grid.Column="3" MinWidth="54" Click="OpenFullButton_Click" Content="App" />
+                    <Button
+                        Grid.Column="2"
+                        MinWidth="40"
+                        Click="OpenFullButton_Click"
+                        ToolTipService.ToolTip="Open app">
+                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE71D;" />
+                    </Button>
                 </Grid>
 
                 <Grid Grid.Row="1" ColumnSpacing="8">

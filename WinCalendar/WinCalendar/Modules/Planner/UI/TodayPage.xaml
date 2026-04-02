@@ -58,9 +58,6 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <StackPanel
@@ -104,34 +101,23 @@
                         Click="CurrentWeekButton_Click"
                         Content="This week" />
 
-                    <TextBox
-                        Grid.Column="3"
-                        x:Name="QuickAddTitleTextBox"
-                        MinWidth="220"
-                        VerticalAlignment="Center"
-                        KeyDown="QuickAddTitleTextBox_KeyDown"
-                        PlaceholderText="Add a task" />
-
-                    <ToggleSwitch
-                        Grid.Column="4"
-                        x:Name="QuickAddUseTimeToggle"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        OffContent="Any"
-                        OnContent="Time" />
-
-                    <TimePicker
-                        Grid.Column="5"
-                        x:Name="QuickAddTimePicker"
-                        Width="118"
-                        VerticalAlignment="Center"
-                        IsEnabled="{Binding IsOn, ElementName=QuickAddUseTimeToggle}" />
-
                     <Button
-                        Grid.Column="6"
-                        Style="{StaticResource ToolbarButtonStyle}"
-                        Click="QuickAddButton_Click"
-                        Content="Add" />
+                        Grid.Column="3"
+                        Width="36"
+                        Height="36"
+                        Padding="0"
+                        Background="{ThemeResource AppAccentBrush}"
+                        BorderBrush="{ThemeResource AppAccentBrush}"
+                        BorderThickness="0"
+                        Click="AddTaskButton_Click"
+                        CornerRadius="12"
+                        ToolTipService.ToolTip="Add task">
+                        <FontIcon
+                            FontFamily="Segoe Fluent Icons"
+                            FontSize="13"
+                            Foreground="White"
+                            Glyph="&#xE710;" />
+                    </Button>
                 </Grid>
             </Border>
 

@@ -1,9 +1,6 @@
 using System;
-using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Input;
-using Windows.System;
 using WinCalendar.Modules.Planner.Presentation;
 using WinCalendar.Shared.Windowing;
 
@@ -40,20 +37,6 @@ public sealed partial class MediumPlannerPage : Page
     private async void NextDayButton_Click(object sender, RoutedEventArgs e)
     {
         await _plannerStateStore.GoToNextDayAsync();
-    }
-
-    private async void QuickAddButton_Click(object sender, RoutedEventArgs e)
-    {
-        await AddSelectedDayTaskAsync();
-    }
-
-    private async void QuickAddTitleTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
-    {
-        if (e.Key != VirtualKey.Enter)
-            return;
-
-        e.Handled = true;
-        await AddSelectedDayTaskAsync();
     }
 
     private async void TaskCompletionCheckBox_Click(object sender, RoutedEventArgs e)
@@ -108,16 +91,8 @@ public sealed partial class MediumPlannerPage : Page
         _windowCoordinator.ShowFullApp();
     }
 
-    private async Task AddSelectedDayTaskAsync()
+    private async void AddTaskButton_Click(object sender, RoutedEventArgs e)
     {
-        string title = QuickAddTitleTextBox.Text;
-        TimeOnly? time = QuickAddUseTimeToggle.IsOn
-            ? TimeOnly.FromTimeSpan(QuickAddTimePicker.Time)
-            : null;
-
-        await _plannerStateStore.AddTaskAsync(title, _plannerStateStore.SelectedDate, time);
-        QuickAddTitleTextBox.Text = string.Empty;
-        QuickAddUseTimeToggle.IsOn = false;
-        QuickAddTimePicker.Time = new TimeSpan(9, 0, 0);
+        await TaskComposerDialogService.ShowAddTaskAsync(XamlRoot, _plannerStateStore, _plannerStateStore.SelectedDate);
     }
 }

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentDialog
+    x:Class="WinCalendar.Modules.Planner.UI.TaskComposerDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    PrimaryButtonText="Add task"
+    CloseButtonText="Cancel"
+    DefaultButton="Primary"
+    mc:Ignorable="d">
+
+    <StackPanel Width="320" Spacing="12">
+        <Border
+            Background="{ThemeResource AppCardAltBackgroundBrush}"
+            BorderBrush="{ThemeResource AppBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="16"
+            Padding="12">
+            <Grid ColumnSpacing="10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border
+                    Width="34"
+                    Height="34"
+                    VerticalAlignment="Top"
+                    Background="{ThemeResource AppAccentMutedBrush}"
+                    CornerRadius="999">
+                    <FontIcon
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        FontFamily="Segoe Fluent Icons"
+                        FontSize="13"
+                        Foreground="{ThemeResource AppAccentBrush}"
+                        Glyph="&#xE710;" />
+                </Border>
+
+                <StackPanel
+                    Grid.Column="1"
+                    Spacing="2">
+                    <TextBlock
+                        FontFamily="Segoe UI Variable Display"
+                        FontSize="18"
+                        FontWeight="SemiBold"
+                        Text="New task" />
+                    <TextBlock
+                        x:Name="SubtitleTextBlock"
+                        FontSize="12"
+                        Foreground="{ThemeResource AppTextMutedBrush}"
+                        TextWrapping="WrapWholeWords" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <TextBox
+            x:Name="TitleTextBox"
+            Header="Task"
+            PlaceholderText="What needs to be done?"
+            TextChanged="TitleTextBox_TextChanged" />
+
+        <DatePicker
+            x:Name="TaskDatePicker"
+            Header="Date"
+            DateChanged="TaskDatePicker_DateChanged" />
+
+        <Border
+            Background="{ThemeResource AppCardBackgroundBrush}"
+            BorderBrush="{ThemeResource AppBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="16"
+            Padding="12">
+            <StackPanel Spacing="10">
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Spacing="2">
+                        <TextBlock FontWeight="SemiBold" Text="Time" />
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{ThemeResource AppTextMutedBrush}"
+                            Text="European 24-hour format" />
+                    </StackPanel>
+
+                    <ToggleSwitch
+                        x:Name="HasTimeToggle"
+                        Grid.Column="1"
+                        OffContent="Any"
+                        OnContent="Set"
+                        Toggled="HasTimeToggle_Toggled" />
+                </Grid>
+
+                <TimePicker
+                    x:Name="TaskTimePicker"
+                    ClockIdentifier="24HourClock"
+                    MinuteIncrement="5"
+                    IsEnabled="False" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</ContentDialog>

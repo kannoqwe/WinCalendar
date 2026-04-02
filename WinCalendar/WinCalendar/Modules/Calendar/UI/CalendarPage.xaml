@@ -16,6 +16,16 @@
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="VerticalContentAlignment" Value="Stretch" />
         </Style>
+
+        <Style x:Key="IconActionButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="36" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="{ThemeResource AppAccentBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource AppAccentBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="12" />
+        </Style>
     </Page.Resources>
 
     <Grid
@@ -179,25 +189,38 @@
                                 Text="{Binding SelectedDateSummary}" />
                         </StackPanel>
 
-                        <StackPanel
+                        <Grid
                             Grid.Row="1"
-                            Spacing="8">
-                            <TextBox
-                                x:Name="QuickAddTitleTextBox"
-                                Header="Quick add"
-                                KeyDown="QuickAddTitleTextBox_KeyDown"
-                                PlaceholderText="Task title" />
-                            <Grid ColumnSpacing="8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <ToggleSwitch x:Name="QuickAddUseTimeToggle" Header="Use time" />
-                                <TimePicker Grid.Column="1" x:Name="QuickAddTimePicker" IsEnabled="{Binding IsOn, ElementName=QuickAddUseTimeToggle}" />
-                                <Button Grid.Column="2" Click="QuickAddButton_Click" Content="Add" />
-                            </Grid>
-                        </StackPanel>
+                            ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Spacing="2">
+                                <TextBlock
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                    Text="TASKS" />
+                                <TextBlock
+                                    FontSize="12"
+                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                    Text="Add everything from one modal window." />
+                            </StackPanel>
+
+                            <Button
+                                Grid.Column="1"
+                                Style="{StaticResource IconActionButtonStyle}"
+                                Click="AddTaskButton_Click"
+                                ToolTipService.ToolTip="Add task">
+                                <FontIcon
+                                    FontFamily="Segoe Fluent Icons"
+                                    FontSize="13"
+                                    Foreground="White"
+                                    Glyph="&#xE710;" />
+                            </Button>
+                        </Grid>
 
                         <ListView
                             Grid.Row="2"

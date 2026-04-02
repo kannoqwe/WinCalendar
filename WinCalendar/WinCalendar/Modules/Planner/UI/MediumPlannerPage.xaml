@@ -8,6 +8,18 @@
     Background="{ThemeResource AppPageBackgroundBrush}"
     mc:Ignorable="d">
 
+    <Page.Resources>
+        <Style x:Key="IconActionButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="36" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="{ThemeResource AppAccentBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource AppAccentBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="12" />
+        </Style>
+    </Page.Resources>
+
     <Grid
         x:Name="Root"
         Loaded="Root_Loaded"
@@ -61,28 +73,36 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <StackPanel Spacing="8">
-                            <TextBlock
-                                FontSize="12"
-                                FontWeight="SemiBold"
-                                Foreground="{ThemeResource AppTextMutedBrush}"
-                                Text="DAY TASKS" />
-                            <TextBox
-                                x:Name="QuickAddTitleTextBox"
-                                Header="Quick add"
-                                KeyDown="QuickAddTitleTextBox_KeyDown"
-                                PlaceholderText="Task title" />
-                            <Grid ColumnSpacing="8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <ToggleSwitch x:Name="QuickAddUseTimeToggle" Header="Use time" />
-                                <TimePicker Grid.Column="1" x:Name="QuickAddTimePicker" IsEnabled="{Binding IsOn, ElementName=QuickAddUseTimeToggle}" />
-                                <Button Grid.Column="2" Click="QuickAddButton_Click" Content="Add" />
-                            </Grid>
-                        </StackPanel>
+                        <Grid ColumnSpacing="10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Spacing="2">
+                                <TextBlock
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                    Text="DAY TASKS" />
+                                <TextBlock
+                                    FontSize="12"
+                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                    Text="Add from one compact modal window." />
+                            </StackPanel>
+
+                            <Button
+                                Grid.Column="1"
+                                Style="{StaticResource IconActionButtonStyle}"
+                                Click="AddTaskButton_Click"
+                                ToolTipService.ToolTip="Add task">
+                                <FontIcon
+                                    FontFamily="Segoe Fluent Icons"
+                                    FontSize="13"
+                                    Foreground="White"
+                                    Glyph="&#xE710;" />
+                            </Button>
+                        </Grid>
 
                         <ListView
                             Grid.Row="1"
@@ -180,6 +200,8 @@
 
                                 <TimePicker
                                     Header="Time"
+                                    ClockIdentifier="24HourClock"
+                                    MinuteIncrement="5"
                                     IsEnabled="{Binding EditorHasTime}"
                                     Time="{Binding EditorTime, Mode=TwoWay}" />
 

@@ -58,7 +58,7 @@ public sealed partial class TaskComposerDialog : ContentDialog
     {
         DateOnly selectedDate = DateOnly.FromDateTime(TaskDatePicker.Date.Date);
         string timeMode = HasTimeToggle.IsOn ? "Time enabled" : "Any time";
-        SubtitleTextBlock.Text = $"{PlannerDateTimeFormatter.FormatDate(selectedDate)} · {timeMode}";
+        SubtitleTextBlock.Text = $"{PlannerDateTimeFormatter.FormatDate(selectedDate)} | {timeMode}";
     }
 }
 

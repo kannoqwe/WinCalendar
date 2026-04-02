@@ -30,7 +30,7 @@ public sealed class PlannerAgendaDayViewModel : ObservableObject
 
     public string HeaderText => PlannerDateTimeFormatter.FormatShortDay(Date);
 
-    public string CompactHeaderText => $"{CompactHeaderPrefix} {PlannerDateTimeFormatter.FormatAgendaHeader(Date)}";
+    public string CompactHeaderLabel => PlannerDateTimeFormatter.FormatAgendaHeader(Date);
 
     public string CompactHeaderDetails => $"{HeaderText} - {SummaryText}";
 
@@ -38,7 +38,7 @@ public sealed class PlannerAgendaDayViewModel : ObservableObject
 
     public string EmptyTasksText => "No tasks scheduled.";
 
-    public string CompactHeaderPrefix => _isExpanded ? "|>" : "->";
+    public string CompactChevronGlyph => _isExpanded ? "\uE70D" : "\uE76C";
 
     public Visibility ContentVisibility => _isExpanded ? Visibility.Visible : Visibility.Collapsed;
 
@@ -55,8 +55,7 @@ public sealed class PlannerAgendaDayViewModel : ObservableObject
                 return;
 
             OnPropertyChanged(nameof(ContentVisibility));
-            OnPropertyChanged(nameof(CompactHeaderText));
-            OnPropertyChanged(nameof(CompactHeaderPrefix));
+            OnPropertyChanged(nameof(CompactChevronGlyph));
         }
     }
 }

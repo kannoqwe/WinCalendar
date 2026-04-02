@@ -16,6 +16,12 @@
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
             <Setter Property="VerticalContentAlignment" Value="Stretch" />
         </Style>
+
+        <Style x:Key="CompactIconButtonStyle" TargetType="Button">
+            <Setter Property="MinWidth" Value="36" />
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
     </Page.Resources>
 
     <Grid x:Name="Root" Loaded="Root_Loaded" Padding="{Binding CompactPanelRootPadding}">
@@ -38,9 +44,16 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <Button MinWidth="34" Click="ToggleSidebarButton_Click" Content="{Binding CompactSidebarToggleText}" />
+                    <Button
+                        Style="{StaticResource CompactIconButtonStyle}"
+                        Click="ToggleSidebarButton_Click"
+                        ToolTipService.ToolTip="Toggle tasks list">
+                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="13" Glyph="&#xE700;" />
+                    </Button>
                     <TextBlock
                         Grid.Column="1"
                         VerticalAlignment="Center"
@@ -50,24 +63,29 @@
                         Text="{Binding MonthLabel}" />
                     <Button
                         Grid.Column="2"
-                        MinWidth="40"
+                        Style="{StaticResource CompactIconButtonStyle}"
+                        Click="PreviousMonthButton_Click"
+                        ToolTipService.ToolTip="Previous month">
+                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="12" Glyph="&#xE100;" />
+                    </Button>
+                    <Button
+                        Grid.Column="3"
+                        Style="{StaticResource CompactIconButtonStyle}"
+                        Click="NextMonthButton_Click"
+                        ToolTipService.ToolTip="Next month">
+                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="12" Glyph="&#xE101;" />
+                    </Button>
+                    <Button
+                        Grid.Column="4"
+                        Style="{StaticResource CompactIconButtonStyle}"
                         Click="OpenFullButton_Click"
                         ToolTipService.ToolTip="Open app">
-                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE71D;" />
+                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="13" Glyph="&#xE80F;" />
                     </Button>
                 </Grid>
 
-                <Grid Grid.Row="1" ColumnSpacing="8">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
-                    <Button Click="PreviousMonthButton_Click" Content="&#xE100;" FontFamily="Segoe Fluent Icons" />
-                    <Button Grid.Column="1" Click="NextMonthButton_Click" Content="&#xE101;" FontFamily="Segoe Fluent Icons" />
+                <Grid Grid.Row="1">
                     <TextBlock
-                        Grid.Column="2"
                         VerticalAlignment="Center"
                         Foreground="{ThemeResource AppTextMutedBrush}"
                         Text="{Binding SelectedDateText}" />

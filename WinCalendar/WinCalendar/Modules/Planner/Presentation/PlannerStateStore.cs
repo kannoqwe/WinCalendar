@@ -124,7 +124,6 @@ public sealed class PlannerStateStore : ObservableObject
                 return;
 
             OnPropertyChanged(nameof(CompactSidebarVisibility));
-            OnPropertyChanged(nameof(CompactSidebarToggleText));
             OnPropertyChanged(nameof(CompactPanelRootPadding));
             OnPropertyChanged(nameof(CompactPanelCornerRadius));
             OnPropertyChanged(nameof(CompactSidebarCornerRadius));
@@ -133,8 +132,6 @@ public sealed class PlannerStateStore : ObservableObject
 
     public Visibility CompactSidebarVisibility =>
         IsCompactSidebarOpen ? Visibility.Visible : Visibility.Collapsed;
-
-    public string CompactSidebarToggleText => IsCompactSidebarOpen ? ">" : "<";
 
     public Thickness CompactPanelRootPadding =>
         IsCompactSidebarOpen ? new Thickness(0, 10, 10, 10) : new Thickness(10);

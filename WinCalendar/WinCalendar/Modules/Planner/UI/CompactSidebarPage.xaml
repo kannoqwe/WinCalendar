@@ -71,13 +71,25 @@
                                             Style="{StaticResource FlatButtonStyle}"
                                             Click="AgendaDayHeaderButton_Click">
                                             <StackPanel Spacing="2">
+                                                <Grid ColumnSpacing="8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <FontIcon
+                                                        VerticalAlignment="Center"
+                                                        FontFamily="Segoe Fluent Icons"
+                                                        FontSize="12"
+                                                        Glyph="{Binding CompactChevronGlyph}" />
+                                                    <TextBlock
+                                                        Grid.Column="1"
+                                                        FontSize="14"
+                                                        FontWeight="SemiBold"
+                                                        Text="{Binding CompactHeaderLabel}" />
+                                                </Grid>
                                                 <TextBlock
-                                                    FontFamily="Consolas"
-                                                    FontSize="14"
-                                                    FontWeight="SemiBold"
-                                                    Text="{Binding CompactHeaderText}" />
-                                                <TextBlock
-                                                    Margin="18,0,0,0"
+                                                    Margin="20,0,0,0"
                                                     Foreground="{ThemeResource AppTextMutedBrush}"
                                                     Text="{Binding CompactHeaderDetails}" />
                                             </StackPanel>

@@ -62,7 +62,6 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <Button Click="PreviousMonthButton_Click" Content="&#xE100;" FontFamily="Segoe Fluent Icons" />
@@ -72,7 +71,6 @@
                         VerticalAlignment="Center"
                         Foreground="{ThemeResource AppTextMutedBrush}"
                         Text="{Binding SelectedDateText}" />
-                    <Button Grid.Column="3" Click="TodayButton_Click" Content="Today" />
                 </Grid>
 
                 <Grid Grid.Row="2">

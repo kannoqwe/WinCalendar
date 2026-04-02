@@ -47,11 +47,6 @@ public sealed partial class CompactPanelPage : Page
         await _plannerStateStore.GoToNextMonthAsync();
     }
 
-    private async void TodayButton_Click(object sender, RoutedEventArgs e)
-    {
-        await _plannerStateStore.GoToTodayAsync();
-    }
-
     private async void MonthDayButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Button { DataContext: PlannerMonthDayViewModel day })

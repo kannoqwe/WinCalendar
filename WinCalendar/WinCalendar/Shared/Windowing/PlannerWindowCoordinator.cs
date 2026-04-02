@@ -34,6 +34,14 @@ public sealed class PlannerWindowCoordinator
 
     public void ShowFullApp()
     {
+        CloseCompactSidebar(updateState: false);
+
+        if (_compactWindow is not null)
+        {
+            _compactWindow.Close();
+            _compactWindow = null;
+        }
+
         _mainWindow?.Activate();
     }
 

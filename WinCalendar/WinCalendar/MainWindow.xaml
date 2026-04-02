@@ -21,7 +21,7 @@
             PaneDisplayMode="Left"
             SelectionChanged="ShellNavigationView_SelectionChanged">
             <controls:NavigationView.MenuItems>
-                <controls:NavigationViewItem x:Name="TodayNavigationItem" Content="Today" Tag="today">
+                <controls:NavigationViewItem x:Name="TodayNavigationItem" Content="Week" Tag="today">
                     <controls:NavigationViewItem.Icon>
                         <SymbolIcon Symbol="Calendar" />
                     </controls:NavigationViewItem.Icon>

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -32,9 +33,24 @@ public sealed partial class TodayPage : Page
         await _plannerStateStore.EnsureInitializedAsync();
     }
 
+    private async void PreviousWeekButton_Click(object sender, RoutedEventArgs e)
+    {
+        await _plannerStateStore.GoToPreviousWeekAsync();
+    }
+
+    private async void CurrentWeekButton_Click(object sender, RoutedEventArgs e)
+    {
+        await _plannerStateStore.GoToTodayAsync();
+    }
+
+    private async void NextWeekButton_Click(object sender, RoutedEventArgs e)
+    {
+        await _plannerStateStore.GoToNextWeekAsync();
+    }
+
     private async void QuickAddButton_Click(object sender, RoutedEventArgs e)
     {
-        await AddTodayTaskAsync();
+        await AddSelectedDayTaskAsync();
     }
 
     private async void QuickAddTitleTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
@@ -43,25 +59,31 @@ public sealed partial class TodayPage : Page
             return;
 
         e.Handled = true;
-        await AddTodayTaskAsync();
+        await AddSelectedDayTaskAsync();
     }
 
-    private async void TodayTaskCompletionCheckBox_Click(object sender, RoutedEventArgs e)
+    private async void WeekDayHeaderButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not CheckBox { DataContext: PlannerTaskViewModel task } checkBox)
+        if (sender is not Button { DataContext: PlannerWeekDayTimelineViewModel day })
             return;
 
-        await _plannerStateStore.ToggleTaskCompletionAsync(task.Id, checkBox.IsChecked == true);
+        await _plannerStateStore.SelectDateAsync(day.Date);
     }
 
-    private async void TodayTaskOpenButton_Click(object sender, RoutedEventArgs e)
+    private async void WeekAllDayTaskButton_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not Button { DataContext: PlannerTaskViewModel task })
             return;
 
-        await _plannerStateStore.SelectDateAsync(task.Date);
-        _plannerStateStore.SelectTask(task);
-        _windowCoordinator.ShowMediumView();
+        await OpenTaskAsync(task);
+    }
+
+    private async void WeekTimedTaskButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { DataContext: PlannerWeekTaskBlockViewModel taskBlock })
+            return;
+
+        await OpenTaskAsync(taskBlock.Task);
     }
 
     private void OpenCompactButton_Click(object sender, RoutedEventArgs e)
@@ -74,7 +96,7 @@ public sealed partial class TodayPage : Page
         _windowCoordinator.ShowMediumView();
     }
 
-    private async Task AddTodayTaskAsync()
+    private async Task AddSelectedDayTaskAsync()
     {
         TimeOnly? time = QuickAddUseTimeToggle.IsOn
             ? TimeOnly.FromTimeSpan(QuickAddTimePicker.Time)
@@ -82,11 +104,22 @@ public sealed partial class TodayPage : Page
 
         await _plannerStateStore.AddTaskAsync(
             QuickAddTitleTextBox.Text,
-            DateOnly.FromDateTime(DateTime.Today),
+            _plannerStateStore.SelectedDate,
             time);
 
         QuickAddTitleTextBox.Text = string.Empty;
         QuickAddUseTimeToggle.IsOn = false;
         QuickAddTimePicker.Time = new TimeSpan(9, 0, 0);
+    }
+
+    private async Task OpenTaskAsync(PlannerTaskViewModel task)
+    {
+        await _plannerStateStore.SelectDateAsync(task.Date);
+        PlannerTaskViewModel selectedTask = _plannerStateStore.SelectedDayTasks
+            .FirstOrDefault(current => current.Id == task.Id)
+            ?? task;
+
+        _plannerStateStore.SelectTask(selectedTask);
+        _windowCoordinator.ShowMediumView();
     }
 }

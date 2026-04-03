@@ -336,7 +336,9 @@
                                                                 <Button
                                                                     Width="{Binding Width}"
                                                                     Height="{Binding Height}"
+                                                                    HorizontalContentAlignment="Stretch"
                                                                     Style="{StaticResource FlatButtonStyle}"
+                                                                    VerticalContentAlignment="Stretch"
                                                                     Click="WeekTimedTaskButton_Click">
                                                                     <Button.RenderTransform>
                                                                         <TranslateTransform

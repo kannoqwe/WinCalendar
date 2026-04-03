@@ -230,174 +230,176 @@
                             </ItemsControl>
                         </StackPanel>
 
-                        <ItemsControl
+                        <Grid
                             Grid.Row="1"
-                            Grid.Column="1"
-                            ItemsSource="{Binding WeekTimelineDays}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Orientation="Horizontal" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border
-                                        Width="{Binding DataContext.WeekTimelineDayWidth, ElementName=LayoutRoot}"
-                                        Margin="0,0,8,0"
-                                        Background="{ThemeResource AppShellBackgroundBrush}"
-                                        BorderBrush="{ThemeResource AppBorderBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="14">
-                                        <Grid>
-                                            <Border
-                                                Visibility="{Binding SelectionVisibility}"
-                                                Background="{ThemeResource AppAccentMutedBrush}"
-                                                Opacity="0.28"
-                                                CornerRadius="14" />
-
-                                            <StackPanel Spacing="0">
+                            Grid.Column="1">
+                            <ItemsControl
+                                ItemsSource="{Binding WeekTimelineDays}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border
+                                            Width="{Binding DataContext.WeekTimelineDayWidth, ElementName=LayoutRoot}"
+                                            Margin="0,0,8,0"
+                                            Background="{ThemeResource AppShellBackgroundBrush}"
+                                            BorderBrush="{ThemeResource AppBorderBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="14">
+                                            <Grid>
                                                 <Border
-                                                    Height="{Binding DataContext.WeekTimelineAnyTimeLaneHeight, ElementName=LayoutRoot}"
-                                                    Padding="8,6"
-                                                    Background="{ThemeResource AppCardAltBackgroundBrush}"
-                                                    BorderBrush="{ThemeResource AppLineBrush}"
-                                                    BorderThickness="0,0,0,1">
-                                                    <StackPanel Spacing="4">
-                                                        <TextBlock
-                                                            Visibility="{Binding EmptyAllDayVisibility}"
-                                                            FontSize="11"
-                                                            Foreground="{ThemeResource AppTextMutedBrush}"
-                                                            Text="Free" />
+                                                    Visibility="{Binding SelectionVisibility}"
+                                                    Background="{ThemeResource AppAccentMutedBrush}"
+                                                    Opacity="0.28"
+                                                    CornerRadius="14" />
 
-                                                        <ItemsControl ItemsSource="{Binding VisibleAllDayTasks}">
+                                                <StackPanel Spacing="0">
+                                                    <Border
+                                                        Height="{Binding DataContext.WeekTimelineAnyTimeLaneHeight, ElementName=LayoutRoot}"
+                                                        Padding="8,6"
+                                                        Background="{ThemeResource AppCardAltBackgroundBrush}"
+                                                        BorderBrush="{ThemeResource AppLineBrush}"
+                                                        BorderThickness="0,0,0,1">
+                                                        <StackPanel Spacing="4">
+                                                            <TextBlock
+                                                                Visibility="{Binding EmptyAllDayVisibility}"
+                                                                FontSize="11"
+                                                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                                                Text="Free" />
+
+                                                            <ItemsControl ItemsSource="{Binding VisibleAllDayTasks}">
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Button
+                                                                            Style="{StaticResource FlatButtonStyle}"
+                                                                            Click="WeekAllDayTaskButton_Click">
+                                                                            <Border
+                                                                                Padding="6,4"
+                                                                                Background="{Binding TaskBackgroundBrush}"
+                                                                                BorderBrush="{Binding TaskBorderBrush}"
+                                                                                BorderThickness="1"
+                                                                                CornerRadius="8"
+                                                                                Opacity="{Binding ContentOpacity}">
+                                                                                <TextBlock
+                                                                                    FontSize="11"
+                                                                                    FontWeight="SemiBold"
+                                                                                    Text="{Binding Title}"
+                                                                                    TextTrimming="CharacterEllipsis" />
+                                                                            </Border>
+                                                                        </Button>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+
+                                                            <Border
+                                                                Visibility="{Binding HiddenAllDayTaskCountVisibility}"
+                                                                Padding="6,3"
+                                                                HorizontalAlignment="Left"
+                                                                Background="{ThemeResource AppCardBackgroundBrush}"
+                                                                BorderBrush="{ThemeResource AppBorderBrush}"
+                                                                BorderThickness="1"
+                                                                CornerRadius="999">
+                                                                <TextBlock
+                                                                    FontSize="10"
+                                                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                                                    Text="{Binding HiddenAllDayTaskCountText}" />
+                                                            </Border>
+                                                        </StackPanel>
+                                                    </Border>
+
+                                                    <Grid Height="{Binding DataContext.WeekTimelineTimedHeight, ElementName=LayoutRoot}">
+                                                        <ItemsControl
+                                                            IsHitTestVisible="False"
+                                                            ItemsSource="{Binding DataContext.WeekTimelineHours, ElementName=LayoutRoot}">
                                                             <ItemsControl.ItemTemplate>
                                                                 <DataTemplate>
-                                                                    <Button
-                                                                        Style="{StaticResource FlatButtonStyle}"
-                                                                        Click="WeekAllDayTaskButton_Click">
-                                                                        <Border
-                                                                            Padding="6,4"
-                                                                            Background="{Binding TaskBackgroundBrush}"
-                                                                            BorderBrush="{Binding TaskBorderBrush}"
-                                                                            BorderThickness="1"
-                                                                            CornerRadius="8"
-                                                                            Opacity="{Binding ContentOpacity}">
-                                                                            <TextBlock
-                                                                                FontSize="11"
-                                                                                FontWeight="SemiBold"
-                                                                                Text="{Binding Title}"
-                                                                                TextTrimming="CharacterEllipsis" />
-                                                                        </Border>
-                                                                    </Button>
+                                                                    <Border
+                                                                        Height="{Binding DataContext.WeekTimelineHourHeight, ElementName=LayoutRoot}"
+                                                                        BorderBrush="{ThemeResource AppLineBrush}"
+                                                                        BorderThickness="0,0,0,1" />
                                                                 </DataTemplate>
                                                             </ItemsControl.ItemTemplate>
                                                         </ItemsControl>
 
-                                                        <Border
-                                                            Visibility="{Binding HiddenAllDayTaskCountVisibility}"
-                                                            Padding="6,3"
-                                                            HorizontalAlignment="Left"
-                                                            Background="{ThemeResource AppCardBackgroundBrush}"
-                                                            BorderBrush="{ThemeResource AppBorderBrush}"
-                                                            BorderThickness="1"
-                                                            CornerRadius="999">
-                                                            <TextBlock
-                                                                FontSize="10"
-                                                                Foreground="{ThemeResource AppTextMutedBrush}"
-                                                                Text="{Binding HiddenAllDayTaskCountText}" />
-                                                        </Border>
-                                                    </StackPanel>
-                                                </Border>
+                                                        <ItemsControl
+                                                            Height="{Binding DataContext.WeekTimelineTimedHeight, ElementName=LayoutRoot}"
+                                                            ItemsSource="{Binding TimedTaskBlocks}">
+                                                            <ItemsControl.ItemsPanel>
+                                                                <ItemsPanelTemplate>
+                                                                    <Canvas />
+                                                                </ItemsPanelTemplate>
+                                                            </ItemsControl.ItemsPanel>
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate>
+                                                                    <Button
+                                                                        Width="{Binding Width}"
+                                                                        Height="{Binding Height}"
+                                                                        HorizontalContentAlignment="Stretch"
+                                                                        Style="{StaticResource FlatButtonStyle}"
+                                                                        VerticalContentAlignment="Stretch"
+                                                                        Click="WeekTimedTaskButton_Click">
+                                                                        <Button.RenderTransform>
+                                                                            <TranslateTransform
+                                                                                X="{Binding Left}"
+                                                                                Y="{Binding Top}" />
+                                                                        </Button.RenderTransform>
+                                                                            <Border
+                                                                                Padding="{Binding ContentPadding}"
+                                                                                Background="{Binding BackgroundBrush}"
+                                                                                BorderBrush="{Binding BorderBrush}"
+                                                                                BorderThickness="1"
+                                                                                CornerRadius="10"
+                                                                                Opacity="{Binding ContentOpacity}">
+                                                                                <Grid RowSpacing="1">
+                                                                                    <Grid.RowDefinitions>
+                                                                                        <RowDefinition Height="*" />
+                                                                                        <RowDefinition Height="Auto" />
+                                                                                    </Grid.RowDefinitions>
 
-                                                <Grid Height="{Binding DataContext.WeekTimelineTimedHeight, ElementName=LayoutRoot}">
-                                                    <ItemsControl
-                                                        IsHitTestVisible="False"
-                                                        ItemsSource="{Binding DataContext.WeekTimelineHours, ElementName=LayoutRoot}">
-                                                        <ItemsControl.ItemTemplate>
-                                                            <DataTemplate>
-                                                                <Border
-                                                                    Height="{Binding DataContext.WeekTimelineHourHeight, ElementName=LayoutRoot}"
-                                                                    BorderBrush="{ThemeResource AppLineBrush}"
-                                                                    BorderThickness="0,0,0,1" />
-                                                            </DataTemplate>
-                                                        </ItemsControl.ItemTemplate>
-                                                    </ItemsControl>
+                                                                                    <TextBlock
+                                                                                        FontSize="{Binding TitleFontSize}"
+                                                                                        FontWeight="SemiBold"
+                                                                                        MaxLines="{Binding TitleMaxLines}"
+                                                                                        Text="{Binding Title}"
+                                                                                        TextTrimming="CharacterEllipsis"
+                                                                                        TextWrapping="{Binding TitleWrapping}" />
+                                                                                    <TextBlock
+                                                                                        Grid.Row="1"
+                                                                                        FontSize="{Binding TimeFontSize}"
+                                                                                        Foreground="{Binding AccentBrush}"
+                                                                                        Text="{Binding TimeText}" />
+                                                                                </Grid>
+                                                                            </Border>
+                                                                        </Button>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
 
-                                                    <ItemsControl
-                                                        Height="{Binding DataContext.WeekTimelineTimedHeight, ElementName=LayoutRoot}"
-                                                        ItemsSource="{Binding TimedTaskBlocks}">
-                                                        <ItemsControl.ItemsPanel>
-                                                            <ItemsPanelTemplate>
-                                                                <Canvas />
-                                                            </ItemsPanelTemplate>
-                                                        </ItemsControl.ItemsPanel>
-                                                        <ItemsControl.ItemTemplate>
-                                                            <DataTemplate>
-                                                                <Button
-                                                                    Width="{Binding Width}"
-                                                                    Height="{Binding Height}"
-                                                                    HorizontalContentAlignment="Stretch"
-                                                                    Style="{StaticResource FlatButtonStyle}"
-                                                                    VerticalContentAlignment="Stretch"
-                                                                    Click="WeekTimedTaskButton_Click">
-                                                                    <Button.RenderTransform>
-                                                                        <TranslateTransform
-                                                                            X="{Binding Left}"
-                                                                            Y="{Binding Top}" />
-                                                                    </Button.RenderTransform>
-                                                                        <Border
-                                                                            Padding="{Binding ContentPadding}"
-                                                                            Background="{Binding BackgroundBrush}"
-                                                                            BorderBrush="{Binding BorderBrush}"
-                                                                            BorderThickness="1"
-                                                                            CornerRadius="10"
-                                                                            Opacity="{Binding ContentOpacity}">
-                                                                            <Grid RowSpacing="1">
-                                                                                <Grid.RowDefinitions>
-                                                                                    <RowDefinition Height="*" />
-                                                                                    <RowDefinition Height="Auto" />
-                                                                                </Grid.RowDefinitions>
-
-                                                                                <TextBlock
-                                                                                    FontSize="{Binding TitleFontSize}"
-                                                                                    FontWeight="SemiBold"
-                                                                                    MaxLines="{Binding TitleMaxLines}"
-                                                                                    Text="{Binding Title}"
-                                                                                    TextTrimming="CharacterEllipsis"
-                                                                                    TextWrapping="{Binding TitleWrapping}" />
-                                                                                <TextBlock
-                                                                                    Grid.Row="1"
-                                                                                    FontSize="{Binding TimeFontSize}"
-                                                                                    Foreground="{Binding AccentBrush}"
-                                                                                    Text="{Binding TimeText}" />
-                                                                            </Grid>
-                                                                        </Border>
-                                                                    </Button>
-                                                            </DataTemplate>
-                                                        </ItemsControl.ItemTemplate>
-                                                    </ItemsControl>
-
-                                                    <Border
-                                                        IsHitTestVisible="False"
-                                                        Height="3"
-                                                        Margin="4,0"
-                                                        VerticalAlignment="Top"
-                                                        Background="{ThemeResource AppAccentBrush}"
-                                                        CornerRadius="999"
-                                                        Opacity="1"
-                                                        Visibility="{Binding TodayVisibility}">
-                                                        <Border.RenderTransform>
-                                                            <TranslateTransform
-                                                                Y="{Binding DataContext.CurrentTimeIndicatorTop, ElementName=LayoutRoot}" />
-                                                        </Border.RenderTransform>
-                                                    </Border>
-                                                </Grid>
-                                            </StackPanel>
-                                        </Grid>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                            <Border
+                                IsHitTestVisible="False"
+                                Height="3"
+                                Margin="4,0,4,0"
+                                VerticalAlignment="Top"
+                                Background="{ThemeResource AppAccentBrush}"
+                                CornerRadius="999"
+                                Opacity="1"
+                                Visibility="{Binding CurrentWeekTimeIndicatorVisibility}">
+                                <Border.RenderTransform>
+                                    <TranslateTransform
+                                        Y="{Binding CurrentWeekTimeIndicatorTop}" />
+                                </Border.RenderTransform>
+                            </Border>
+                        </Grid>
                     </Grid>
                 </ScrollViewer>
             </Border>

@@ -156,8 +156,21 @@ public sealed class PlannerStateStore : ObservableObject
     public double CurrentTimeIndicatorTop
     {
         get => _currentTimeIndicatorTop;
-        private set => SetProperty(ref _currentTimeIndicatorTop, value);
+        private set
+        {
+            if (!SetProperty(ref _currentTimeIndicatorTop, value))
+                return;
+
+            OnPropertyChanged(nameof(CurrentWeekTimeIndicatorTop));
+        }
     }
+
+    public double CurrentWeekTimeIndicatorTop => WeekTimelineAnyTimeLaneHeightValue + CurrentTimeIndicatorTop;
+
+    public Visibility CurrentWeekTimeIndicatorVisibility =>
+        GetWeekStart(_selectedDate) == GetWeekStart(DateOnly.FromDateTime(DateTime.Today))
+            ? Visibility.Visible
+            : Visibility.Collapsed;
 
     public Visibility WeekAgendaVisibility =>
         WeekAgendaDays.Any(day => day.Tasks.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
@@ -298,6 +311,7 @@ public sealed class PlannerStateStore : ObservableObject
     {
         double top = (TimeOnly.FromDateTime(DateTime.Now).ToTimeSpan().TotalMinutes / 60d) * WeekTimelineHourHeightValue;
         CurrentTimeIndicatorTop = Math.Clamp(top, 0d, Math.Max(0d, WeekTimelineTimedHeight - 2d));
+        OnPropertyChanged(nameof(CurrentWeekTimeIndicatorVisibility));
     }
 
     public Task GoToPreviousMonthAsync()
@@ -466,6 +480,7 @@ public sealed class PlannerStateStore : ObservableObject
         BuildWeekAgenda(taskLookup, today, todayWeekEnd);
         BuildWeekTimeline(taskLookup, selectedWeekStart, selectedWeekEnd, today);
         RefreshCurrentTimeIndicator();
+        OnPropertyChanged(nameof(CurrentWeekTimeIndicatorVisibility));
         UpdateSummaries(selectedWeekStart, selectedWeekEnd);
         ReselectTask();
     }

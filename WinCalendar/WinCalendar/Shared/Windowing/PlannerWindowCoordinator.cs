@@ -77,6 +77,17 @@ public sealed class PlannerWindowCoordinator
         _compactWindow.Activate();
     }
 
+    public void ToggleCompactPanel()
+    {
+        if (_compactWindow is not null)
+        {
+            _compactWindow.Close();
+            return;
+        }
+
+        ShowCompactPanel();
+    }
+
     public void ToggleCompactSidebar()
     {
         if (_plannerStateStore.IsCompactSidebarOpen)

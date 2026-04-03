@@ -36,7 +36,7 @@ public sealed class ShellExperienceCoordinator : IDisposable
         {
             _taskbarClockClickInterceptor = new TaskbarClockClickInterceptor(
                 dispatcherQueue,
-                _plannerWindowCoordinator.ShowCompactPanel);
+                _plannerWindowCoordinator.ToggleCompactPanel);
         }
     }
 

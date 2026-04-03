@@ -20,7 +20,7 @@ public sealed class PlannerStateStore : ObservableObject
     private const double WeekTaskHorizontalPaddingValue = 5;
     private const double WeekTaskColumnGapValue = 5;
     private const int WeekTaskDefaultDurationMinutes = 45;
-    private const double WeekTaskMinimumHeightValue = 40;
+    private const double WeekTaskMinimumHeightValue = 28;
 
     private readonly CreateTaskUseCase _createTaskUseCase;
     private readonly DeleteTaskUseCase _deleteTaskUseCase;

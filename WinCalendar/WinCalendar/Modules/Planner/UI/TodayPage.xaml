@@ -346,25 +346,31 @@
                                                                             Y="{Binding Top}" />
                                                                     </Button.RenderTransform>
                                                                         <Border
-                                                                            Padding="4,2"
+                                                                            Padding="{Binding ContentPadding}"
                                                                             Background="{Binding BackgroundBrush}"
                                                                             BorderBrush="{Binding BorderBrush}"
                                                                             BorderThickness="1"
                                                                             CornerRadius="10"
                                                                             Opacity="{Binding ContentOpacity}">
-                                                                            <StackPanel Spacing="0">
+                                                                            <Grid RowSpacing="1">
+                                                                                <Grid.RowDefinitions>
+                                                                                    <RowDefinition Height="*" />
+                                                                                    <RowDefinition Height="Auto" />
+                                                                                </Grid.RowDefinitions>
+
                                                                                 <TextBlock
-                                                                                    FontSize="10"
+                                                                                    FontSize="{Binding TitleFontSize}"
                                                                                     FontWeight="SemiBold"
-                                                                                    MaxLines="1"
+                                                                                    MaxLines="{Binding TitleMaxLines}"
                                                                                     Text="{Binding Title}"
                                                                                     TextTrimming="CharacterEllipsis"
-                                                                                    TextWrapping="NoWrap" />
+                                                                                    TextWrapping="{Binding TitleWrapping}" />
                                                                                 <TextBlock
-                                                                                    FontSize="9"
+                                                                                    Grid.Row="1"
+                                                                                    FontSize="{Binding TimeFontSize}"
                                                                                     Foreground="{Binding AccentBrush}"
                                                                                     Text="{Binding TimeText}" />
-                                                                            </StackPanel>
+                                                                            </Grid>
                                                                         </Border>
                                                                     </Button>
                                                             </DataTemplate>

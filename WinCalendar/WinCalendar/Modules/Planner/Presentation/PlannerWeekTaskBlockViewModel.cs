@@ -1,4 +1,5 @@
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml;
 
 namespace WinCalendar.Modules.Planner.Presentation;
 
@@ -37,6 +38,29 @@ public sealed class PlannerWeekTaskBlockViewModel
     public SolidColorBrush BorderBrush => Task.TaskBorderBrush;
 
     public SolidColorBrush AccentBrush => Task.TaskAccentBrush;
+
+    public Thickness ContentPadding =>
+        Height >= 72
+            ? new Thickness(6, 5, 6, 5)
+            : Height >= 44
+                ? new Thickness(5, 4, 5, 4)
+                : new Thickness(4, 3, 4, 3);
+
+    public int TitleMaxLines =>
+        Height >= 124
+            ? 4
+            : Height >= 88
+                ? 3
+                : Height >= 52
+                    ? 2
+                    : 1;
+
+    public TextWrapping TitleWrapping =>
+        TitleMaxLines > 1 ? TextWrapping.WrapWholeWords : TextWrapping.NoWrap;
+
+    public double TitleFontSize => Height >= 52 ? 11 : 10;
+
+    public double TimeFontSize => Height >= 44 ? 10 : 9;
 
     public double ContentOpacity => Task.ContentOpacity;
 }

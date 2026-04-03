@@ -331,12 +331,6 @@
                                                                 <Canvas />
                                                             </ItemsPanelTemplate>
                                                         </ItemsControl.ItemsPanel>
-                                                        <ItemsControl.ItemContainerStyle>
-                                                            <Style TargetType="ContentPresenter">
-                                                                <Setter Property="Canvas.Left" Value="{Binding Left}" />
-                                                                <Setter Property="Canvas.Top" Value="{Binding Top}" />
-                                                            </Style>
-                                                        </ItemsControl.ItemContainerStyle>
                                                         <ItemsControl.ItemTemplate>
                                                             <DataTemplate>
                                                                 <Button
@@ -344,6 +338,11 @@
                                                                     Height="{Binding Height}"
                                                                     Style="{StaticResource FlatButtonStyle}"
                                                                     Click="WeekTimedTaskButton_Click">
+                                                                    <Button.RenderTransform>
+                                                                        <TranslateTransform
+                                                                            X="{Binding Left}"
+                                                                            Y="{Binding Top}" />
+                                                                    </Button.RenderTransform>
                                                                     <Border
                                                                         Padding="7,6"
                                                                         Background="{ThemeResource AppCardBackgroundBrush}"

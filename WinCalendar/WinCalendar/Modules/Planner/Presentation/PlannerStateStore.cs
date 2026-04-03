@@ -326,6 +326,18 @@ public sealed class PlannerStateStore : ObservableObject
         return SelectDateAsync(ClampToMonth(nextMonth, _selectedDate.Day));
     }
 
+    public Task BrowsePreviousMonthAsync()
+    {
+        _displayMonth = _displayMonth.AddMonths(-1);
+        return ReloadAsync();
+    }
+
+    public Task BrowseNextMonthAsync()
+    {
+        _displayMonth = _displayMonth.AddMonths(1);
+        return ReloadAsync();
+    }
+
     public Task GoToPreviousDayAsync()
     {
         return SelectDateAsync(_selectedDate.AddDays(-1));

@@ -38,12 +38,12 @@ public sealed partial class CompactPanelPage : Page
 
     private async void PreviousMonthButton_Click(object sender, RoutedEventArgs e)
     {
-        await _plannerStateStore.GoToPreviousMonthAsync();
+        await _plannerStateStore.BrowsePreviousMonthAsync();
     }
 
     private async void NextMonthButton_Click(object sender, RoutedEventArgs e)
     {
-        await _plannerStateStore.GoToNextMonthAsync();
+        await _plannerStateStore.BrowseNextMonthAsync();
     }
 
     private async void MonthDayButton_Click(object sender, RoutedEventArgs e)

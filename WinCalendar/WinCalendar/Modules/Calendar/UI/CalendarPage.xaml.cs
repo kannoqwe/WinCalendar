@@ -49,12 +49,21 @@ public sealed partial class CalendarPage : Page
         await _plannerStateStore.SelectDateAsync(day.Date);
     }
 
-    private async void TaskCompletionCheckBox_Click(object sender, RoutedEventArgs e)
+    private async void TaskCompletionButton_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is not CheckBox { DataContext: PlannerTaskViewModel task } checkBox)
+        if (sender is not Button { DataContext: PlannerTaskViewModel task } button)
             return;
 
-        await _plannerStateStore.ToggleTaskCompletionAsync(task.Id, checkBox.IsChecked == true);
+        button.IsEnabled = false;
+
+        try
+        {
+            await _plannerStateStore.ToggleTaskCompletionAsync(task.Id, !task.IsCompleted);
+        }
+        finally
+        {
+            button.IsEnabled = true;
+        }
     }
 
     private void TaskOpenButton_Click(object sender, RoutedEventArgs e)

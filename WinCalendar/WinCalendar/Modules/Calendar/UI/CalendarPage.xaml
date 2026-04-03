@@ -26,31 +26,39 @@
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="CornerRadius" Value="12" />
         </Style>
+
+        <Style x:Key="MonthNavButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="40" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="{ThemeResource AppCardAltBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource AppBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="Foreground" Value="{ThemeResource AppAccentBrush}" />
+        </Style>
     </Page.Resources>
 
     <Grid
         x:Name="Root"
         Loaded="Root_Loaded"
-        Padding="24">
-        <Grid RowSpacing="18">
+        Padding="16">
+        <Grid RowSpacing="14">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <Grid ColumnSpacing="10">
+            <Grid ColumnSpacing="12">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Spacing="4">
                     <TextBlock
                         FontFamily="Segoe UI Variable Display"
-                        FontSize="34"
+                        FontSize="30"
                         FontWeight="SemiBold"
                         Text="{Binding MonthLabel}" />
                     <TextBlock
@@ -58,112 +66,141 @@
                         Text="{Binding SelectedDateText}" />
                 </StackPanel>
 
-                <Button Grid.Column="1" Click="PreviousMonthButton_Click" Content="&#xE100;" FontFamily="Segoe Fluent Icons" />
-                <Button Grid.Column="2" Click="NextMonthButton_Click" Content="&#xE101;" FontFamily="Segoe Fluent Icons" />
-                <Button Grid.Column="3" Click="OpenCompactButton_Click" Content="Compact" />
-                <Button Grid.Column="4" Click="OpenMediumButton_Click" Content="Medium" />
+                <StackPanel
+                    Grid.Column="1"
+                    Orientation="Horizontal"
+                    Spacing="8"
+                    VerticalAlignment="Center">
+                    <Button
+                        Style="{StaticResource MonthNavButtonStyle}"
+                        Click="PreviousMonthButton_Click"
+                        ToolTipService.ToolTip="Previous month">
+                        <FontIcon
+                            FontFamily="Segoe Fluent Icons"
+                            FontSize="14"
+                            Glyph="&#xE76B;" />
+                    </Button>
+                    <Button
+                        Style="{StaticResource MonthNavButtonStyle}"
+                        Click="NextMonthButton_Click"
+                        ToolTipService.ToolTip="Next month">
+                        <FontIcon
+                            FontFamily="Segoe Fluent Icons"
+                            FontSize="14"
+                            Glyph="&#xE76C;" />
+                    </Button>
+                </StackPanel>
             </Grid>
 
             <Grid
                 Grid.Row="1"
-                ColumnSpacing="18">
+                ColumnSpacing="14">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="360" />
+                    <ColumnDefinition Width="300" />
                 </Grid.ColumnDefinitions>
 
-                <Border
-                    Background="{ThemeResource AppCardBackgroundBrush}"
-                    BorderBrush="{ThemeResource AppBorderBrush}"
-                    BorderThickness="1"
-                    CornerRadius="18"
-                    Padding="16">
-                    <Grid RowSpacing="12">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+                <Viewbox
+                    Stretch="Uniform"
+                    StretchDirection="DownOnly"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Top">
+                    <Border
+                        Width="734"
+                        Background="{ThemeResource AppCardBackgroundBrush}"
+                        BorderBrush="{ThemeResource AppBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="18"
+                        Padding="12">
+                        <Grid RowSpacing="10">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
 
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
 
-                            <TextBlock HorizontalAlignment="Center" Text="Mo" />
-                            <TextBlock Grid.Column="1" HorizontalAlignment="Center" Text="Tu" />
-                            <TextBlock Grid.Column="2" HorizontalAlignment="Center" Text="We" />
-                            <TextBlock Grid.Column="3" HorizontalAlignment="Center" Text="Th" />
-                            <TextBlock Grid.Column="4" HorizontalAlignment="Center" Text="Fr" />
-                            <TextBlock Grid.Column="5" HorizontalAlignment="Center" Text="Sa" />
-                            <TextBlock Grid.Column="6" HorizontalAlignment="Center" Text="Su" />
-                        </Grid>
+                                <TextBlock HorizontalAlignment="Center" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource AppTextMutedBrush}" Text="Mo" />
+                                <TextBlock Grid.Column="1" HorizontalAlignment="Center" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource AppTextMutedBrush}" Text="Tu" />
+                                <TextBlock Grid.Column="2" HorizontalAlignment="Center" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource AppTextMutedBrush}" Text="We" />
+                                <TextBlock Grid.Column="3" HorizontalAlignment="Center" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource AppTextMutedBrush}" Text="Th" />
+                                <TextBlock Grid.Column="4" HorizontalAlignment="Center" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource AppTextMutedBrush}" Text="Fr" />
+                                <TextBlock Grid.Column="5" HorizontalAlignment="Center" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource AppTextMutedBrush}" Text="Sa" />
+                                <TextBlock Grid.Column="6" HorizontalAlignment="Center" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource AppTextMutedBrush}" Text="Su" />
+                            </Grid>
 
-                        <GridView
-                            Grid.Row="1"
-                            ItemsSource="{Binding MonthDays}"
-                            SelectionMode="None"
-                            ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                            ScrollViewer.VerticalScrollBarVisibility="Disabled">
-                            <GridView.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <ItemsWrapGrid MaximumRowsOrColumns="7" Orientation="Horizontal" />
-                                </ItemsPanelTemplate>
-                            </GridView.ItemsPanel>
+                            <GridView
+                                Grid.Row="1"
+                                ItemsSource="{Binding MonthDays}"
+                                SelectionMode="None"
+                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                                <GridView.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <ItemsWrapGrid MaximumRowsOrColumns="7" Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </GridView.ItemsPanel>
 
-                            <GridView.ItemContainerStyle>
-                                <Style TargetType="GridViewItem">
-                                    <Setter Property="Padding" Value="0" />
-                                    <Setter Property="Margin" Value="4" />
-                                    <Setter Property="Width" Value="112" />
-                                    <Setter Property="Height" Value="88" />
-                                </Style>
-                            </GridView.ItemContainerStyle>
+                                <GridView.ItemContainerStyle>
+                                    <Style TargetType="GridViewItem">
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="Margin" Value="3" />
+                                        <Setter Property="Width" Value="96" />
+                                        <Setter Property="Height" Value="74" />
+                                    </Style>
+                                </GridView.ItemContainerStyle>
 
-                            <GridView.ItemTemplate>
-                                <DataTemplate>
-                                    <Button
-                                        Style="{StaticResource FlatButtonStyle}"
-                                        Click="MonthDayButton_Click">
-                                        <Grid Opacity="{Binding DayOpacity}">
-                                            <Border
-                                                Visibility="{Binding SelectionVisibility}"
-                                                Background="{ThemeResource AppAccentMutedBrush}"
-                                                CornerRadius="16" />
-                                            <Border
-                                                Visibility="{Binding TodayVisibility}"
-                                                BorderBrush="{ThemeResource AppAccentBrush}"
-                                                BorderThickness="1"
-                                                CornerRadius="16" />
-                                            <StackPanel
-                                                Padding="12"
-                                                VerticalAlignment="Stretch"
-                                                Spacing="8">
-                                                <TextBlock FontSize="18" FontWeight="SemiBold" Text="{Binding DayNumberText}" />
-                                                <StackPanel Spacing="4">
-                                                    <TextBlock
-                                                        Foreground="{ThemeResource AppTextMutedBrush}"
-                                                        Text="{Binding StateText}" />
-                                                    <Border
-                                                        Visibility="{Binding TaskIndicatorVisibility}"
-                                                        Width="10"
-                                                        Height="10"
-                                                        Background="{Binding IndicatorBrush}"
-                                                        CornerRadius="999" />
+                                <GridView.ItemTemplate>
+                                    <DataTemplate>
+                                        <Button
+                                            Style="{StaticResource FlatButtonStyle}"
+                                            Click="MonthDayButton_Click">
+                                            <Grid Opacity="{Binding DayOpacity}">
+                                                <Border
+                                                    Visibility="{Binding SelectionVisibility}"
+                                                    Background="{ThemeResource AppAccentMutedBrush}"
+                                                    CornerRadius="14" />
+                                                <Border
+                                                    Visibility="{Binding TodayVisibility}"
+                                                    BorderBrush="{ThemeResource AppAccentBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="14" />
+                                                <StackPanel
+                                                    Padding="10"
+                                                    VerticalAlignment="Stretch"
+                                                    Spacing="6">
+                                                    <TextBlock FontSize="17" FontWeight="SemiBold" Text="{Binding DayNumberText}" />
+                                                    <StackPanel Spacing="3">
+                                                        <TextBlock
+                                                            FontSize="11"
+                                                            Foreground="{ThemeResource AppTextMutedBrush}"
+                                                            Text="{Binding StateText}"
+                                                            TextTrimming="CharacterEllipsis" />
+                                                        <Border
+                                                            Visibility="{Binding TaskIndicatorVisibility}"
+                                                            Width="8"
+                                                            Height="8"
+                                                            Background="{Binding IndicatorBrush}"
+                                                            CornerRadius="999" />
+                                                    </StackPanel>
                                                 </StackPanel>
-                                            </StackPanel>
-                                        </Grid>
-                                    </Button>
-                                </DataTemplate>
-                            </GridView.ItemTemplate>
-                        </GridView>
-                    </Grid>
-                </Border>
+                                            </Grid>
+                                        </Button>
+                                    </DataTemplate>
+                                </GridView.ItemTemplate>
+                            </GridView>
+                        </Grid>
+                    </Border>
+                </Viewbox>
 
                 <Border
                     Grid.Column="1"
@@ -171,8 +208,8 @@
                     BorderBrush="{ThemeResource AppBorderBrush}"
                     BorderThickness="1"
                     CornerRadius="18"
-                    Padding="16">
-                    <Grid RowSpacing="12">
+                    Padding="14">
+                    <Grid RowSpacing="10">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -181,7 +218,7 @@
 
                         <StackPanel Spacing="4">
                             <TextBlock
-                                FontSize="26"
+                                FontSize="22"
                                 FontWeight="SemiBold"
                                 Text="{Binding SelectedDateText}" />
                             <TextBlock
@@ -206,7 +243,7 @@
                                 <TextBlock
                                     FontSize="12"
                                     Foreground="{ThemeResource AppTextMutedBrush}"
-                                    Text="Add everything from one modal window." />
+                                    Text="Quick actions for the selected day." />
                             </StackPanel>
 
                             <Button

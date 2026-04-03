@@ -66,16 +66,6 @@ public sealed partial class CalendarPage : Page
         _windowCoordinator.ShowMediumView();
     }
 
-    private void OpenCompactButton_Click(object sender, RoutedEventArgs e)
-    {
-        _windowCoordinator.ShowCompactPanel();
-    }
-
-    private void OpenMediumButton_Click(object sender, RoutedEventArgs e)
-    {
-        _windowCoordinator.ShowMediumView();
-    }
-
     private async void AddTaskButton_Click(object sender, RoutedEventArgs e)
     {
         await TaskComposerDialogService.ShowAddTaskAsync(XamlRoot, _plannerStateStore, _plannerStateStore.SelectedDate);

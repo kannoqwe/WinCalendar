@@ -30,6 +30,7 @@ public sealed class SqliteTaskRepository : ITaskRepository
                 title,
                 task_date,
                 task_time,
+                duration_minutes,
                 is_completed,
                 created_at_utc,
                 updated_at_utc
@@ -59,6 +60,7 @@ public sealed class SqliteTaskRepository : ITaskRepository
                 title,
                 task_date,
                 task_time,
+                duration_minutes,
                 is_completed,
                 created_at_utc,
                 updated_at_utc
@@ -83,11 +85,12 @@ public sealed class SqliteTaskRepository : ITaskRepository
                 title,
                 task_date,
                 task_time,
+                duration_minutes,
                 is_completed,
                 created_at_utc,
                 updated_at_utc
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?);
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?);
             """);
 
         BindTask(statement, task);
@@ -106,6 +109,7 @@ public sealed class SqliteTaskRepository : ITaskRepository
                 title = ?,
                 task_date = ?,
                 task_time = ?,
+                duration_minutes = ?,
                 is_completed = ?,
                 created_at_utc = ?,
                 updated_at_utc = ?
@@ -115,10 +119,11 @@ public sealed class SqliteTaskRepository : ITaskRepository
         statement.BindText(1, task.Title);
         statement.BindText(2, FormatDate(task.Date));
         statement.BindNullableText(3, FormatTime(task.Time));
-        statement.BindBoolean(4, task.IsCompleted);
-        statement.BindText(5, FormatTimestamp(task.CreatedAt));
-        statement.BindText(6, FormatTimestamp(task.UpdatedAt));
-        statement.BindText(7, task.Id.ToString());
+        statement.BindNullableInt(4, task.DurationMinutes);
+        statement.BindBoolean(5, task.IsCompleted);
+        statement.BindText(6, FormatTimestamp(task.CreatedAt));
+        statement.BindText(7, FormatTimestamp(task.UpdatedAt));
+        statement.BindText(8, task.Id.ToString());
         statement.ExecuteNonQuery();
 
         return Task.CompletedTask;
@@ -146,9 +151,10 @@ public sealed class SqliteTaskRepository : ITaskRepository
         statement.BindText(2, task.Title);
         statement.BindText(3, FormatDate(task.Date));
         statement.BindNullableText(4, FormatTime(task.Time));
-        statement.BindBoolean(5, task.IsCompleted);
-        statement.BindText(6, FormatTimestamp(task.CreatedAt));
-        statement.BindText(7, FormatTimestamp(task.UpdatedAt));
+        statement.BindNullableInt(5, task.DurationMinutes);
+        statement.BindBoolean(6, task.IsCompleted);
+        statement.BindText(7, FormatTimestamp(task.CreatedAt));
+        statement.BindText(8, FormatTimestamp(task.UpdatedAt));
     }
 
     private static TaskItem Map(SqliteStatement statement)
@@ -157,11 +163,12 @@ public sealed class SqliteTaskRepository : ITaskRepository
         string title = statement.GetText(1)!;
         DateOnly date = ParseDate(statement.GetText(2)!);
         TimeOnly? time = ParseTime(statement.GetText(3));
-        bool isCompleted = statement.GetInt(4) == 1;
-        DateTime createdAt = ParseTimestamp(statement.GetText(5)!);
-        DateTime updatedAt = ParseTimestamp(statement.GetText(6)!);
+        int? durationMinutes = statement.GetNullableInt(4);
+        bool isCompleted = statement.GetInt(5) == 1;
+        DateTime createdAt = ParseTimestamp(statement.GetText(6)!);
+        DateTime updatedAt = ParseTimestamp(statement.GetText(7)!);
 
-        return TaskItem.Restore(id, title, date, time, isCompleted, createdAt, updatedAt);
+        return TaskItem.Restore(id, title, date, time, durationMinutes, isCompleted, createdAt, updatedAt);
     }
 
     private static string FormatDate(DateOnly value)

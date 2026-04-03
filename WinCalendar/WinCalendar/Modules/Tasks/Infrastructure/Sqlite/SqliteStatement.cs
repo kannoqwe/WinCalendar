@@ -40,6 +40,17 @@ internal sealed class SqliteStatement : IDisposable
         BindInt(index, value ? 1 : 0);
     }
 
+    public void BindNullableInt(int index, int? value)
+    {
+        if (value is null)
+        {
+            BindNull(index);
+            return;
+        }
+
+        BindInt(index, value.Value);
+    }
+
     public void BindInt(int index, int value)
     {
         SqliteException.ThrowIfError(
@@ -91,6 +102,14 @@ internal sealed class SqliteStatement : IDisposable
 
     public int GetInt(int index)
     {
+        return SqliteNative.sqlite3_column_int(_handle, index);
+    }
+
+    public int? GetNullableInt(int index)
+    {
+        if (SqliteNative.sqlite3_column_type(_handle, index) == SqliteNative.Null)
+            return null;
+
         return SqliteNative.sqlite3_column_int(_handle, index);
     }
 

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 
 namespace Planner.App.Modules.Tasks.Infrastructure.Sqlite;
@@ -27,16 +28,37 @@ public sealed class TaskDatabaseInitializer
                 title TEXT NOT NULL,
                 task_date TEXT NOT NULL,
                 task_time TEXT NULL,
+                duration_minutes INTEGER NULL,
                 is_completed INTEGER NOT NULL,
                 created_at_utc TEXT NOT NULL,
                 updated_at_utc TEXT NOT NULL
             );
             """);
 
+        EnsureColumn(
+            connection,
+            "duration_minutes",
+            "ALTER TABLE tasks ADD COLUMN duration_minutes INTEGER NULL;");
+
         connection.ExecuteNonQuery(
             """
             CREATE INDEX IF NOT EXISTS idx_tasks_task_date
             ON tasks(task_date);
             """);
+    }
+
+    private static void EnsureColumn(SqliteConnection connection, string columnName, string alterSql)
+    {
+        using SqliteStatement statement = connection.Prepare("PRAGMA table_info(tasks);");
+
+        while (statement.Read())
+        {
+            string? existingColumnName = statement.GetText(1);
+
+            if (string.Equals(existingColumnName, columnName, StringComparison.OrdinalIgnoreCase))
+                return;
+        }
+
+        connection.ExecuteNonQuery(alterSql);
     }
 }

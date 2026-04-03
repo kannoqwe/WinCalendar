@@ -1,6 +1,8 @@
+using System;
 using Planner.App.Modules.Tasks.Contracts;
 using Planner.App.Modules.Tasks.Infrastructure.Sqlite;
 using Planner.App.Modules.Tasks.UseCases;
+using WinCalendar.Modules.Shell.UI;
 using WinCalendar.Modules.Planner.Presentation;
 using WinCalendar.Shared.Windowing;
 
@@ -10,8 +12,9 @@ public sealed class AppBootstrapper
 {
     private readonly PlannerStateStore _plannerStateStore;
     private readonly PlannerWindowCoordinator _plannerWindowCoordinator;
+    private readonly ShellExperienceCoordinator _shellExperienceCoordinator;
 
-    public AppBootstrapper()
+    public AppBootstrapper(Action requestExit)
     {
         string databasePath = AppPaths.GetDatabasePath();
 
@@ -34,6 +37,7 @@ public sealed class AppBootstrapper
             updateTaskUseCase);
 
         _plannerWindowCoordinator = new(_plannerStateStore, CreateMainWindow);
+        _shellExperienceCoordinator = new(_plannerWindowCoordinator, requestExit);
     }
 
     public MainWindow CreateMainWindow()
@@ -42,5 +46,27 @@ public sealed class AppBootstrapper
         _plannerWindowCoordinator.AttachMainWindow(mainWindow);
 
         return mainWindow;
+    }
+
+    public void Launch(AppLaunchMode launchMode)
+    {
+        _shellExperienceCoordinator.Start();
+
+        switch (launchMode)
+        {
+            case AppLaunchMode.BackgroundShell:
+                return;
+            case AppLaunchMode.CompactPanel:
+                _plannerWindowCoordinator.ShowCompactPanel();
+                return;
+            default:
+                _plannerWindowCoordinator.ShowFullApp();
+                return;
+        }
+    }
+
+    public void Shutdown()
+    {
+        _shellExperienceCoordinator.Dispose();
     }
 }

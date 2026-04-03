@@ -9,7 +9,8 @@ namespace WinCalendar
     public partial class App : Application
     {
         private readonly AppBootstrapper _bootstrapper;
-        private Window? _window;
+        private readonly AppSingleInstanceRelay _singleInstanceRelay;
+        private Microsoft.UI.Dispatching.DispatcherQueue? _uiDispatcherQueue;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -18,7 +19,8 @@ namespace WinCalendar
         public App()
         {
             InitializeComponent();
-            _bootstrapper = new AppBootstrapper();
+            _bootstrapper = new AppBootstrapper(RequestExit);
+            _singleInstanceRelay = new AppSingleInstanceRelay();
         }
 
         /// <summary>
@@ -27,8 +29,29 @@ namespace WinCalendar
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            _window = _bootstrapper.CreateMainWindow();
-            _window.Activate();
+            _uiDispatcherQueue ??= Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+            AppLaunchMode launchMode = AppLaunchArguments.Parse(args.Arguments);
+
+            if (!_singleInstanceRelay.IsPrimaryInstance)
+            {
+                _singleInstanceRelay.TryForwardToPrimary(launchMode);
+                Exit();
+                return;
+            }
+
+            _singleInstanceRelay.StartListening(mode =>
+            {
+                _uiDispatcherQueue?.TryEnqueue(() => _bootstrapper.Launch(mode));
+            });
+
+            _bootstrapper.Launch(launchMode);
+        }
+
+        private void RequestExit()
+        {
+            _bootstrapper.Shutdown();
+            _singleInstanceRelay.Dispose();
+            Exit();
         }
     }
 }

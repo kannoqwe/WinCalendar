@@ -118,15 +118,17 @@
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
 
-                            <Grid>
+                            <Grid
+                                Width="686"
+                                HorizontalAlignment="Center">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="98" />
+                                    <ColumnDefinition Width="98" />
+                                    <ColumnDefinition Width="98" />
+                                    <ColumnDefinition Width="98" />
+                                    <ColumnDefinition Width="98" />
+                                    <ColumnDefinition Width="98" />
+                                    <ColumnDefinition Width="98" />
                                 </Grid.ColumnDefinitions>
 
                                 <TextBlock HorizontalAlignment="Center" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource AppTextMutedBrush}" Text="Mo" />
@@ -138,30 +140,24 @@
                                 <TextBlock Grid.Column="6" HorizontalAlignment="Center" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource AppTextMutedBrush}" Text="Su" />
                             </Grid>
 
-                            <GridView
+                            <ItemsControl
                                 Grid.Row="1"
+                                Width="686"
+                                HorizontalAlignment="Center"
                                 ItemsSource="{Binding MonthDays}"
-                                SelectionMode="None"
-                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                ScrollViewer.VerticalScrollBarVisibility="Disabled">
-                                <GridView.ItemsPanel>
+                                IsTabStop="False">
+                                <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <ItemsWrapGrid MaximumRowsOrColumns="7" Orientation="Horizontal" />
                                     </ItemsPanelTemplate>
-                                </GridView.ItemsPanel>
+                                </ItemsControl.ItemsPanel>
 
-                                <GridView.ItemContainerStyle>
-                                    <Style TargetType="GridViewItem">
-                                        <Setter Property="Padding" Value="0" />
-                                        <Setter Property="Margin" Value="3" />
-                                        <Setter Property="Width" Value="96" />
-                                        <Setter Property="Height" Value="74" />
-                                    </Style>
-                                </GridView.ItemContainerStyle>
-
-                                <GridView.ItemTemplate>
+                                <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Button
+                                            Width="94"
+                                            Height="72"
+                                            Margin="2"
                                             Style="{StaticResource FlatButtonStyle}"
                                             Click="MonthDayButton_Click">
                                             <Grid Opacity="{Binding DayOpacity}">
@@ -196,8 +192,8 @@
                                             </Grid>
                                         </Button>
                                     </DataTemplate>
-                                </GridView.ItemTemplate>
-                            </GridView>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </Grid>
                     </Border>
                 </Viewbox>

@@ -13,6 +13,7 @@ public sealed class PlannerTaskViewModel
         Title = task.Title;
         Date = task.Date;
         Time = task.Time;
+        DurationMinutes = task.DurationMinutes;
         IsCompleted = task.IsCompleted;
     }
 
@@ -24,17 +25,25 @@ public sealed class PlannerTaskViewModel
 
     public TimeOnly? Time { get; }
 
+    public int? DurationMinutes { get; }
+
     public bool IsCompleted { get; }
 
     public string DateText => PlannerDateTimeFormatter.FormatDate(Date);
 
     public string TimeText => PlannerDateTimeFormatter.FormatTime(Time);
 
-    public string DetailsText => PlannerDateTimeFormatter.FormatDateTime(Date, Time);
+    public string TimeRangeText => PlannerDateTimeFormatter.FormatTimeRange(Time, DurationMinutes);
 
-    public string CompactTimeText => HasTime ? TimeText : "Any time";
+    public string DetailsText => PlannerDateTimeFormatter.FormatDateTime(Date, Time, DurationMinutes);
+
+    public string CompactTimeText => PlannerDateTimeFormatter.FormatCompactTime(Time, DurationMinutes);
+
+    public string DurationText => PlannerDateTimeFormatter.FormatDuration(DurationMinutes);
 
     public bool HasTime => Time is not null;
+
+    public bool HasDuration => DurationMinutes is > 0;
 
     public Visibility CompletedVisibility => IsCompleted ? Visibility.Visible : Visibility.Collapsed;
 

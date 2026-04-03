@@ -17,6 +17,6 @@ internal static class TaskComposerDialogService
         if (result is null)
             return;
 
-        await plannerStateStore.AddTaskAsync(result.Title, result.Date, result.Time);
+        await plannerStateStore.AddTaskAsync(result.Title, result.Date, result.Time, result.DurationMinutes);
     }
 }

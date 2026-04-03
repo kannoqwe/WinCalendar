@@ -42,10 +42,55 @@ internal static class PlannerDateTimeFormatter
         return time?.ToString("HH:mm") ?? "No time";
     }
 
-    public static string FormatDateTime(DateOnly date, TimeOnly? time)
+    public static string FormatDuration(int? durationMinutes)
+    {
+        if (durationMinutes is not > 0)
+            return string.Empty;
+
+        int hours = durationMinutes.Value / 60;
+        int minutes = durationMinutes.Value % 60;
+
+        if (hours > 0 && minutes > 0)
+            return $"{hours}h {minutes}m";
+
+        if (hours > 0)
+            return $"{hours}h";
+
+        return $"{minutes} min";
+    }
+
+    public static string FormatCompactTime(TimeOnly? time, int? durationMinutes = null)
+    {
+        if (time is null)
+            return "Any time";
+
+        string durationText = FormatDuration(durationMinutes);
+        return string.IsNullOrWhiteSpace(durationText)
+            ? FormatTime(time)
+            : $"{FormatTime(time)} | {durationText}";
+    }
+
+    public static string FormatTimeRange(TimeOnly? time, int? durationMinutes = null)
+    {
+        if (time is null)
+            return FormatTime(time);
+
+        if (durationMinutes is not > 0)
+            return FormatTime(time);
+
+        int startMinutes = (int)time.Value.ToTimeSpan().TotalMinutes;
+        int endMinutes = Math.Min(24 * 60, startMinutes + durationMinutes.Value);
+        string endText = endMinutes == 24 * 60
+            ? "24:00"
+            : TimeOnly.MinValue.Add(TimeSpan.FromMinutes(endMinutes)).ToString("HH:mm");
+
+        return $"{FormatTime(time)} - {endText}";
+    }
+
+    public static string FormatDateTime(DateOnly date, TimeOnly? time, int? durationMinutes = null)
     {
         return time is null
             ? FormatDate(date)
-            : $"{FormatDate(date)} {FormatTime(time)}";
+            : $"{FormatDate(date)} {FormatTimeRange(time, durationMinutes)}";
     }
 }

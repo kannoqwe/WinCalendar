@@ -19,7 +19,7 @@ public sealed class PlannerStateStore : ObservableObject
     private const double WeekTimelineAnyTimeLaneHeightValue = 58;
     private const double WeekTaskHorizontalPaddingValue = 5;
     private const double WeekTaskColumnGapValue = 5;
-    private const int WeekTaskSyntheticDurationMinutes = 45;
+    private const int WeekTaskDefaultDurationMinutes = 45;
     private const double WeekTaskMinimumHeightValue = 40;
 
     private readonly CreateTaskUseCase _createTaskUseCase;
@@ -44,7 +44,9 @@ public sealed class PlannerStateStore : ObservableObject
     private string _weekViewSummary = string.Empty;
     private string _editorTitle = string.Empty;
     private bool _editorHasTime;
+    private bool _editorHasDuration;
     private TimeSpan _editorTime = new(9, 0, 0);
+    private double _editorDurationMinutes = WeekTaskDefaultDurationMinutes;
     private DateTimeOffset _editorDate = DateTimeOffset.Now;
 
     public PlannerStateStore(
@@ -212,13 +214,53 @@ public sealed class PlannerStateStore : ObservableObject
     public bool EditorHasTime
     {
         get => _editorHasTime;
-        set => SetProperty(ref _editorHasTime, value);
+        set
+        {
+            if (!SetProperty(ref _editorHasTime, value))
+                return;
+
+            if (!value)
+                EditorHasDuration = false;
+
+            ClampEditorDuration();
+            OnPropertyChanged(nameof(EditorDurationToggleEnabled));
+            OnPropertyChanged(nameof(EditorDurationInputEnabled));
+            OnPropertyChanged(nameof(EditorMaxDurationMinutes));
+        }
     }
 
     public TimeSpan EditorTime
     {
         get => _editorTime;
-        set => SetProperty(ref _editorTime, value);
+        set
+        {
+            if (!SetProperty(ref _editorTime, value))
+                return;
+
+            ClampEditorDuration();
+            OnPropertyChanged(nameof(EditorMaxDurationMinutes));
+        }
+    }
+
+    public bool EditorHasDuration
+    {
+        get => _editorHasDuration;
+        set
+        {
+            bool normalizedValue = EditorHasTime && value;
+
+            if (!SetProperty(ref _editorHasDuration, normalizedValue))
+                return;
+
+            ClampEditorDuration();
+            OnPropertyChanged(nameof(EditorDurationInputEnabled));
+        }
+    }
+
+    public double EditorDurationMinutes
+    {
+        get => _editorDurationMinutes;
+        set => SetProperty(ref _editorDurationMinutes, NormalizeDurationValue(value, EditorMaxDurationMinutes));
     }
 
     public DateTimeOffset EditorDate
@@ -226,6 +268,15 @@ public sealed class PlannerStateStore : ObservableObject
         get => _editorDate;
         set => SetProperty(ref _editorDate, value);
     }
+
+    public bool EditorDurationToggleEnabled => EditorHasTime;
+
+    public bool EditorDurationInputEnabled => EditorHasTime && EditorHasDuration;
+
+    public double EditorMaxDurationMinutes =>
+        EditorHasTime
+            ? GetMaxDurationMinutes(TimeOnly.FromTimeSpan(EditorTime))
+            : 24 * 60;
 
     public async Task EnsureInitializedAsync()
     {
@@ -306,13 +357,13 @@ public sealed class PlannerStateStore : ObservableObject
         }
     }
 
-    public async Task AddTaskAsync(string title, DateOnly? date = null, TimeOnly? time = null)
+    public async Task AddTaskAsync(string title, DateOnly? date = null, TimeOnly? time = null, int? durationMinutes = null)
     {
         if (string.IsNullOrWhiteSpace(title))
             return;
 
         DateOnly targetDate = date ?? _selectedDate;
-        await _createTaskUseCase.ExecuteAsync(title, targetDate, time);
+        await _createTaskUseCase.ExecuteAsync(title, targetDate, time, durationMinutes);
         await SelectDateAsync(targetDate);
     }
 
@@ -341,6 +392,8 @@ public sealed class PlannerStateStore : ObservableObject
             EditorTitle = string.Empty;
             EditorHasTime = false;
             EditorTime = new TimeSpan(9, 0, 0);
+            EditorHasDuration = false;
+            EditorDurationMinutes = WeekTaskDefaultDurationMinutes;
             EditorDate = new DateTimeOffset(_selectedDate.ToDateTime(TimeOnly.MinValue));
             return;
         }
@@ -348,6 +401,8 @@ public sealed class PlannerStateStore : ObservableObject
         EditorTitle = task.Title;
         EditorHasTime = task.HasTime;
         EditorTime = task.Time?.ToTimeSpan() ?? new TimeSpan(9, 0, 0);
+        EditorHasDuration = task.HasDuration;
+        EditorDurationMinutes = task.DurationMinutes ?? WeekTaskDefaultDurationMinutes;
         EditorDate = new DateTimeOffset(task.Date.ToDateTime(TimeOnly.MinValue));
     }
 
@@ -361,8 +416,11 @@ public sealed class PlannerStateStore : ObservableObject
 
         DateOnly date = DateOnly.FromDateTime(EditorDate.Date);
         TimeOnly? time = EditorHasTime ? TimeOnly.FromTimeSpan(EditorTime) : null;
+        int? durationMinutes = EditorHasTime && EditorHasDuration
+            ? (int)NormalizeDurationValue(EditorDurationMinutes, EditorMaxDurationMinutes)
+            : null;
 
-        await _updateTaskUseCase.ExecuteAsync(SelectedTask.Id, EditorTitle, date, time);
+        await _updateTaskUseCase.ExecuteAsync(SelectedTask.Id, EditorTitle, date, time, durationMinutes);
         _selectedDate = date;
         _displayMonth = new DateOnly(date.Year, date.Month, 1);
         await ReloadAsync();
@@ -503,7 +561,8 @@ public sealed class PlannerStateStore : ObservableObject
 
     private static int GetTaskEndMinutes(PlannerTaskViewModel task)
     {
-        return Math.Min(24 * 60, GetTaskStartMinutes(task) + WeekTaskSyntheticDurationMinutes);
+        int durationMinutes = task.DurationMinutes ?? WeekTaskDefaultDurationMinutes;
+        return Math.Min(24 * 60, GetTaskStartMinutes(task) + durationMinutes);
     }
 
     private static List<List<WeekTaskLayoutItem>> BuildWeekTaskGroups(List<WeekTaskLayoutItem> items)
@@ -630,6 +689,31 @@ public sealed class PlannerStateStore : ObservableObject
     private void UpdateAgendaState(PlannerAgendaDayViewModel day)
     {
         _agendaState[day.Date] = day.IsExpanded;
+    }
+
+    private void ClampEditorDuration()
+    {
+        double normalizedDuration = NormalizeDurationValue(_editorDurationMinutes, EditorMaxDurationMinutes);
+
+        if (Math.Abs(normalizedDuration - _editorDurationMinutes) < double.Epsilon)
+            return;
+
+        _editorDurationMinutes = normalizedDuration;
+        OnPropertyChanged(nameof(EditorDurationMinutes));
+    }
+
+    private static double NormalizeDurationValue(double value, double maxDurationMinutes)
+    {
+        double normalizedValue = double.IsNaN(value)
+            ? WeekTaskDefaultDurationMinutes
+            : Math.Round(value / 5d) * 5d;
+
+        return Math.Clamp(normalizedValue, 5d, maxDurationMinutes);
+    }
+
+    private static double GetMaxDurationMinutes(TimeOnly time)
+    {
+        return (24 * 60) - time.ToTimeSpan().TotalMinutes;
     }
 
     private sealed class WeekTaskLayoutItem

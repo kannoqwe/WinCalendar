@@ -28,7 +28,7 @@ public sealed class PlannerWeekTaskBlockViewModel
 
     public string Title => Task.Title;
 
-    public string TimeText => Task.TimeText;
+    public string TimeText => Task.TimeRangeText;
 
     public double ContentOpacity => Task.ContentOpacity;
 }

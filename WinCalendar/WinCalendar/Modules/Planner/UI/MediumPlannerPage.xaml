@@ -205,6 +205,21 @@
                                     IsEnabled="{Binding EditorHasTime}"
                                     Time="{Binding EditorTime, Mode=TwoWay}" />
 
+                                <ToggleSwitch
+                                    Header="Use duration"
+                                    IsEnabled="{Binding EditorDurationToggleEnabled}"
+                                    IsOn="{Binding EditorHasDuration, Mode=TwoWay}" />
+
+                                <NumberBox
+                                    Header="Duration (minutes)"
+                                    IsEnabled="{Binding EditorDurationInputEnabled}"
+                                    LargeChange="15"
+                                    Maximum="{Binding EditorMaxDurationMinutes}"
+                                    Minimum="5"
+                                    SmallChange="5"
+                                    SpinButtonPlacementMode="Compact"
+                                    Value="{Binding EditorDurationMinutes, Mode=TwoWay}" />
+
                                 <Grid ColumnSpacing="10">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto" />

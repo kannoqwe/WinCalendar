@@ -99,7 +99,50 @@
                     x:Name="TaskTimePicker"
                     ClockIdentifier="24HourClock"
                     MinuteIncrement="5"
-                    IsEnabled="False" />
+                    IsEnabled="False"
+                    TimeChanged="TaskTimePicker_TimeChanged" />
+            </StackPanel>
+        </Border>
+
+        <Border
+            Background="{ThemeResource AppCardBackgroundBrush}"
+            BorderBrush="{ThemeResource AppBorderBrush}"
+            BorderThickness="1"
+            CornerRadius="16"
+            Padding="12">
+            <StackPanel Spacing="10">
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Spacing="2">
+                        <TextBlock FontWeight="SemiBold" Text="Duration" />
+                        <TextBlock
+                            FontSize="12"
+                            Foreground="{ThemeResource AppTextMutedBrush}"
+                            Text="Optional length in minutes for timeline sizing" />
+                    </StackPanel>
+
+                    <ToggleSwitch
+                        x:Name="HasDurationToggle"
+                        Grid.Column="1"
+                        IsEnabled="False"
+                        OffContent="Off"
+                        OnContent="Set"
+                        Toggled="HasDurationToggle_Toggled" />
+                </Grid>
+
+                <NumberBox
+                    x:Name="TaskDurationNumberBox"
+                    Header="Minutes"
+                    IsEnabled="False"
+                    LargeChange="15"
+                    Minimum="5"
+                    SmallChange="5"
+                    SpinButtonPlacementMode="Compact"
+                    ValueChanged="TaskDurationNumberBox_ValueChanged" />
             </StackPanel>
         </Border>
     </StackPanel>

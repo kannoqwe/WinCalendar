@@ -387,7 +387,7 @@
 
                             <Border
                                 IsHitTestVisible="False"
-                                Height="3"
+                                Height="1"
                                 Margin="4,0,4,0"
                                 VerticalAlignment="Top"
                                 Background="{ThemeResource AppAccentBrush}"

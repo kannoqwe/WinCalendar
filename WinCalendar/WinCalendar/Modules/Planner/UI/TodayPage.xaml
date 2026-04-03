@@ -343,28 +343,28 @@
                                                                             X="{Binding Left}"
                                                                             Y="{Binding Top}" />
                                                                     </Button.RenderTransform>
-                                                                    <Border
-                                                                        Padding="7,6"
-                                                                        Background="{ThemeResource AppCardBackgroundBrush}"
-                                                                        BorderBrush="{ThemeResource AppAccentBrush}"
-                                                                        BorderThickness="1"
-                                                                        CornerRadius="10"
-                                                                        Opacity="{Binding ContentOpacity}">
-                                                                        <StackPanel Spacing="2">
-                                                                            <TextBlock
-                                                                                FontSize="10"
-                                                                                Foreground="{ThemeResource AppTextMutedBrush}"
-                                                                                Text="{Binding TimeText}" />
-                                                                            <TextBlock
-                                                                                FontSize="11"
-                                                                                FontWeight="SemiBold"
-                                                                                MaxLines="2"
-                                                                                Text="{Binding Title}"
-                                                                                TextTrimming="CharacterEllipsis"
-                                                                                TextWrapping="WrapWholeWords" />
-                                                                        </StackPanel>
-                                                                    </Border>
-                                                                </Button>
+                                                                        <Border
+                                                                            Padding="7,6"
+                                                                            Background="{ThemeResource AppCardBackgroundBrush}"
+                                                                            BorderBrush="{ThemeResource AppAccentBrush}"
+                                                                            BorderThickness="1"
+                                                                            CornerRadius="10"
+                                                                            Opacity="{Binding ContentOpacity}">
+                                                                            <StackPanel Spacing="2">
+                                                                                <TextBlock
+                                                                                    FontSize="11"
+                                                                                    FontWeight="SemiBold"
+                                                                                    MaxLines="2"
+                                                                                    Text="{Binding Title}"
+                                                                                    TextTrimming="CharacterEllipsis"
+                                                                                    TextWrapping="WrapWholeWords" />
+                                                                                <TextBlock
+                                                                                    FontSize="10"
+                                                                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                                                                    Text="{Binding TimeText}" />
+                                                                            </StackPanel>
+                                                                        </Border>
+                                                                    </Button>
                                                             </DataTemplate>
                                                         </ItemsControl.ItemTemplate>
                                                     </ItemsControl>

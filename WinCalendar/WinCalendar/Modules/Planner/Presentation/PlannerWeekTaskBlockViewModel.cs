@@ -1,3 +1,5 @@
+using Microsoft.UI.Xaml.Media;
+
 namespace WinCalendar.Modules.Planner.Presentation;
 
 public sealed class PlannerWeekTaskBlockViewModel
@@ -29,6 +31,12 @@ public sealed class PlannerWeekTaskBlockViewModel
     public string Title => Task.Title;
 
     public string TimeText => Task.TimeRangeText;
+
+    public SolidColorBrush BackgroundBrush => Task.TaskBackgroundBrush;
+
+    public SolidColorBrush BorderBrush => Task.TaskBorderBrush;
+
+    public SolidColorBrush AccentBrush => Task.TaskAccentBrush;
 
     public double ContentOpacity => Task.ContentOpacity;
 }

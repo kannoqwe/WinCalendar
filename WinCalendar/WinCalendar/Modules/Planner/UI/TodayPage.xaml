@@ -277,8 +277,8 @@
                                                                         Click="WeekAllDayTaskButton_Click">
                                                                         <Border
                                                                             Padding="6,4"
-                                                                            Background="{ThemeResource AppCardBackgroundBrush}"
-                                                                            BorderBrush="{ThemeResource AppBorderBrush}"
+                                                                            Background="{Binding TaskBackgroundBrush}"
+                                                                            BorderBrush="{Binding TaskBorderBrush}"
                                                                             BorderThickness="1"
                                                                             CornerRadius="8"
                                                                             Opacity="{Binding ContentOpacity}">
@@ -347,8 +347,8 @@
                                                                     </Button.RenderTransform>
                                                                         <Border
                                                                             Padding="6,4"
-                                                                            Background="{ThemeResource AppCardBackgroundBrush}"
-                                                                            BorderBrush="{ThemeResource AppAccentBrush}"
+                                                                            Background="{Binding BackgroundBrush}"
+                                                                            BorderBrush="{Binding BorderBrush}"
                                                                             BorderThickness="1"
                                                                             CornerRadius="10"
                                                                             Opacity="{Binding ContentOpacity}">
@@ -362,7 +362,7 @@
                                                                                     TextWrapping="NoWrap" />
                                                                                 <TextBlock
                                                                                     FontSize="10"
-                                                                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                                                                    Foreground="{Binding AccentBrush}"
                                                                                     Text="{Binding TimeText}" />
                                                                             </StackPanel>
                                                                         </Border>

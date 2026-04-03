@@ -238,8 +238,8 @@
                                 <DataTemplate>
                                     <Border
                                         Padding="12"
-                                        Background="{ThemeResource AppCardAltBackgroundBrush}"
-                                        BorderBrush="{ThemeResource AppBorderBrush}"
+                                        Background="{Binding TaskBackgroundBrush}"
+                                        BorderBrush="{Binding TaskBorderBrush}"
                                         BorderThickness="1"
                                         CornerRadius="14"
                                         Opacity="{Binding ContentOpacity}">
@@ -259,7 +259,7 @@
                                                 Grid.Column="1"
                                                 Spacing="2">
                                                 <TextBlock FontWeight="SemiBold" Text="{Binding Title}" />
-                                                <TextBlock Foreground="{ThemeResource AppTextMutedBrush}" Text="{Binding DetailsText}" />
+                                                <TextBlock Foreground="{Binding TaskAccentBrush}" Text="{Binding DetailsText}" />
                                             </StackPanel>
 
                                             <Button

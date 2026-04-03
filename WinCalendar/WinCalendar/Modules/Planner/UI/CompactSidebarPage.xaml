@@ -112,32 +112,38 @@
                                                     ItemsSource="{Binding Tasks}">
                                                     <ItemsControl.ItemTemplate>
                                                         <DataTemplate>
-                                                            <Grid
+                                                            <Border
                                                                 Margin="0,0,0,8"
-                                                                ColumnSpacing="10"
+                                                                Padding="10,8"
+                                                                Background="{Binding TaskBackgroundBrush}"
+                                                                BorderBrush="{Binding TaskBorderBrush}"
+                                                                BorderThickness="1"
+                                                                CornerRadius="12"
                                                                 Opacity="{Binding ContentOpacity}">
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="Auto" />
-                                                                    <ColumnDefinition Width="*" />
-                                                                </Grid.ColumnDefinitions>
+                                                                <Grid ColumnSpacing="10">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="Auto" />
+                                                                        <ColumnDefinition Width="*" />
+                                                                    </Grid.ColumnDefinitions>
 
-                                                                <CheckBox
-                                                                    VerticalAlignment="Top"
-                                                                    IsChecked="{Binding IsCompleted, Mode=OneWay}"
-                                                                    Click="AgendaTaskCompletionCheckBox_Click" />
+                                                                    <CheckBox
+                                                                        VerticalAlignment="Top"
+                                                                        IsChecked="{Binding IsCompleted, Mode=OneWay}"
+                                                                        Click="AgendaTaskCompletionCheckBox_Click" />
 
-                                                                <StackPanel
-                                                                    Grid.Column="1"
-                                                                    Spacing="2">
-                                                                    <TextBlock
-                                                                        FontWeight="SemiBold"
-                                                                        Text="{Binding Title}"
-                                                                        TextWrapping="WrapWholeWords" />
-                                                                    <TextBlock
-                                                                        Foreground="{ThemeResource AppTextMutedBrush}"
-                                                                        Text="{Binding CompactTimeText}" />
-                                                                </StackPanel>
-                                                            </Grid>
+                                                                    <StackPanel
+                                                                        Grid.Column="1"
+                                                                        Spacing="2">
+                                                                        <TextBlock
+                                                                            FontWeight="SemiBold"
+                                                                            Text="{Binding Title}"
+                                                                            TextWrapping="WrapWholeWords" />
+                                                                        <TextBlock
+                                                                            Foreground="{Binding TaskAccentBrush}"
+                                                                            Text="{Binding CompactTimeText}" />
+                                                                    </StackPanel>
+                                                                </Grid>
+                                                            </Border>
                                                         </DataTemplate>
                                                     </ItemsControl.ItemTemplate>
                                                 </ItemsControl>

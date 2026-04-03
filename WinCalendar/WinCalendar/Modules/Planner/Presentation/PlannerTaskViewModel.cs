@@ -1,5 +1,6 @@
 using System;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using Planner.App.Modules.Tasks.Entities;
 using WinCalendar.Core.Time;
 
@@ -9,12 +10,17 @@ public sealed class PlannerTaskViewModel
 {
     public PlannerTaskViewModel(TaskItem task)
     {
+        PlannerTaskPalette.PlannerTaskTone tone = PlannerTaskPalette.GetTone(task.Id);
+
         Id = task.Id;
         Title = task.Title;
         Date = task.Date;
         Time = task.Time;
         DurationMinutes = task.DurationMinutes;
         IsCompleted = task.IsCompleted;
+        TaskBackgroundBrush = tone.BackgroundBrush;
+        TaskBorderBrush = tone.BorderBrush;
+        TaskAccentBrush = tone.AccentBrush;
     }
 
     public Guid Id { get; }
@@ -28,6 +34,12 @@ public sealed class PlannerTaskViewModel
     public int? DurationMinutes { get; }
 
     public bool IsCompleted { get; }
+
+    public SolidColorBrush TaskBackgroundBrush { get; }
+
+    public SolidColorBrush TaskBorderBrush { get; }
+
+    public SolidColorBrush TaskAccentBrush { get; }
 
     public string DateText => PlannerDateTimeFormatter.FormatDate(Date);
 

@@ -293,33 +293,35 @@
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
 
-                                            <StackPanel
-                                                Spacing="2"
-                                                HorizontalAlignment="Left">
-                                                <TextBlock
-                                                    FontWeight="SemiBold"
-                                                    Text="{Binding Title}"
-                                                    TextAlignment="Left"
-                                                    TextTrimming="CharacterEllipsis" />
-                                                <TextBlock
-                                                    Foreground="{Binding TaskAccentBrush}"
-                                                    Text="{Binding DetailsText}"
-                                                    TextAlignment="Left"
-                                                    TextTrimming="CharacterEllipsis" />
-                                            </StackPanel>
-
-                                            <StackPanel
-                                                Grid.Column="1"
-                                                Spacing="6"
-                                                HorizontalAlignment="Right">
-                                                <CheckBox
-                                                    HorizontalAlignment="Center"
-                                                    VerticalAlignment="Top"
-                                                    IsChecked="{Binding IsCompleted, Mode=OneWay}"
-                                                    Click="TaskCompletionCheckBox_Click" />
-
-                                                <Button
-                                                    Style="{StaticResource TaskIconButtonStyle}"
+                                             <StackPanel
+                                                 Spacing="2"
+                                                 HorizontalAlignment="Left">
+                                                 <TextBlock
+                                                     FontWeight="SemiBold"
+                                                     Text="{Binding Title}"
+                                                     TextAlignment="Left"
+                                                     TextTrimming="CharacterEllipsis" />
+                                                 <TextBlock
+                                                     Foreground="{Binding TaskAccentBrush}"
+                                                     Text="{Binding CompactTimeText}"
+                                                     TextAlignment="Left"
+                                                     TextTrimming="CharacterEllipsis" />
+                                             </StackPanel>
+ 
+                                             <StackPanel
+                                                 Grid.Column="1"
+                                                 Orientation="Horizontal"
+                                                 Spacing="8"
+                                                 HorizontalAlignment="Right"
+                                                 VerticalAlignment="Center">
+                                                 <CheckBox
+                                                     HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center"
+                                                     IsChecked="{Binding IsCompleted, Mode=OneWay}"
+                                                     Click="TaskCompletionCheckBox_Click" />
+ 
+                                                 <Button
+                                                     Style="{StaticResource TaskIconButtonStyle}"
                                                     Click="TaskOpenButton_Click"
                                                     ToolTipService.ToolTip="Open task">
                                                     <FontIcon

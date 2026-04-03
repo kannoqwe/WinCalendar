@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using WinCalendar.Modules.Planner.Presentation;
@@ -12,6 +13,7 @@ public sealed partial class TodayPage : Page
 {
     private readonly PlannerStateStore _plannerStateStore;
     private readonly PlannerWindowCoordinator _windowCoordinator;
+    private readonly DispatcherQueueTimer _currentTimeTimer;
     private bool _initialized;
 
     public TodayPage(PlannerStateStore plannerStateStore, PlannerWindowCoordinator windowCoordinator)
@@ -20,15 +22,25 @@ public sealed partial class TodayPage : Page
         _windowCoordinator = windowCoordinator;
         InitializeComponent();
         DataContext = _plannerStateStore;
+        _currentTimeTimer = DispatcherQueue.CreateTimer();
+        _currentTimeTimer.Interval = TimeSpan.FromMinutes(1);
+        _currentTimeTimer.IsRepeating = true;
+        _currentTimeTimer.Tick += CurrentTimeTimer_Tick;
+        Unloaded += TodayPage_Unloaded;
     }
 
     private async void Root_Loaded(object sender, RoutedEventArgs e)
     {
         if (_initialized)
+        {
+            StartCurrentTimeTimer();
             return;
+        }
 
         _initialized = true;
         await _plannerStateStore.EnsureInitializedAsync();
+        _plannerStateStore.RefreshCurrentTimeIndicator();
+        StartCurrentTimeTimer();
     }
 
     private async void PreviousWeekButton_Click(object sender, RoutedEventArgs e)
@@ -84,5 +96,25 @@ public sealed partial class TodayPage : Page
 
         _plannerStateStore.SelectTask(selectedTask);
         _windowCoordinator.ShowMediumView();
+    }
+
+    private void CurrentTimeTimer_Tick(DispatcherQueueTimer sender, object args)
+    {
+        _plannerStateStore.RefreshCurrentTimeIndicator();
+    }
+
+    private void TodayPage_Unloaded(object sender, RoutedEventArgs e)
+    {
+        _currentTimeTimer.Stop();
+    }
+
+    private void StartCurrentTimeTimer()
+    {
+        _plannerStateStore.RefreshCurrentTimeIndicator();
+
+        if (_currentTimeTimer.IsRunning)
+            return;
+
+        _currentTimeTimer.Start();
     }
 }

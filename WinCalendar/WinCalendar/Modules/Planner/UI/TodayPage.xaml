@@ -323,6 +323,21 @@
                                                         </ItemsControl.ItemTemplate>
                                                     </ItemsControl>
 
+                                                    <Border
+                                                        IsHitTestVisible="False"
+                                                        Height="2"
+                                                        Margin="6,0"
+                                                        VerticalAlignment="Top"
+                                                        Background="{ThemeResource AppAccentBrush}"
+                                                        CornerRadius="999"
+                                                        Opacity="0.9"
+                                                        Visibility="{Binding TodayVisibility}">
+                                                        <Border.RenderTransform>
+                                                            <TranslateTransform
+                                                                Y="{Binding DataContext.CurrentTimeIndicatorTop, ElementName=LayoutRoot}" />
+                                                        </Border.RenderTransform>
+                                                    </Border>
+
                                                     <ItemsControl
                                                         Height="{Binding DataContext.WeekTimelineTimedHeight, ElementName=LayoutRoot}"
                                                         ItemsSource="{Binding TimedTaskBlocks}">

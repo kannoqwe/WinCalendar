@@ -37,6 +37,17 @@
             <Setter Property="CornerRadius" Value="14" />
             <Setter Property="Foreground" Value="{ThemeResource AppAccentBrush}" />
         </Style>
+
+        <Style x:Key="TaskIconButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="{ThemeResource AppCardBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource AppBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Foreground" Value="{ThemeResource AppAccentBrush}" />
+        </Style>
     </Page.Resources>
 
     <Grid
@@ -280,7 +291,6 @@
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
-                                                <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
 
                                             <StackPanel
@@ -298,16 +308,26 @@
                                                     TextTrimming="CharacterEllipsis" />
                                             </StackPanel>
 
-                                            <CheckBox
+                                            <StackPanel
                                                 Grid.Column="1"
-                                                VerticalAlignment="Top"
-                                                IsChecked="{Binding IsCompleted, Mode=OneWay}"
-                                                Click="TaskCompletionCheckBox_Click" />
+                                                Spacing="6"
+                                                HorizontalAlignment="Right">
+                                                <CheckBox
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Top"
+                                                    IsChecked="{Binding IsCompleted, Mode=OneWay}"
+                                                    Click="TaskCompletionCheckBox_Click" />
 
-                                            <Button
-                                                Grid.Column="2"
-                                                Click="TaskOpenButton_Click"
-                                                Content="Open" />
+                                                <Button
+                                                    Style="{StaticResource TaskIconButtonStyle}"
+                                                    Click="TaskOpenButton_Click"
+                                                    ToolTipService.ToolTip="Open task">
+                                                    <FontIcon
+                                                        FontFamily="Segoe Fluent Icons"
+                                                        FontSize="12"
+                                                        Glyph="&#xE8A7;" />
+                                                </Button>
+                                            </StackPanel>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>

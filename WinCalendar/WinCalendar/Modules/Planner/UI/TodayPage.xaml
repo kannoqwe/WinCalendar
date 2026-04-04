@@ -17,121 +17,163 @@
         </Style>
 
         <Style x:Key="IconButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="32" />
-            <Setter Property="Height" Value="32" />
+            <Setter Property="Width" Value="36" />
+            <Setter Property="Height" Value="36" />
             <Setter Property="Padding" Value="0" />
-            <Setter Property="Background" Value="{ThemeResource AppCardAltBackgroundBrush}" />
+            <Setter Property="Background" Value="{ThemeResource AppShellBackgroundBrush}" />
             <Setter Property="BorderBrush" Value="{ThemeResource AppBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="11" />
+            <Setter Property="CornerRadius" Value="12" />
         </Style>
 
         <Style x:Key="ToolbarButtonStyle" TargetType="Button">
             <Setter Property="MinHeight" Value="36" />
             <Setter Property="Padding" Value="14,0" />
-            <Setter Property="Background" Value="{ThemeResource AppCardAltBackgroundBrush}" />
+            <Setter Property="Background" Value="{ThemeResource AppShellBackgroundBrush}" />
             <Setter Property="BorderBrush" Value="{ThemeResource AppBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="12" />
+        </Style>
+
+        <Style x:Key="PrimaryToolbarButtonStyle" TargetType="Button">
+            <Setter Property="MinHeight" Value="36" />
+            <Setter Property="Padding" Value="16,0" />
+            <Setter Property="Background" Value="{ThemeResource AppAccentBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource AppAccentBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Foreground" Value="White" />
         </Style>
     </Page.Resources>
 
     <Grid
         x:Name="LayoutRoot"
         Loaded="Root_Loaded"
-        Padding="12">
-        <Grid RowSpacing="10">
+        Padding="16">
+        <Grid RowSpacing="16">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
             <Border
-                Background="{ThemeResource AppCardBackgroundBrush}"
+                Background="{ThemeResource AppShellBackgroundBrush}"
                 BorderBrush="{ThemeResource AppBorderBrush}"
                 BorderThickness="1"
-                CornerRadius="16"
-                Padding="10">
-                <Grid ColumnSpacing="8">
+                CornerRadius="20"
+                Padding="16">
+                <Grid ColumnSpacing="12">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <StackPanel
                         Grid.Column="0"
-                        Orientation="Horizontal"
-                        Spacing="6"
-                        VerticalAlignment="Center">
-                        <Button
-                            Style="{StaticResource IconButtonStyle}"
-                            Click="PreviousWeekButton_Click"
-                            ToolTipService.ToolTip="Previous week">
-                            <FontIcon FontFamily="Segoe Fluent Icons" FontSize="12" Glyph="&#xE76B;" />
-                        </Button>
-
-                        <Button
-                            Style="{StaticResource IconButtonStyle}"
-                            Click="NextWeekButton_Click"
-                            ToolTipService.ToolTip="Next week">
-                            <FontIcon FontFamily="Segoe Fluent Icons" FontSize="12" Glyph="&#xE76C;" />
-                        </Button>
-                    </StackPanel>
-
-                    <StackPanel
-                        Grid.Column="1"
-                        Spacing="1"
+                        Spacing="2"
                         VerticalAlignment="Center">
                         <TextBlock
                             FontFamily="Segoe UI Variable Display"
-                            FontSize="18"
+                            FontSize="28"
                             FontWeight="SemiBold"
-                            Text="{Binding WeekLabel}" />
+                            Text="{Binding MonthLabel}" />
                         <TextBlock
                             FontSize="12"
                             Foreground="{ThemeResource AppTextMutedBrush}"
-                            Text="{Binding QuickAddTargetText}" />
+                            Text="{Binding WeekLabel}" />
                     </StackPanel>
+
+                    <Button
+                        Grid.Column="1"
+                        Style="{StaticResource IconButtonStyle}"
+                        Click="PreviousWeekButton_Click"
+                        ToolTipService.ToolTip="Previous week">
+                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="12" Glyph="&#xE76B;" />
+                    </Button>
 
                     <Button
                         Grid.Column="2"
                         Style="{StaticResource ToolbarButtonStyle}"
                         Click="CurrentWeekButton_Click"
-                        Content="This week" />
+                        Content="Today" />
 
                     <Button
                         Grid.Column="3"
-                        Width="36"
-                        Height="36"
-                        Padding="0"
-                        Background="{ThemeResource AppAccentBrush}"
-                        BorderBrush="{ThemeResource AppAccentBrush}"
-                        BorderThickness="0"
-                        Click="AddTaskButton_Click"
-                        CornerRadius="12"
-                        ToolTipService.ToolTip="Add task">
-                        <FontIcon
-                            FontFamily="Segoe Fluent Icons"
-                            FontSize="13"
-                            Foreground="White"
-                            Glyph="&#xE710;" />
+                        Style="{StaticResource IconButtonStyle}"
+                        Click="NextWeekButton_Click"
+                        ToolTipService.ToolTip="Next week">
+                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="12" Glyph="&#xE76C;" />
                     </Button>
+
+                    <Button
+                        Grid.Column="4"
+                        Style="{StaticResource PrimaryToolbarButtonStyle}"
+                        Click="AddTaskButton_Click"
+                        Content="New task" />
                 </Grid>
             </Border>
 
-            <Border
+            <Grid
                 Grid.Row="1"
-                Background="{ThemeResource AppCardBackgroundBrush}"
-                BorderBrush="{ThemeResource AppBorderBrush}"
-                BorderThickness="1"
-                CornerRadius="18"
-                Padding="10">
-                <ScrollViewer
-                    HorizontalScrollBarVisibility="Auto"
-                    VerticalScrollBarVisibility="Auto">
-                    <Grid RowSpacing="8">
+                ColumnSpacing="16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="340" />
+                </Grid.ColumnDefinitions>
+
+                <Border
+                    Grid.Column="0"
+                    Background="{ThemeResource AppShellBackgroundBrush}"
+                    BorderBrush="{ThemeResource AppBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="22"
+                    Padding="18">
+                    <Grid RowSpacing="14">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Spacing="2">
+                                <TextBlock
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                    Text="WEEK VIEW" />
+                                <TextBlock
+                                    FontSize="13"
+                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                    Text="{Binding WeekViewSummary}" />
+                            </StackPanel>
+
+                            <Border
+                                Grid.Column="1"
+                                Padding="10,6"
+                                Background="{ThemeResource AppPageBackgroundBrush}"
+                                BorderBrush="{ThemeResource AppBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="999">
+                                <TextBlock
+                                    FontSize="12"
+                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                    Text="{Binding QuickAddTargetText}" />
+                            </Border>
+                        </Grid>
+
+                        <ScrollViewer
+                            Grid.Row="1"
+                            HorizontalScrollBarVisibility="Auto"
+                            VerticalScrollBarVisibility="Auto">
+                            <Grid RowSpacing="8">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
@@ -158,8 +200,8 @@
                                         <Border
                                             Width="{Binding DataContext.WeekTimelineDayWidth, ElementName=LayoutRoot}"
                                             Padding="10,8"
-                                            Background="{ThemeResource AppShellBackgroundBrush}"
-                                            BorderBrush="{ThemeResource AppBorderBrush}"
+                                            Background="{ThemeResource AppPageBackgroundBrush}"
+                                            BorderBrush="{ThemeResource AppLineBrush}"
                                             BorderThickness="1"
                                             CornerRadius="14">
                                             <Grid>
@@ -210,9 +252,10 @@
                                 Height="{Binding WeekTimelineAnyTimeLaneHeight}"
                                 Padding="0,8,0,0">
                                 <TextBlock
-                                    FontSize="11"
+                                    FontSize="10"
+                                    FontWeight="SemiBold"
                                     Foreground="{ThemeResource AppTextMutedBrush}"
-                                    Text="Any" />
+                                    Text="ALL DAY" />
                             </Border>
 
                             <ItemsControl ItemsSource="{Binding WeekTimelineHours}">
@@ -246,7 +289,7 @@
                                             Width="{Binding DataContext.WeekTimelineDayWidth, ElementName=LayoutRoot}"
                                             Margin="0,0,8,0"
                                             Background="{ThemeResource AppShellBackgroundBrush}"
-                                            BorderBrush="{ThemeResource AppBorderBrush}"
+                                            BorderBrush="{ThemeResource AppLineBrush}"
                                             BorderThickness="1"
                                             CornerRadius="14">
                                             <Grid>
@@ -257,18 +300,23 @@
                                                     CornerRadius="14" />
 
                                                 <StackPanel Spacing="0">
-                                                    <Border
-                                                        Height="{Binding DataContext.WeekTimelineAnyTimeLaneHeight, ElementName=LayoutRoot}"
-                                                        Padding="8,6"
-                                                        Background="{ThemeResource AppCardAltBackgroundBrush}"
-                                                        BorderBrush="{ThemeResource AppLineBrush}"
-                                                        BorderThickness="0,0,0,1">
-                                                        <StackPanel Spacing="4">
+                                                    <Grid Height="{Binding DataContext.WeekTimelineAnyTimeLaneHeight, ElementName=LayoutRoot}">
+                                                        <Border
+                                                            Background="Transparent"
+                                                            Tapped="WeekAllDayLane_Tapped" />
+
+                                                        <Border
+                                                            Margin="0,0,0,1"
+                                                            Background="{ThemeResource AppPageBackgroundBrush}" />
+
+                                                        <StackPanel
+                                                            Padding="8,6"
+                                                            Spacing="4">
                                                             <TextBlock
                                                                 Visibility="{Binding EmptyAllDayVisibility}"
                                                                 FontSize="11"
                                                                 Foreground="{ThemeResource AppTextMutedBrush}"
-                                                                Text="Free" />
+                                                                Text="Click to add" />
 
                                                             <ItemsControl ItemsSource="{Binding VisibleAllDayTasks}">
                                                                 <ItemsControl.ItemTemplate>
@@ -298,7 +346,7 @@
                                                                 Visibility="{Binding HiddenAllDayTaskCountVisibility}"
                                                                 Padding="6,3"
                                                                 HorizontalAlignment="Left"
-                                                                Background="{ThemeResource AppCardBackgroundBrush}"
+                                                                Background="{ThemeResource AppShellBackgroundBrush}"
                                                                 BorderBrush="{ThemeResource AppBorderBrush}"
                                                                 BorderThickness="1"
                                                                 CornerRadius="999">
@@ -308,9 +356,13 @@
                                                                     Text="{Binding HiddenAllDayTaskCountText}" />
                                                             </Border>
                                                         </StackPanel>
-                                                    </Border>
+                                                    </Grid>
 
                                                     <Grid Height="{Binding DataContext.WeekTimelineTimedHeight, ElementName=LayoutRoot}">
+                                                        <Border
+                                                            Background="Transparent"
+                                                            Tapped="WeekTimedGrid_Tapped" />
+
                                                         <ItemsControl
                                                             IsHitTestVisible="False"
                                                             ItemsSource="{Binding DataContext.WeekTimelineHours, ElementName=LayoutRoot}">
@@ -353,24 +405,24 @@
                                                                                 BorderThickness="1"
                                                                                 CornerRadius="10"
                                                                                 Opacity="{Binding ContentOpacity}">
-                                                                                <Grid RowSpacing="1">
+                                                                                <Grid RowSpacing="2">
                                                                                     <Grid.RowDefinitions>
-                                                                                        <RowDefinition Height="*" />
                                                                                         <RowDefinition Height="Auto" />
+                                                                                        <RowDefinition Height="*" />
                                                                                     </Grid.RowDefinitions>
 
                                                                                     <TextBlock
+                                                                                        FontSize="{Binding TimeFontSize}"
+                                                                                        Foreground="{Binding AccentBrush}"
+                                                                                        Text="{Binding TimeText}" />
+                                                                                    <TextBlock
+                                                                                        Grid.Row="1"
                                                                                         FontSize="{Binding TitleFontSize}"
                                                                                         FontWeight="SemiBold"
                                                                                         MaxLines="{Binding TitleMaxLines}"
                                                                                         Text="{Binding Title}"
                                                                                         TextTrimming="CharacterEllipsis"
                                                                                         TextWrapping="{Binding TitleWrapping}" />
-                                                                                    <TextBlock
-                                                                                        Grid.Row="1"
-                                                                                        FontSize="{Binding TimeFontSize}"
-                                                                                        Foreground="{Binding AccentBrush}"
-                                                                                        Text="{Binding TimeText}" />
                                                                                 </Grid>
                                                                             </Border>
                                                                         </Button>
@@ -387,7 +439,7 @@
 
                             <Border
                                 IsHitTestVisible="False"
-                                Height="1"
+                                Height="2"
                                 Margin="4,0,4,0"
                                 VerticalAlignment="Top"
                                 Background="{ThemeResource AppAccentBrush}"
@@ -400,9 +452,189 @@
                                 </Border.RenderTransform>
                             </Border>
                         </Grid>
+                            </Grid>
+                        </ScrollViewer>
                     </Grid>
-                </ScrollViewer>
-            </Border>
+                </Border>
+
+                <Border
+                    Grid.Column="1"
+                    Background="{ThemeResource AppShellBackgroundBrush}"
+                    BorderBrush="{ThemeResource AppBorderBrush}"
+                    BorderThickness="1"
+                    CornerRadius="22"
+                    Padding="18">
+                    <Grid>
+                        <StackPanel
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            Spacing="10"
+                            Visibility="{Binding EmptySelectedTaskVisibility}">
+                            <Border
+                                Width="52"
+                                Height="52"
+                                HorizontalAlignment="Center"
+                                Background="{ThemeResource AppAccentMutedBrush}"
+                                CornerRadius="999">
+                                <FontIcon
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    FontFamily="Segoe Fluent Icons"
+                                    FontSize="18"
+                                    Foreground="{ThemeResource AppAccentBrush}"
+                                    Glyph="&#xE8A5;" />
+                            </Border>
+
+                            <TextBlock
+                                FontFamily="Segoe UI Variable Display"
+                                FontSize="22"
+                                FontWeight="SemiBold"
+                                HorizontalAlignment="Center"
+                                Text="Week editor" />
+                            <TextBlock
+                                Width="240"
+                                TextAlignment="Center"
+                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Text="Click an existing task to edit it, or click empty space in the week timeline to create a new one."
+                                TextWrapping="WrapWholeWords" />
+                        </StackPanel>
+
+                        <ScrollViewer
+                            HorizontalScrollBarVisibility="Disabled"
+                            Visibility="{Binding SelectedTaskVisibility}">
+                            <StackPanel Spacing="16">
+                                <Grid ColumnSpacing="10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Spacing="3">
+                                        <TextBlock
+                                            FontFamily="Segoe UI Variable Display"
+                                            FontSize="24"
+                                            FontWeight="SemiBold"
+                                            Text="{Binding EditorPanelTitle}" />
+                                        <TextBlock
+                                            Foreground="{ThemeResource AppTextMutedBrush}"
+                                            Text="{Binding EditorScheduleSummary}" />
+                                        <TextBlock
+                                            FontSize="12"
+                                            Foreground="{ThemeResource AppTextMutedBrush}"
+                                            Text="{Binding EditorPanelSubtitle}"
+                                            TextWrapping="WrapWholeWords" />
+                                    </StackPanel>
+
+                                    <Button
+                                        Grid.Column="1"
+                                        Style="{StaticResource IconButtonStyle}"
+                                        Click="CloseEditorButton_Click"
+                                        ToolTipService.ToolTip="Close editor">
+                                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="12" Glyph="&#xE711;" />
+                                    </Button>
+                                </Grid>
+
+                                <TextBox
+                                    Header="Title"
+                                    PlaceholderText="What needs to be done?"
+                                    Text="{Binding EditorTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+
+                                <DatePicker
+                                    Header="Date"
+                                    Date="{Binding EditorDate, Mode=TwoWay}" />
+
+                                <Border
+                                    Background="{ThemeResource AppPageBackgroundBrush}"
+                                    BorderBrush="{ThemeResource AppBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="16"
+                                    Padding="12">
+                                    <StackPanel Spacing="12">
+                                        <Grid ColumnSpacing="10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel Spacing="2">
+                                                <TextBlock FontWeight="SemiBold" Text="Time" />
+                                                <TextBlock
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                                    Text="Enable timed placement on the week timeline" />
+                                            </StackPanel>
+
+                                            <ToggleSwitch
+                                                Grid.Column="1"
+                                                IsOn="{Binding EditorHasTime, Mode=TwoWay}"
+                                                OffContent="Any"
+                                                OnContent="Set" />
+                                        </Grid>
+
+                                        <TimePicker
+                                            ClockIdentifier="24HourClock"
+                                            Header="Start"
+                                            IsEnabled="{Binding EditorHasTime}"
+                                            MinuteIncrement="5"
+                                            Time="{Binding EditorTime, Mode=TwoWay}" />
+
+                                        <Grid ColumnSpacing="10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <StackPanel Spacing="2">
+                                                <TextBlock FontWeight="SemiBold" Text="Duration" />
+                                                <TextBlock
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                                    Text="Optional block length for the timeline" />
+                                            </StackPanel>
+
+                                            <ToggleSwitch
+                                                Grid.Column="1"
+                                                IsEnabled="{Binding EditorDurationToggleEnabled}"
+                                                IsOn="{Binding EditorHasDuration, Mode=TwoWay}"
+                                                OffContent="Off"
+                                                OnContent="Set" />
+                                        </Grid>
+
+                                        <NumberBox
+                                            Header="Minutes"
+                                            IsEnabled="{Binding EditorDurationInputEnabled}"
+                                            LargeChange="15"
+                                            Maximum="{Binding EditorMaxDurationMinutes}"
+                                            Minimum="5"
+                                            SmallChange="5"
+                                            SpinButtonPlacementMode="Compact"
+                                            Value="{Binding EditorDurationMinutes, Mode=TwoWay}" />
+                                    </StackPanel>
+                                </Border>
+
+                                <StackPanel Spacing="10">
+                                    <Button
+                                        Style="{StaticResource PrimaryToolbarButtonStyle}"
+                                        Click="SaveTaskButton_Click"
+                                        Content="{Binding EditorPrimaryActionText}" />
+
+                                    <Button
+                                        Style="{StaticResource ToolbarButtonStyle}"
+                                        Click="CompleteTaskButton_Click"
+                                        Content="{Binding EditorCompletionButtonText}"
+                                        Visibility="{Binding EditorCompleteVisibility}" />
+
+                                    <Button
+                                        Style="{StaticResource ToolbarButtonStyle}"
+                                        Click="DeleteSelectedTaskButton_Click"
+                                        Content="Delete task"
+                                        Visibility="{Binding EditorDeleteVisibility}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Grid>
         </Grid>
     </Grid>
 </Page>

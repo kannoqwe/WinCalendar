@@ -9,7 +9,7 @@ namespace WinCalendar.Modules.Planner.Presentation;
 
 public sealed class PlannerWeekDayTimelineViewModel : ObservableObject
 {
-    private const int InlineAllDayTaskLimit = 1;
+    private const int InlineAllDayTaskLimit = 2;
     private bool _isSelected;
 
     public PlannerWeekDayTimelineViewModel(

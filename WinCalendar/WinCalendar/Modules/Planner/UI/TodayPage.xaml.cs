@@ -16,6 +16,7 @@ public sealed partial class TodayPage : Page
     private readonly PlannerStateStore _plannerStateStore;
     private readonly DispatcherQueueTimer _currentTimeTimer;
     private readonly DispatcherQueueTimer _inlineSaveTimer;
+    private bool _timersInitialized;
     private bool _suppressInlineSave;
     private bool _isInlineSaveInProgress;
     private bool _inlineSaveQueued;
@@ -25,8 +26,6 @@ public sealed partial class TodayPage : Page
     public TodayPage(PlannerStateStore plannerStateStore, PlannerWindowCoordinator windowCoordinator)
     {
         _plannerStateStore = plannerStateStore;
-        InitializeComponent();
-        DataContext = _plannerStateStore;
         _currentTimeTimer = DispatcherQueue.CreateTimer();
         _currentTimeTimer.Interval = TimeSpan.FromMinutes(1);
         _currentTimeTimer.IsRepeating = true;
@@ -35,6 +34,9 @@ public sealed partial class TodayPage : Page
         _inlineSaveTimer.Interval = TimeSpan.FromMilliseconds(350);
         _inlineSaveTimer.IsRepeating = false;
         _inlineSaveTimer.Tick += InlineSaveTimer_Tick;
+        _timersInitialized = true;
+        InitializeComponent();
+        DataContext = _plannerStateStore;
         Unloaded += TodayPage_Unloaded;
     }
 
@@ -198,7 +200,9 @@ public sealed partial class TodayPage : Page
 
     private void CloseEditorButton_Click(object sender, RoutedEventArgs e)
     {
-        _inlineSaveTimer.Stop();
+        if (_timersInitialized)
+            _inlineSaveTimer.Stop();
+
         SuspendInlineEditor();
         _plannerStateStore.SelectTask(null);
         ResumeInlineEditor(focusTitleEditor: false);
@@ -211,6 +215,9 @@ public sealed partial class TodayPage : Page
 
     private void TodayPage_Unloaded(object sender, RoutedEventArgs e)
     {
+        if (!_timersInitialized)
+            return;
+
         _currentTimeTimer.Stop();
         _inlineSaveTimer.Stop();
     }
@@ -236,7 +243,7 @@ public sealed partial class TodayPage : Page
 
     private void ScheduleInlineSave()
     {
-        if (_suppressInlineSave)
+        if (!_timersInitialized || _suppressInlineSave)
             return;
 
         if (_isInlineSaveInProgress)
@@ -284,6 +291,9 @@ public sealed partial class TodayPage : Page
 
     private void SuspendInlineEditor()
     {
+        if (!_timersInitialized)
+            return;
+
         _inlineSaveTimer.Stop();
         _suppressInlineSave = true;
     }

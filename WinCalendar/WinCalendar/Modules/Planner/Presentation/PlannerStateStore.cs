@@ -150,6 +150,8 @@ public sealed class PlannerStateStore : ObservableObject
 
     public double WeekTimelineHourHeight => WeekTimelineHourHeightValue;
 
+    public double WeekTimelineQuarterHourHeight => WeekTimelineHourHeightValue / 4d;
+
     public double WeekTimelineDayWidth => WeekTimelineDayWidthValue;
 
     public double WeekTimelineAnyTimeLaneHeight => WeekTimelineAnyTimeLaneHeightValue;
@@ -641,11 +643,13 @@ public sealed class PlannerStateStore : ObservableObject
                 .Where(task => !task.HasTime)
                 .ToList();
 
+            List<PlannerWeekTimeSlotViewModel> timeSlots = BuildWeekTimeSlots(date);
             List<PlannerWeekTaskBlockViewModel> timedTaskBlocks = BuildWeekTimedTaskBlocks(tasksForDay);
 
             WeekTimelineDays.Add(new PlannerWeekDayTimelineViewModel(
                 date,
                 allDayTasks,
+                timeSlots,
                 timedTaskBlocks,
                 date == today,
                 date == _selectedDate));
@@ -749,6 +753,20 @@ public sealed class PlannerStateStore : ObservableObject
         return items
             .Select(CreateWeekTaskBlock)
             .ToList();
+    }
+
+    private static List<PlannerWeekTimeSlotViewModel> BuildWeekTimeSlots(DateOnly date)
+    {
+        List<PlannerWeekTimeSlotViewModel> slots = [];
+
+        for (int minutes = 0; minutes < 24 * 60; minutes += 15)
+        {
+            slots.Add(new PlannerWeekTimeSlotViewModel(
+                date,
+                new TimeOnly(minutes / 60, minutes % 60)));
+        }
+
+        return slots;
     }
 
     private void UpdateSummaries(DateOnly weekStart, DateOnly weekEnd)

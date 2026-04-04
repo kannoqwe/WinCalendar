@@ -15,6 +15,7 @@ public sealed class PlannerWeekDayTimelineViewModel : ObservableObject
     public PlannerWeekDayTimelineViewModel(
         DateOnly date,
         IEnumerable<PlannerTaskViewModel> allDayTasks,
+        IEnumerable<PlannerWeekTimeSlotViewModel> timeSlots,
         IEnumerable<PlannerWeekTaskBlockViewModel> timedTaskBlocks,
         bool isToday,
         bool isSelected)
@@ -26,6 +27,7 @@ public sealed class PlannerWeekDayTimelineViewModel : ObservableObject
 
         AllDayTasks = [];
         VisibleAllDayTasks = [];
+        TimeSlots = [];
         TimedTaskBlocks = [];
 
         foreach (PlannerTaskViewModel task in allDayTaskList)
@@ -33,6 +35,9 @@ public sealed class PlannerWeekDayTimelineViewModel : ObservableObject
 
         foreach (PlannerTaskViewModel task in allDayTaskList.Take(InlineAllDayTaskLimit))
             VisibleAllDayTasks.Add(task);
+
+        foreach (PlannerWeekTimeSlotViewModel timeSlot in timeSlots)
+            TimeSlots.Add(timeSlot);
 
         foreach (PlannerWeekTaskBlockViewModel taskBlock in timedTaskBlocks)
             TimedTaskBlocks.Add(taskBlock);
@@ -45,6 +50,8 @@ public sealed class PlannerWeekDayTimelineViewModel : ObservableObject
     public ObservableCollection<PlannerTaskViewModel> AllDayTasks { get; }
 
     public ObservableCollection<PlannerTaskViewModel> VisibleAllDayTasks { get; }
+
+    public ObservableCollection<PlannerWeekTimeSlotViewModel> TimeSlots { get; }
 
     public ObservableCollection<PlannerWeekTaskBlockViewModel> TimedTaskBlocks { get; }
 

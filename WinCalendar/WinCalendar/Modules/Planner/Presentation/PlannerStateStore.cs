@@ -14,13 +14,13 @@ namespace WinCalendar.Modules.Planner.Presentation;
 public sealed class PlannerStateStore : ObservableObject
 {
     private const int MonthGridCellCount = 42;
-    private const double WeekTimelineHourHeightValue = 44;
-    private const double WeekTimelineDayWidthValue = 144;
-    private const double WeekTimelineAnyTimeLaneHeightValue = 62;
-    private const double WeekTaskHorizontalPaddingValue = 6;
+    private const double WeekTimelineHourHeightValue = 40;
+    private const double WeekTimelineDayWidthValue = 104;
+    private const double WeekTimelineAnyTimeLaneHeightValue = 54;
+    private const double WeekTaskHorizontalPaddingValue = 4;
     private const double WeekTaskColumnGapValue = 4;
     private const int WeekTaskDefaultDurationMinutes = 45;
-    private const double WeekTaskMinimumHeightValue = 34;
+    private const double WeekTaskMinimumHeightValue = 30;
 
     private readonly CreateTaskUseCase _createTaskUseCase;
     private readonly DeleteTaskUseCase _deleteTaskUseCase;
@@ -791,8 +791,8 @@ public sealed class PlannerStateStore : ObservableObject
     {
         SelectedDateText = PlannerDateTimeFormatter.FormatDate(_selectedDate);
         SelectedDateSummary = SelectedDayTasks.Count == 0
-            ? "No tasks for selected day"
-            : $"{SelectedDayTasks.Count} task{(SelectedDayTasks.Count == 1 ? string.Empty : "s")} on selected day";
+            ? "No tasks"
+            : $"{SelectedDayTasks.Count} task{(SelectedDayTasks.Count == 1 ? string.Empty : "s")}";
 
         MonthLabel = PlannerDateTimeFormatter.FormatMonthTitle(_displayMonth);
         WeekLabel = PlannerDateTimeFormatter.FormatWeekRange(weekStart, weekEnd);

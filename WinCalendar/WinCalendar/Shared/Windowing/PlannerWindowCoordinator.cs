@@ -9,6 +9,8 @@ namespace WinCalendar.Shared.Windowing;
 
 public sealed class PlannerWindowCoordinator
 {
+    private const int MainWindowWidth = 1360;
+    private const int MainWindowHeight = 860;
     private const int CompactWindowWidth = 420;
     private const int CompactWindowHeight = 500;
     private const int CompactSidebarWindowWidth = 228;
@@ -36,6 +38,7 @@ public sealed class PlannerWindowCoordinator
 
         _mainWindow = mainWindow;
         _mainWindow.Closed += MainWindow_Closed;
+        ConfigureMainWindow(_mainWindow);
     }
 
     public void ShowFullApp()
@@ -128,6 +131,13 @@ public sealed class PlannerWindowCoordinator
         PositionCompactWindow(appWindow);
     }
 
+    private static void ConfigureMainWindow(Window window)
+    {
+        AppWindow appWindow = window.GetAppWindow();
+        appWindow.Resize(new SizeInt32(MainWindowWidth, MainWindowHeight));
+        PositionMainWindow(appWindow);
+    }
+
     private void ShowCompactSidebar()
     {
         if (_compactWindow is null)
@@ -206,6 +216,16 @@ public sealed class PlannerWindowCoordinator
         appWindow.Move(new PointInt32(
             workArea.X + workArea.Width - CompactWindowWidth - margin,
             workArea.Y + workArea.Height - CompactWindowHeight - margin));
+    }
+
+    private static void PositionMainWindow(AppWindow appWindow)
+    {
+        DisplayArea displayArea = DisplayArea.GetFromWindowId(appWindow.Id, DisplayAreaFallback.Primary);
+        RectInt32 workArea = displayArea.WorkArea;
+
+        appWindow.Move(new PointInt32(
+            workArea.X + Math.Max(0, (workArea.Width - MainWindowWidth) / 2),
+            workArea.Y + Math.Max(0, (workArea.Height - MainWindowHeight) / 2)));
     }
 
     private static void PositionCompactSidebarWindow(AppWindow appWindow)

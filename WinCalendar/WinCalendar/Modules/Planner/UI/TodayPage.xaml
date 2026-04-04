@@ -121,7 +121,7 @@
                 ColumnSpacing="16">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="340" />
+                    <ColumnDefinition Width="296" />
                 </Grid.ColumnDefinitions>
 
                 <Border
@@ -137,41 +137,21 @@
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
 
-                        <Grid ColumnSpacing="12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Spacing="2">
-                                <TextBlock
-                                    FontSize="12"
-                                    FontWeight="SemiBold"
-                                    Foreground="{ThemeResource AppTextMutedBrush}"
-                                    Text="WEEK VIEW" />
-                                <TextBlock
-                                    FontSize="13"
-                                    Foreground="{ThemeResource AppTextMutedBrush}"
-                                    Text="{Binding WeekViewSummary}" />
-                            </StackPanel>
-
-                            <Border
-                                Grid.Column="1"
-                                Padding="10,6"
-                                Background="{ThemeResource AppPageBackgroundBrush}"
-                                BorderBrush="{ThemeResource AppBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="999">
-                                <TextBlock
-                                    FontSize="12"
-                                    Foreground="{ThemeResource AppTextMutedBrush}"
-                                    Text="{Binding QuickAddTargetText}" />
-                            </Border>
-                        </Grid>
+                        <StackPanel Spacing="2">
+                            <TextBlock
+                                FontSize="12"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Text="WEEK VIEW" />
+                            <TextBlock
+                                FontSize="13"
+                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Text="{Binding WeekViewSummary}" />
+                        </StackPanel>
 
                         <ScrollViewer
                             Grid.Row="1"
-                            HorizontalScrollBarVisibility="Auto"
+                            HorizontalScrollBarVisibility="Disabled"
                             VerticalScrollBarVisibility="Auto">
                             <Grid RowSpacing="8">
                         <Grid.RowDefinitions>
@@ -179,7 +159,7 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="56" />
+                            <ColumnDefinition Width="48" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
@@ -194,12 +174,12 @@
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Button
-                                        Margin="0,0,8,0"
+                                        Margin="0,0,4,0"
                                         Style="{StaticResource FlatButtonStyle}"
                                         Click="WeekDayHeaderButton_Click">
                                         <Border
                                             Width="{Binding DataContext.WeekTimelineDayWidth, ElementName=LayoutRoot}"
-                                            Padding="10,8"
+                                            Padding="8,8"
                                             Background="{ThemeResource AppPageBackgroundBrush}"
                                             BorderBrush="{ThemeResource AppLineBrush}"
                                             BorderThickness="1"
@@ -246,7 +226,7 @@
 
                         <StackPanel
                             Grid.Row="1"
-                            Margin="0,0,8,0"
+                            Margin="0,0,4,0"
                             Spacing="0">
                             <Border
                                 Height="{Binding WeekTimelineAnyTimeLaneHeight}"
@@ -287,7 +267,7 @@
                                     <DataTemplate>
                                         <Border
                                             Width="{Binding DataContext.WeekTimelineDayWidth, ElementName=LayoutRoot}"
-                                            Margin="0,0,8,0"
+                                            Margin="0,0,4,0"
                                             Background="{ThemeResource AppShellBackgroundBrush}"
                                             BorderBrush="{ThemeResource AppLineBrush}"
                                             BorderThickness="1"
@@ -310,7 +290,7 @@
                                                             Background="{ThemeResource AppPageBackgroundBrush}" />
 
                                                         <StackPanel
-                                                            Padding="8,6"
+                                                            Padding="6,6"
                                                             Spacing="4">
                                                             <TextBlock
                                                                 Visibility="{Binding EmptyAllDayVisibility}"

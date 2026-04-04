@@ -18,6 +18,7 @@ public sealed partial class TaskComposerDialog : ContentDialog
         IsPrimaryButtonEnabled = false;
         Opened += TaskComposerDialog_Opened;
         UpdateDurationControls();
+        UpdateFieldVisibility();
         UpdateSubtitle();
     }
 
@@ -55,13 +56,13 @@ public sealed partial class TaskComposerDialog : ContentDialog
 
     private void HasTimeToggle_Toggled(object sender, RoutedEventArgs e)
     {
-        TaskTimePicker.IsEnabled = HasTimeToggle.IsOn;
         HasDurationToggle.IsEnabled = HasTimeToggle.IsOn;
 
         if (!HasTimeToggle.IsOn)
             HasDurationToggle.IsOn = false;
 
         UpdateDurationControls();
+        UpdateFieldVisibility();
         UpdateSubtitle();
     }
 
@@ -74,6 +75,7 @@ public sealed partial class TaskComposerDialog : ContentDialog
     private void HasDurationToggle_Toggled(object sender, RoutedEventArgs e)
     {
         UpdateDurationControls();
+        UpdateFieldVisibility();
         UpdateSubtitle();
     }
 
@@ -99,9 +101,16 @@ public sealed partial class TaskComposerDialog : ContentDialog
     private void UpdateDurationControls()
     {
         HasDurationToggle.IsEnabled = HasTimeToggle.IsOn;
-        TaskDurationNumberBox.IsEnabled = HasTimeToggle.IsOn && HasDurationToggle.IsOn;
         TaskDurationNumberBox.Maximum = GetMaxDurationMinutes();
         TaskDurationNumberBox.Value = NormalizeDurationValue(TaskDurationNumberBox.Value, TaskDurationNumberBox.Maximum);
+    }
+
+    private void UpdateFieldVisibility()
+    {
+        TaskTimePicker.Visibility = HasTimeToggle.IsOn ? Visibility.Visible : Visibility.Collapsed;
+        TaskDurationNumberBox.Visibility = HasTimeToggle.IsOn && HasDurationToggle.IsOn
+            ? Visibility.Visible
+            : Visibility.Collapsed;
     }
 
     private double GetMaxDurationMinutes()

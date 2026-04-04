@@ -250,7 +250,7 @@
                                 <TextBlock
                                     FontSize="12"
                                     Foreground="{ThemeResource AppTextMutedBrush}"
-                                    Text="Quick actions for the selected day." />
+                                    Text="Quick actions." />
                             </StackPanel>
 
                             <Button

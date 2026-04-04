@@ -5,60 +5,28 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    PrimaryButtonText="Add task"
+    PrimaryButtonText="Create"
     CloseButtonText="Cancel"
     DefaultButton="Primary"
     mc:Ignorable="d">
 
-    <StackPanel Width="320" Spacing="12">
-        <Border
-            Background="{ThemeResource AppCardAltBackgroundBrush}"
-            BorderBrush="{ThemeResource AppBorderBrush}"
-            BorderThickness="1"
-            CornerRadius="16"
-            Padding="12">
-            <Grid ColumnSpacing="10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <Border
-                    Width="34"
-                    Height="34"
-                    VerticalAlignment="Top"
-                    Background="{ThemeResource AppAccentMutedBrush}"
-                    CornerRadius="999">
-                    <FontIcon
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        FontFamily="Segoe Fluent Icons"
-                        FontSize="13"
-                        Foreground="{ThemeResource AppAccentBrush}"
-                        Glyph="&#xE710;" />
-                </Border>
-
-                <StackPanel
-                    Grid.Column="1"
-                    Spacing="2">
-                    <TextBlock
-                        FontFamily="Segoe UI Variable Display"
-                        FontSize="18"
-                        FontWeight="SemiBold"
-                        Text="New task" />
-                    <TextBlock
-                        x:Name="SubtitleTextBlock"
-                        FontSize="12"
-                        Foreground="{ThemeResource AppTextMutedBrush}"
-                        TextWrapping="WrapWholeWords" />
-                </StackPanel>
-            </Grid>
-        </Border>
+    <StackPanel Width="300" Spacing="10">
+        <StackPanel Spacing="2">
+            <TextBlock
+                FontFamily="Segoe UI Variable Display"
+                FontSize="20"
+                FontWeight="SemiBold"
+                Text="New task" />
+            <TextBlock
+                x:Name="SubtitleTextBlock"
+                FontSize="12"
+                Foreground="{ThemeResource AppTextMutedBrush}"
+                TextWrapping="WrapWholeWords" />
+        </StackPanel>
 
         <TextBox
             x:Name="TitleTextBox"
-            Header="Task"
-            PlaceholderText="What needs to be done?"
+            PlaceholderText="Task title"
             TextChanged="TitleTextBox_TextChanged" />
 
         <DatePicker
@@ -67,10 +35,10 @@
             DateChanged="TaskDatePicker_DateChanged" />
 
         <Border
-            Background="{ThemeResource AppCardBackgroundBrush}"
+            Background="{ThemeResource AppShellBackgroundBrush}"
             BorderBrush="{ThemeResource AppBorderBrush}"
             BorderThickness="1"
-            CornerRadius="16"
+            CornerRadius="14"
             Padding="12">
             <StackPanel Spacing="10">
                 <Grid ColumnSpacing="10">
@@ -79,12 +47,12 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Spacing="2">
+                    <StackPanel Spacing="1">
                         <TextBlock FontWeight="SemiBold" Text="Time" />
                         <TextBlock
                             FontSize="12"
                             Foreground="{ThemeResource AppTextMutedBrush}"
-                            Text="European 24-hour format" />
+                            Text="Place task on the timeline" />
                     </StackPanel>
 
                     <ToggleSwitch
@@ -98,17 +66,18 @@
                 <TimePicker
                     x:Name="TaskTimePicker"
                     ClockIdentifier="24HourClock"
+                    Header="Start"
                     MinuteIncrement="5"
-                    IsEnabled="False"
+                    Visibility="Collapsed"
                     TimeChanged="TaskTimePicker_TimeChanged" />
             </StackPanel>
         </Border>
 
         <Border
-            Background="{ThemeResource AppCardBackgroundBrush}"
+            Background="{ThemeResource AppShellBackgroundBrush}"
             BorderBrush="{ThemeResource AppBorderBrush}"
             BorderThickness="1"
-            CornerRadius="16"
+            CornerRadius="14"
             Padding="12">
             <StackPanel Spacing="10">
                 <Grid ColumnSpacing="10">
@@ -117,12 +86,12 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <StackPanel Spacing="2">
+                    <StackPanel Spacing="1">
                         <TextBlock FontWeight="SemiBold" Text="Duration" />
                         <TextBlock
                             FontSize="12"
                             Foreground="{ThemeResource AppTextMutedBrush}"
-                            Text="Optional length in minutes for timeline sizing" />
+                            Text="Optional block length" />
                     </StackPanel>
 
                     <ToggleSwitch
@@ -137,11 +106,11 @@
                 <NumberBox
                     x:Name="TaskDurationNumberBox"
                     Header="Minutes"
-                    IsEnabled="False"
                     LargeChange="15"
                     Minimum="5"
                     SmallChange="5"
                     SpinButtonPlacementMode="Compact"
+                    Visibility="Collapsed"
                     ValueChanged="TaskDurationNumberBox_ValueChanged" />
             </StackPanel>
         </Border>

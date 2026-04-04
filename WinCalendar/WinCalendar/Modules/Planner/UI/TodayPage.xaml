@@ -150,10 +150,13 @@
                         </StackPanel>
 
                         <ScrollViewer
+                            x:Name="WeekTimelineScrollViewer"
                             Grid.Row="1"
                             HorizontalScrollBarVisibility="Disabled"
                             VerticalScrollBarVisibility="Auto">
-                            <Grid RowSpacing="8">
+                            <Grid
+                                x:Name="WeekTimelineContentGrid"
+                                RowSpacing="8">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />

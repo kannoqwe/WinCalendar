@@ -128,10 +128,11 @@ public sealed partial class TodayPage : Page
         if (sender is not FrameworkElement { DataContext: PlannerWeekDayTimelineViewModel day } surface)
             return;
 
-        SuspendInlineEditor();
-        await _plannerStateStore.SelectDateAsync(day.Date);
         double offsetY = GetTimeGridContentOffset(surface, e);
         TimeOnly time = GetTimeFromTimelinePosition(offsetY);
+
+        SuspendInlineEditor();
+        await _plannerStateStore.SelectDateAsync(day.Date);
         _plannerStateStore.BeginNewTaskDraft(day.Date, time);
         ResumeInlineEditor(focusTitleEditor: true);
     }

@@ -283,11 +283,10 @@
                                                     CornerRadius="14" />
 
                                                 <StackPanel Spacing="0">
-                                                    <Grid Height="{Binding DataContext.WeekTimelineAnyTimeLaneHeight, ElementName=LayoutRoot}">
-                                                        <Border
-                                                            Background="Transparent"
-                                                            Tapped="WeekAllDayLane_Tapped" />
-
+                                                    <Grid
+                                                        Height="{Binding DataContext.WeekTimelineAnyTimeLaneHeight, ElementName=LayoutRoot}"
+                                                        Background="Transparent"
+                                                        Tapped="WeekAllDayLane_Tapped">
                                                         <Border
                                                             Margin="0,0,0,1"
                                                             Background="{ThemeResource AppPageBackgroundBrush}" />

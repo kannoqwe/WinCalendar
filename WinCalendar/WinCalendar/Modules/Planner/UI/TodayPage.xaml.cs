@@ -5,6 +5,7 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
 using WinCalendar.Modules.Planner.Presentation;
 using WinCalendar.Shared.Windowing;
 
@@ -117,6 +118,10 @@ public sealed partial class TodayPage : Page
         if (sender is not FrameworkElement { DataContext: PlannerWeekDayTimelineViewModel day })
             return;
 
+        if (IsInsideButton(e.OriginalSource))
+            return;
+
+        e.Handled = true;
         SuspendInlineEditor();
         _plannerStateStore.BeginNewTaskDraft(day.Date);
         await _plannerStateStore.SelectDateAsync(day.Date);
@@ -246,6 +251,21 @@ public sealed partial class TodayPage : Page
     {
         double surfaceOffsetY = e.GetPosition(surface).Y;
         return Math.Clamp(surfaceOffsetY, 0d, _plannerStateStore.WeekTimelineTimedHeight);
+    }
+
+    private static bool IsInsideButton(object? originalSource)
+    {
+        DependencyObject? current = originalSource as DependencyObject;
+
+        while (current is not null)
+        {
+            if (current is Button)
+                return true;
+
+            current = VisualTreeHelper.GetParent(current);
+        }
+
+        return false;
     }
 
     private void ScheduleInlineSave()

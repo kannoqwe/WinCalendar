@@ -24,12 +24,6 @@ internal static class TaskbarNative
     [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     public static extern int GetClassName(nint hWnd, StringBuilder lpClassName, int nMaxCount);
 
-    [DllImport("user32.dll")]
-    public static extern nint WindowFromPoint(LowLevelMouseHookNative.POINT point);
-
-    [DllImport("user32.dll")]
-    public static extern nint GetParent(nint hWnd);
-
     [StructLayout(LayoutKind.Sequential)]
     public struct APPBARDATA
     {

@@ -1,6 +1,4 @@
 using System;
-using Microsoft.UI.Dispatching;
-using WinCalendar.Modules.Shell.Infrastructure.Win32;
 using WinCalendar.Shared.Windowing;
 
 namespace WinCalendar.Modules.Shell.UI;
@@ -9,7 +7,7 @@ public sealed class ShellExperienceCoordinator : IDisposable
 {
     private readonly PlannerWindowCoordinator _plannerWindowCoordinator;
     private readonly Action _requestExit;
-    private TaskbarClockClickInterceptor? _taskbarClockClickInterceptor;
+    private TaskbarClockOverlayHost? _taskbarClockOverlayHost;
     private TrayIconHost? _trayIconHost;
     private bool _started;
     private bool _isStopping;
@@ -31,10 +29,10 @@ public sealed class ShellExperienceCoordinator : IDisposable
             _plannerWindowCoordinator.ShowCompactPanel,
             _requestExit);
 
-        DispatcherQueue? dispatcherQueue = DispatcherQueue.GetForCurrentThread();
+        Microsoft.UI.Dispatching.DispatcherQueue? dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         if (dispatcherQueue is not null)
         {
-            _taskbarClockClickInterceptor = new TaskbarClockClickInterceptor(
+            _taskbarClockOverlayHost = new TaskbarClockOverlayHost(
                 dispatcherQueue,
                 _plannerWindowCoordinator.ToggleCompactPanel);
         }
@@ -46,8 +44,8 @@ public sealed class ShellExperienceCoordinator : IDisposable
             return;
 
         _isStopping = true;
-        _taskbarClockClickInterceptor?.Dispose();
-        _taskbarClockClickInterceptor = null;
+        _taskbarClockOverlayHost?.Dispose();
+        _taskbarClockOverlayHost = null;
         _trayIconHost?.Dispose();
         _trayIconHost = null;
     }

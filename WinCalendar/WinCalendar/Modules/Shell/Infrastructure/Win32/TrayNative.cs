@@ -22,16 +22,35 @@ internal static class TrayNative
     public const uint TPM_BOTTOMALIGN = 0x0020;
     public const uint TPM_RIGHTBUTTON = 0x0002;
 
+    public const uint WS_POPUP = 0x80000000;
+    public const uint WS_EX_TOPMOST = 0x00000008;
+    public const uint WS_EX_TOOLWINDOW = 0x00000080;
+    public const uint WS_EX_LAYERED = 0x00080000;
+    public const uint WS_EX_NOACTIVATE = 0x08000000;
+
+    public const uint SW_HIDE = 0;
+    public const uint SW_SHOWNOACTIVATE = 4;
+
+    public const uint SWP_NOACTIVATE = 0x0010;
+    public const uint SWP_SHOWWINDOW = 0x0040;
+
+    public const uint LWA_ALPHA = 0x00000002;
+
     public const uint WM_NULL = 0x0000;
+    public const uint WM_MOUSEACTIVATE = 0x0021;
+    public const uint WM_NCHITTEST = 0x0084;
     public const uint WM_COMMAND = 0x0111;
     public const uint WM_CONTEXTMENU = 0x007B;
     public const uint WM_LBUTTONUP = 0x0202;
     public const uint WM_LBUTTONDBLCLK = 0x0203;
     public const uint WM_RBUTTONUP = 0x0205;
 
+    public const int HTCLIENT = 1;
+    public const int MA_NOACTIVATE = 3;
     public const int IDI_APPLICATION = 32512;
 
     public static readonly nint HwndMessage = new(-3);
+    public static readonly nint HwndTopMost = new(-1);
 
     [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -62,6 +81,29 @@ internal static class TrayNative
     [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static extern bool UnregisterClass(string lpClassName, nint hInstance);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool ShowWindow(nint hWnd, uint nCmdShow);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetWindowPos(
+        nint hWnd,
+        nint hWndInsertAfter,
+        int X,
+        int Y,
+        int cx,
+        int cy,
+        uint uFlags);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool SetLayeredWindowAttributes(
+        nint hwnd,
+        uint crKey,
+        byte bAlpha,
+        uint dwFlags);
 
     [DllImport("user32.dll", CharSet = CharSet.Unicode)]
     public static extern uint RegisterWindowMessage(string lpString);

@@ -5,6 +5,7 @@ using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
+using Windows.Foundation;
 using WinCalendar.Modules.Planner.Presentation;
 using WinCalendar.Shared.Windowing;
 
@@ -12,6 +13,7 @@ namespace WinCalendar.Modules.Planner.UI;
 
 public sealed partial class TodayPage : Page
 {
+    private const int TimelineSnapMinutes = 15;
     private readonly PlannerStateStore _plannerStateStore;
     private readonly DispatcherQueueTimer _currentTimeTimer;
     private readonly DispatcherQueueTimer _inlineSaveTimer;
@@ -122,15 +124,16 @@ public sealed partial class TodayPage : Page
         ResumeInlineEditor(focusTitleEditor: true);
     }
 
-    private async void WeekTimeSlot_Tapped(object sender, TappedRoutedEventArgs e)
+    private async void WeekTimedGrid_Tapped(object sender, TappedRoutedEventArgs e)
     {
-        if (sender is not FrameworkElement { DataContext: PlannerWeekTimeSlotViewModel slot })
+        if (sender is not FrameworkElement { DataContext: PlannerWeekDayTimelineViewModel day } surface)
             return;
 
-        e.Handled = true;
         SuspendInlineEditor();
-        await _plannerStateStore.SelectDateAsync(slot.Date);
-        _plannerStateStore.BeginNewTaskDraft(slot.Date, slot.Time);
+        await _plannerStateStore.SelectDateAsync(day.Date);
+        double offsetY = GetTimeGridContentOffset(surface, e.GetPosition(WeekTimelineScrollViewer));
+        TimeOnly time = GetTimeFromTimelinePosition(offsetY);
+        _plannerStateStore.BeginNewTaskDraft(day.Date, time);
         ResumeInlineEditor(focusTitleEditor: true);
     }
 
@@ -228,6 +231,27 @@ public sealed partial class TodayPage : Page
             return;
 
         _currentTimeTimer.Start();
+    }
+
+    private TimeOnly GetTimeFromTimelinePosition(double offsetY)
+    {
+        double rawMinutes = Math.Max(0d, (offsetY / _plannerStateStore.WeekTimelineHourHeight) * 60d);
+        int roundedMinutes = (int)(Math.Round(rawMinutes / TimelineSnapMinutes) * TimelineSnapMinutes);
+        roundedMinutes = Math.Clamp(roundedMinutes, 0, (24 * 60) - TimelineSnapMinutes);
+
+        return new TimeOnly(roundedMinutes / 60, roundedMinutes % 60);
+    }
+
+    private double GetTimeGridContentOffset(FrameworkElement surface, Point clickInScrollViewer)
+    {
+        Point surfaceOriginInContent = surface
+            .TransformToVisual(WeekTimelineContentGrid)
+            .TransformPoint(new Point(0, 0));
+
+        double contentY = WeekTimelineScrollViewer.VerticalOffset + clickInScrollViewer.Y;
+        double offsetY = contentY - surfaceOriginInContent.Y;
+
+        return Math.Clamp(offsetY, 0d, _plannerStateStore.WeekTimelineTimedHeight);
     }
 
     private void ScheduleInlineSave()

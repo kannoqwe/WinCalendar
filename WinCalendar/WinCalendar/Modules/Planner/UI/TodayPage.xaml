@@ -342,22 +342,19 @@
                                                     </Grid>
 
                                                     <Grid Height="{Binding DataContext.WeekTimelineTimedHeight, ElementName=LayoutRoot}">
+                                                        <Border
+                                                            Background="Transparent"
+                                                            Tapped="WeekTimedGrid_Tapped" />
+
                                                         <ItemsControl
-                                                            ItemsSource="{Binding TimeSlots}">
+                                                            IsHitTestVisible="False"
+                                                            ItemsSource="{Binding DataContext.WeekTimelineHours, ElementName=LayoutRoot}">
                                                             <ItemsControl.ItemTemplate>
                                                                 <DataTemplate>
-                                                                    <Grid
-                                                                        Height="{Binding DataContext.WeekTimelineQuarterHourHeight, ElementName=LayoutRoot}">
-                                                                        <Border
-                                                                            Background="Transparent"
-                                                                            Tapped="WeekTimeSlot_Tapped" />
-
-                                                                        <Border
-                                                                            IsHitTestVisible="False"
-                                                                            BorderBrush="{ThemeResource AppLineBrush}"
-                                                                            BorderThickness="{Binding SeparatorThickness}"
-                                                                            Opacity="{Binding SeparatorOpacity}" />
-                                                                    </Grid>
+                                                                    <Border
+                                                                        Height="{Binding DataContext.WeekTimelineHourHeight, ElementName=LayoutRoot}"
+                                                                        BorderBrush="{ThemeResource AppLineBrush}"
+                                                                        BorderThickness="0,0,0,1" />
                                                                 </DataTemplate>
                                                             </ItemsControl.ItemTemplate>
                                                         </ItemsControl>

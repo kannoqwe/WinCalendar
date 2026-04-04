@@ -15,6 +15,11 @@ public sealed partial class TodayPage : Page
     private const int TimelineSnapMinutes = 15;
     private readonly PlannerStateStore _plannerStateStore;
     private readonly DispatcherQueueTimer _currentTimeTimer;
+    private readonly DispatcherQueueTimer _inlineSaveTimer;
+    private bool _suppressInlineSave;
+    private bool _isInlineSaveInProgress;
+    private bool _inlineSaveQueued;
+    private bool _focusTitleEditorAfterSelection;
     private bool _initialized;
 
     public TodayPage(PlannerStateStore plannerStateStore, PlannerWindowCoordinator windowCoordinator)
@@ -26,6 +31,10 @@ public sealed partial class TodayPage : Page
         _currentTimeTimer.Interval = TimeSpan.FromMinutes(1);
         _currentTimeTimer.IsRepeating = true;
         _currentTimeTimer.Tick += CurrentTimeTimer_Tick;
+        _inlineSaveTimer = DispatcherQueue.CreateTimer();
+        _inlineSaveTimer.Interval = TimeSpan.FromMilliseconds(350);
+        _inlineSaveTimer.IsRepeating = false;
+        _inlineSaveTimer.Tick += InlineSaveTimer_Tick;
         Unloaded += TodayPage_Unloaded;
     }
 
@@ -84,17 +93,21 @@ public sealed partial class TodayPage : Page
 
     private void AddTaskButton_Click(object sender, RoutedEventArgs e)
     {
+        SuspendInlineEditor();
         _plannerStateStore.BeginNewTaskDraft(_plannerStateStore.SelectedDate);
+        ResumeInlineEditor(focusTitleEditor: true);
     }
 
     private async Task OpenTaskAsync(PlannerTaskViewModel task)
     {
+        SuspendInlineEditor();
         await _plannerStateStore.SelectDateAsync(task.Date);
         PlannerTaskViewModel selectedTask = _plannerStateStore.SelectedDayTasks
             .FirstOrDefault(current => current.Id == task.Id)
             ?? task;
 
         _plannerStateStore.SelectTask(selectedTask);
+        ResumeInlineEditor(focusTitleEditor: false);
     }
 
     private async void WeekAllDayLane_Tapped(object sender, TappedRoutedEventArgs e)
@@ -102,8 +115,10 @@ public sealed partial class TodayPage : Page
         if (sender is not FrameworkElement { DataContext: PlannerWeekDayTimelineViewModel day })
             return;
 
+        SuspendInlineEditor();
         await _plannerStateStore.SelectDateAsync(day.Date);
         _plannerStateStore.BeginNewTaskDraft(day.Date);
+        ResumeInlineEditor(focusTitleEditor: true);
     }
 
     private async void WeekTimedGrid_Tapped(object sender, TappedRoutedEventArgs e)
@@ -111,15 +126,52 @@ public sealed partial class TodayPage : Page
         if (sender is not FrameworkElement { DataContext: PlannerWeekDayTimelineViewModel day } surface)
             return;
 
+        SuspendInlineEditor();
         await _plannerStateStore.SelectDateAsync(day.Date);
         var clickPosition = e.GetPosition(surface);
         TimeOnly time = GetTimeFromTimelinePosition(clickPosition.Y);
         _plannerStateStore.BeginNewTaskDraft(day.Date, time);
+        ResumeInlineEditor(focusTitleEditor: true);
     }
 
-    private async void SaveTaskButton_Click(object sender, RoutedEventArgs e)
+    private async void EditorDatePicker_DateChanged(CalendarDatePicker sender, CalendarDatePickerDateChangedEventArgs args)
     {
-        await _plannerStateStore.SaveSelectedTaskAsync();
+        await SaveInlineEditorNowAsync();
+    }
+
+    private async void EditorTitleTextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        await SaveInlineEditorNowAsync();
+    }
+
+    private void EditorTitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        ScheduleInlineSave();
+    }
+
+    private void EditorTimeToggle_Click(object sender, RoutedEventArgs e)
+    {
+        ScheduleInlineSave();
+    }
+
+    private void EditorDurationToggle_Click(object sender, RoutedEventArgs e)
+    {
+        ScheduleInlineSave();
+    }
+
+    private void EditorTimePicker_TimeChanged(object sender, TimePickerValueChangedEventArgs args)
+    {
+        ScheduleInlineSave();
+    }
+
+    private void EditorDurationNumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
+    {
+        ScheduleInlineSave();
+    }
+
+    private async void InlineSaveTimer_Tick(DispatcherQueueTimer sender, object args)
+    {
+        await SaveInlineEditorNowAsync();
     }
 
     private async void CompleteTaskButton_Click(object sender, RoutedEventArgs e)
@@ -127,9 +179,11 @@ public sealed partial class TodayPage : Page
         if (_plannerStateStore.SelectedTask is null)
             return;
 
+        SuspendInlineEditor();
         await _plannerStateStore.ToggleTaskCompletionAsync(
             _plannerStateStore.SelectedTask.Id,
             !_plannerStateStore.SelectedTask.IsCompleted);
+        ResumeInlineEditor(focusTitleEditor: false);
     }
 
     private async void DeleteSelectedTaskButton_Click(object sender, RoutedEventArgs e)
@@ -137,12 +191,17 @@ public sealed partial class TodayPage : Page
         if (_plannerStateStore.SelectedTask is null)
             return;
 
+        SuspendInlineEditor();
         await _plannerStateStore.DeleteTaskAsync(_plannerStateStore.SelectedTask.Id);
+        ResumeInlineEditor(focusTitleEditor: false);
     }
 
     private void CloseEditorButton_Click(object sender, RoutedEventArgs e)
     {
+        _inlineSaveTimer.Stop();
+        SuspendInlineEditor();
         _plannerStateStore.SelectTask(null);
+        ResumeInlineEditor(focusTitleEditor: false);
     }
 
     private void CurrentTimeTimer_Tick(DispatcherQueueTimer sender, object args)
@@ -153,6 +212,7 @@ public sealed partial class TodayPage : Page
     private void TodayPage_Unloaded(object sender, RoutedEventArgs e)
     {
         _currentTimeTimer.Stop();
+        _inlineSaveTimer.Stop();
     }
 
     private void StartCurrentTimeTimer()
@@ -169,8 +229,78 @@ public sealed partial class TodayPage : Page
     {
         double rawMinutes = Math.Max(0d, (offsetY / _plannerStateStore.WeekTimelineHourHeight) * 60d);
         int roundedMinutes = (int)(Math.Round(rawMinutes / TimelineSnapMinutes) * TimelineSnapMinutes);
-        roundedMinutes = Math.Clamp(roundedMinutes, 0, (24 * 60) - 5);
+        roundedMinutes = Math.Clamp(roundedMinutes, 0, (24 * 60) - TimelineSnapMinutes);
 
         return new TimeOnly(roundedMinutes / 60, roundedMinutes % 60);
+    }
+
+    private void ScheduleInlineSave()
+    {
+        if (_suppressInlineSave)
+            return;
+
+        if (_isInlineSaveInProgress)
+        {
+            _inlineSaveQueued = true;
+            return;
+        }
+
+        if (_inlineSaveTimer.IsRunning)
+            _inlineSaveTimer.Stop();
+
+        _inlineSaveTimer.Start();
+    }
+
+    private async Task SaveInlineEditorNowAsync()
+    {
+        if (_suppressInlineSave || _isInlineSaveInProgress)
+            return;
+
+        if (string.IsNullOrWhiteSpace(_plannerStateStore.EditorTitle))
+            return;
+
+        _isInlineSaveInProgress = true;
+        _suppressInlineSave = true;
+
+        try
+        {
+            await _plannerStateStore.SaveSelectedTaskAsync();
+        }
+        finally
+        {
+            DispatcherQueue.TryEnqueue(() =>
+            {
+                _isInlineSaveInProgress = false;
+                _suppressInlineSave = false;
+
+                if (_inlineSaveQueued)
+                {
+                    _inlineSaveQueued = false;
+                    ScheduleInlineSave();
+                }
+            });
+        }
+    }
+
+    private void SuspendInlineEditor()
+    {
+        _inlineSaveTimer.Stop();
+        _suppressInlineSave = true;
+    }
+
+    private void ResumeInlineEditor(bool focusTitleEditor)
+    {
+        _focusTitleEditorAfterSelection = focusTitleEditor;
+        DispatcherQueue.TryEnqueue(() =>
+        {
+            _suppressInlineSave = false;
+
+            if (!_focusTitleEditorAfterSelection)
+                return;
+
+            _focusTitleEditorAfterSelection = false;
+            EditorTitleTextBox.Focus(FocusState.Programmatic);
+            EditorTitleTextBox.SelectAll();
+        });
     }
 }

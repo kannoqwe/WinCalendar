@@ -125,9 +125,9 @@ public sealed partial class TaskComposerDialog : ContentDialog
     {
         double normalizedValue = double.IsNaN(value)
             ? 45
-            : Math.Round(value / 5d) * 5d;
+            : Math.Round(value / 15d) * 15d;
 
-        return Math.Clamp(normalizedValue, 5d, maxDurationMinutes);
+        return Math.Clamp(normalizedValue, 15d, maxDurationMinutes);
     }
 }
 

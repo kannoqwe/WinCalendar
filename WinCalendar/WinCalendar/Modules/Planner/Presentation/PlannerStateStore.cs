@@ -217,7 +217,6 @@ public sealed class PlannerStateStore : ObservableObject
             _selectedTaskId = value?.Id;
             OnPropertyChanged(nameof(SelectedTaskVisibility));
             OnPropertyChanged(nameof(EmptySelectedTaskVisibility));
-            OnPropertyChanged(nameof(EditorPanelSubtitle));
             OnPropertyChanged(nameof(EditorCompletionButtonText));
         }
     }
@@ -227,40 +226,6 @@ public sealed class PlannerStateStore : ObservableObject
 
     public Visibility EmptySelectedTaskVisibility =>
         _taskEditorMode == TaskEditorMode.None ? Visibility.Visible : Visibility.Collapsed;
-
-    public string EditorPanelTitle => _taskEditorMode switch
-    {
-        TaskEditorMode.New => "New task",
-        TaskEditorMode.Edit => "Edit task",
-        _ => "Week editor"
-    };
-
-    public string EditorPanelSubtitle => _taskEditorMode switch
-    {
-        TaskEditorMode.New => "Click any empty slot in the week grid to prefill date and time.",
-        TaskEditorMode.Edit => SelectedTask?.DetailsText ?? "Update the selected task details.",
-        _ => "Select a task block or click an empty slot in the timeline to start planning."
-    };
-
-    public string EditorScheduleSummary
-    {
-        get
-        {
-            if (_taskEditorMode == TaskEditorMode.None)
-                return "No task selected";
-
-            DateOnly date = DateOnly.FromDateTime(EditorDate.Date);
-            TimeOnly? time = EditorHasTime ? TimeOnly.FromTimeSpan(EditorTime) : null;
-            int? durationMinutes = EditorHasTime && EditorHasDuration
-                ? (int)NormalizeDurationValue(EditorDurationMinutes, EditorMaxDurationMinutes)
-                : null;
-
-            return PlannerDateTimeFormatter.FormatDateTime(date, time, durationMinutes);
-        }
-    }
-
-    public string EditorPrimaryActionText =>
-        _taskEditorMode == TaskEditorMode.New ? "Create task" : "Save changes";
 
     public Visibility EditorDeleteVisibility =>
         _taskEditorMode == TaskEditorMode.Edit ? Visibility.Visible : Visibility.Collapsed;
@@ -278,8 +243,6 @@ public sealed class PlannerStateStore : ObservableObject
         {
             if (!SetProperty(ref _editorTitle, value))
                 return;
-
-            OnPropertyChanged(nameof(EditorPanelSubtitle));
         }
     }
 
@@ -297,8 +260,9 @@ public sealed class PlannerStateStore : ObservableObject
             ClampEditorDuration();
             OnPropertyChanged(nameof(EditorDurationToggleEnabled));
             OnPropertyChanged(nameof(EditorDurationInputEnabled));
+            OnPropertyChanged(nameof(EditorTimeVisibility));
+            OnPropertyChanged(nameof(EditorDurationVisibility));
             OnPropertyChanged(nameof(EditorMaxDurationMinutes));
-            OnPropertyChanged(nameof(EditorScheduleSummary));
         }
     }
 
@@ -312,7 +276,6 @@ public sealed class PlannerStateStore : ObservableObject
 
             ClampEditorDuration();
             OnPropertyChanged(nameof(EditorMaxDurationMinutes));
-            OnPropertyChanged(nameof(EditorScheduleSummary));
         }
     }
 
@@ -328,7 +291,7 @@ public sealed class PlannerStateStore : ObservableObject
 
             ClampEditorDuration();
             OnPropertyChanged(nameof(EditorDurationInputEnabled));
-            OnPropertyChanged(nameof(EditorScheduleSummary));
+            OnPropertyChanged(nameof(EditorDurationVisibility));
         }
     }
 
@@ -339,8 +302,6 @@ public sealed class PlannerStateStore : ObservableObject
         {
             if (!SetProperty(ref _editorDurationMinutes, NormalizeDurationValue(value, EditorMaxDurationMinutes)))
                 return;
-
-            OnPropertyChanged(nameof(EditorScheduleSummary));
         }
     }
 
@@ -349,16 +310,19 @@ public sealed class PlannerStateStore : ObservableObject
         get => _editorDate;
         set
         {
-            if (!SetProperty(ref _editorDate, value))
-                return;
-
-            OnPropertyChanged(nameof(EditorScheduleSummary));
+            SetProperty(ref _editorDate, value);
         }
     }
 
     public bool EditorDurationToggleEnabled => EditorHasTime;
 
     public bool EditorDurationInputEnabled => EditorHasTime && EditorHasDuration;
+
+    public Visibility EditorTimeVisibility =>
+        EditorHasTime ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility EditorDurationVisibility =>
+        EditorHasTime && EditorHasDuration ? Visibility.Visible : Visibility.Collapsed;
 
     public double EditorMaxDurationMinutes =>
         EditorHasTime
@@ -845,10 +809,6 @@ public sealed class PlannerStateStore : ObservableObject
         _taskEditorMode = mode;
         OnPropertyChanged(nameof(SelectedTaskVisibility));
         OnPropertyChanged(nameof(EmptySelectedTaskVisibility));
-        OnPropertyChanged(nameof(EditorPanelTitle));
-        OnPropertyChanged(nameof(EditorPanelSubtitle));
-        OnPropertyChanged(nameof(EditorScheduleSummary));
-        OnPropertyChanged(nameof(EditorPrimaryActionText));
         OnPropertyChanged(nameof(EditorDeleteVisibility));
         OnPropertyChanged(nameof(EditorCompleteVisibility));
         OnPropertyChanged(nameof(EditorCompletionButtonText));
@@ -874,9 +834,9 @@ public sealed class PlannerStateStore : ObservableObject
     {
         double normalizedValue = double.IsNaN(value)
             ? WeekTaskDefaultDurationMinutes
-            : Math.Round(value / 5d) * 5d;
+            : Math.Round(value / 15d) * 15d;
 
-        return Math.Clamp(normalizedValue, 5d, maxDurationMinutes);
+        return Math.Clamp(normalizedValue, 15d, maxDurationMinutes);
     }
 
     private static double GetMaxDurationMinutes(TimeOnly time)

@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    PrimaryButtonText="Create"
+    PrimaryButtonText="Done"
     CloseButtonText="Cancel"
     DefaultButton="Primary"
     mc:Ignorable="d">
@@ -67,7 +67,7 @@
                     x:Name="TaskTimePicker"
                     ClockIdentifier="24HourClock"
                     Header="Start"
-                    MinuteIncrement="5"
+                    MinuteIncrement="15"
                     Visibility="Collapsed"
                     TimeChanged="TaskTimePicker_TimeChanged" />
             </StackPanel>
@@ -107,8 +107,8 @@
                     x:Name="TaskDurationNumberBox"
                     Header="Minutes"
                     LargeChange="15"
-                    Minimum="5"
-                    SmallChange="5"
+                    Minimum="15"
+                    SmallChange="15"
                     SpinButtonPlacementMode="Compact"
                     Visibility="Collapsed"
                     ValueChanged="TaskDurationNumberBox_ValueChanged" />

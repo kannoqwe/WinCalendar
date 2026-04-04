@@ -118,8 +118,8 @@ public sealed partial class TodayPage : Page
             return;
 
         SuspendInlineEditor();
-        await _plannerStateStore.SelectDateAsync(day.Date);
         _plannerStateStore.BeginNewTaskDraft(day.Date);
+        await _plannerStateStore.SelectDateAsync(day.Date);
         ResumeInlineEditor(focusTitleEditor: true);
     }
 
@@ -132,8 +132,8 @@ public sealed partial class TodayPage : Page
         TimeOnly time = GetTimeFromTimelinePosition(offsetY);
 
         SuspendInlineEditor();
-        await _plannerStateStore.SelectDateAsync(day.Date);
         _plannerStateStore.BeginNewTaskDraft(day.Date, time);
+        await _plannerStateStore.SelectDateAsync(day.Date);
         ResumeInlineEditor(focusTitleEditor: true);
     }
 

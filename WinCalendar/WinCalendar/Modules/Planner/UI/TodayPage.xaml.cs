@@ -23,6 +23,8 @@ public sealed partial class TodayPage : Page
     private bool _inlineSaveQueued;
     private bool _focusTitleEditorAfterSelection;
     private bool _initialized;
+    private bool _syncingWeekHorizontalScroll;
+    private bool _syncingWeekVerticalScroll;
 
     public TodayPage(PlannerStateStore plannerStateStore, PlannerWindowCoordinator windowCoordinator)
     {
@@ -46,6 +48,7 @@ public sealed partial class TodayPage : Page
         if (_initialized)
         {
             StartCurrentTimeTimer();
+            QueueCenterCurrentTimeIndicator();
             return;
         }
 
@@ -53,6 +56,7 @@ public sealed partial class TodayPage : Page
         await _plannerStateStore.EnsureInitializedAsync();
         _plannerStateStore.RefreshCurrentTimeIndicator();
         StartCurrentTimeTimer();
+        QueueCenterCurrentTimeIndicator();
     }
 
     private async void PreviousWeekButton_Click(object sender, RoutedEventArgs e)
@@ -63,6 +67,7 @@ public sealed partial class TodayPage : Page
     private async void CurrentWeekButton_Click(object sender, RoutedEventArgs e)
     {
         await _plannerStateStore.GoToTodayAsync();
+        QueueCenterCurrentTimeIndicator();
     }
 
     private async void NextWeekButton_Click(object sender, RoutedEventArgs e)
@@ -236,6 +241,98 @@ public sealed partial class TodayPage : Page
             return;
 
         _currentTimeTimer.Start();
+    }
+
+    private void WeekTimelineStickyScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+    {
+        if (_syncingWeekHorizontalScroll || sender is not ScrollViewer source)
+            return;
+
+        SyncWeekHorizontalScroll(source.HorizontalOffset, source);
+    }
+
+    private void WeekTimelineHoursScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+    {
+        if (_syncingWeekVerticalScroll || sender is not ScrollViewer source)
+            return;
+
+        SyncWeekVerticalScroll(source.VerticalOffset, source);
+    }
+
+    private void WeekTimelineScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
+    {
+        if (!_syncingWeekHorizontalScroll)
+            SyncWeekHorizontalScroll(WeekTimelineScrollViewer.HorizontalOffset, WeekTimelineScrollViewer);
+
+        if (!_syncingWeekVerticalScroll)
+            SyncWeekVerticalScroll(WeekTimelineScrollViewer.VerticalOffset, WeekTimelineScrollViewer);
+    }
+
+    private void QueueCenterCurrentTimeIndicator()
+    {
+        if (_plannerStateStore.CurrentWeekTimeIndicatorVisibility != Visibility.Visible)
+            return;
+
+        DispatcherQueue.TryEnqueue(() => CenterCurrentTimeIndicatorInView(6));
+    }
+
+    private void CenterCurrentTimeIndicatorInView(int attemptsRemaining)
+    {
+        if (_plannerStateStore.CurrentWeekTimeIndicatorVisibility != Visibility.Visible)
+            return;
+
+        double viewportHeight = WeekTimelineScrollViewer.ViewportHeight;
+        if (viewportHeight <= 0d)
+        {
+            if (attemptsRemaining <= 0)
+                return;
+
+            DispatcherQueue.TryEnqueue(() => CenterCurrentTimeIndicatorInView(attemptsRemaining - 1));
+            return;
+        }
+
+        double targetOffset = _plannerStateStore.CurrentTimeIndicatorTop - (viewportHeight / 2d);
+        double clampedOffset = Math.Clamp(targetOffset, 0d, Math.Max(0d, WeekTimelineScrollViewer.ScrollableHeight));
+        WeekTimelineScrollViewer.ChangeView(null, clampedOffset, null, true);
+    }
+
+    private void SyncWeekHorizontalScroll(double horizontalOffset, ScrollViewer source)
+    {
+        _syncingWeekHorizontalScroll = true;
+
+        try
+        {
+            if (!ReferenceEquals(source, WeekTimelineHeaderScrollViewer))
+                WeekTimelineHeaderScrollViewer.ChangeView(horizontalOffset, null, null, true);
+
+            if (!ReferenceEquals(source, WeekTimelineAllDayScrollViewer))
+                WeekTimelineAllDayScrollViewer.ChangeView(horizontalOffset, null, null, true);
+
+            if (!ReferenceEquals(source, WeekTimelineScrollViewer))
+                WeekTimelineScrollViewer.ChangeView(horizontalOffset, null, null, true);
+        }
+        finally
+        {
+            _syncingWeekHorizontalScroll = false;
+        }
+    }
+
+    private void SyncWeekVerticalScroll(double verticalOffset, ScrollViewer source)
+    {
+        _syncingWeekVerticalScroll = true;
+
+        try
+        {
+            if (!ReferenceEquals(source, WeekTimelineHoursScrollViewer))
+                WeekTimelineHoursScrollViewer.ChangeView(null, verticalOffset, null, true);
+
+            if (!ReferenceEquals(source, WeekTimelineScrollViewer))
+                WeekTimelineScrollViewer.ChangeView(null, verticalOffset, null, true);
+        }
+        finally
+        {
+            _syncingWeekVerticalScroll = false;
+        }
     }
 
     private TimeOnly GetTimeFromTimelinePosition(double offsetY)

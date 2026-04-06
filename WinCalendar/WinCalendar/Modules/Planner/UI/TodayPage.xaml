@@ -519,35 +519,20 @@
                                                                                         <RowDefinition Height="*" />
                                                                                     </Grid.RowDefinitions>
 
-                                                                                    <Grid ColumnSpacing="4">
-                                                                                        <Grid.ColumnDefinitions>
-                                                                                            <ColumnDefinition Width="*" />
-                                                                                            <ColumnDefinition Width="Auto" />
-                                                                                        </Grid.ColumnDefinitions>
-
-                                                                                        <TextBlock
-                                                                                            FontSize="{Binding TitleFontSize}"
-                                                                                            FontWeight="SemiBold"
-                                                                                            MaxLines="{Binding TitleMaxLines}"
-                                                                                            Text="{Binding Title}"
-                                                                                            TextTrimming="CharacterEllipsis"
-                                                                                            TextWrapping="{Binding TitleWrapping}" />
-                                                                                        <TextBlock
-                                                                                            Grid.Column="1"
-                                                                                            VerticalAlignment="Top"
-                                                                                            FontSize="{Binding TimeFontSize}"
-                                                                                            Foreground="{Binding AccentBrush}"
-                                                                                            Text="{Binding InlineTimeText}"
-                                                                                            Visibility="{Binding InlineTimeVisibility}" />
-                                                                                    </Grid>
+                                                                                    <TextBlock
+                                                                                        FontSize="{Binding TitleFontSize}"
+                                                                                        FontWeight="SemiBold"
+                                                                                        MaxLines="{Binding TitleMaxLines}"
+                                                                                        Text="{Binding Title}"
+                                                                                        TextTrimming="CharacterEllipsis"
+                                                                                        TextWrapping="{Binding TitleWrapping}" />
 
                                                                                     <TextBlock
                                                                                         Grid.Row="1"
                                                                                         FontSize="{Binding TimeFontSize}"
                                                                                         Foreground="{Binding AccentBrush}"
                                                                                         Text="{Binding BottomTimeText}"
-                                                                                        TextTrimming="CharacterEllipsis"
-                                                                                        Visibility="{Binding BottomTimeVisibility}" />
+                                                                                        TextTrimming="CharacterEllipsis" />
                                                                                 </Grid>
                                                                             </Grid>
                                                                         </Border>

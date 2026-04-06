@@ -328,7 +328,10 @@ public sealed class PlannerStateStore : ObservableObject
         get => _editorDate;
         set
         {
-            SetProperty(ref _editorDate, value);
+            if (!SetProperty(ref _editorDate, value))
+                return;
+
+            OnPropertyChanged(nameof(EditorDateText));
         }
     }
 
@@ -352,7 +355,9 @@ public sealed class PlannerStateStore : ObservableObject
 
     public string EditorTimeText => $"{EditorTime.Hours:00}:{EditorTime.Minutes:00}";
 
-    public string EditorDurationText => BuildEditorDurationSummary((int)NormalizeDurationValue(EditorDurationMinutes, EditorMaxDurationMinutes));
+    public string EditorDurationText => FormatEditorDurationDescription((int)NormalizeDurationValue(EditorDurationMinutes, EditorMaxDurationMinutes));
+
+    public string EditorDateText => PlannerDateTimeFormatter.FormatDate(DateOnly.FromDateTime(EditorDate.Date));
 
     public double EditorMaxDurationMinutes =>
         EditorHasTime
@@ -886,16 +891,6 @@ public sealed class PlannerStateStore : ObservableObject
                 endTimeText,
                 FormatEditorDurationDescription(duration)));
         }
-    }
-
-    private string BuildEditorDurationSummary(int durationMinutes)
-    {
-        int endMinutes = Math.Min(24 * 60, (int)EditorTime.TotalMinutes + durationMinutes);
-        string endTimeText = endMinutes == 24 * 60
-            ? "24:00"
-            : TimeOnly.MinValue.Add(TimeSpan.FromMinutes(endMinutes)).ToString("HH:mm");
-
-        return $"{endTimeText} | {FormatEditorDurationDescription(durationMinutes)}";
     }
 
     private static string FormatEditorDurationDescription(int durationMinutes)

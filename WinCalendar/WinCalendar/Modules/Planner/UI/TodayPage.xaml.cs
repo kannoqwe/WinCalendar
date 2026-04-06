@@ -18,6 +18,7 @@ public sealed partial class TodayPage : Page
     private readonly PlannerStateStore _plannerStateStore;
     private readonly DispatcherQueueTimer _currentTimeTimer;
     private readonly DispatcherQueueTimer _inlineSaveTimer;
+    private bool _syncingEditorDateSelection;
     private bool _syncingEditorTimeSelection;
     private bool _timersInitialized;
     private bool _suppressInlineSave;
@@ -155,11 +156,6 @@ public sealed partial class TodayPage : Page
         ResumeInlineEditor(focusTitleEditor: true);
     }
 
-    private async void EditorDatePicker_DateChanged(CalendarDatePicker sender, CalendarDatePickerDateChangedEventArgs args)
-    {
-        await SaveInlineEditorNowAsync();
-    }
-
     private async void EditorTitleTextBox_LostFocus(object sender, RoutedEventArgs e)
     {
         await SaveInlineEditorNowAsync();
@@ -170,7 +166,7 @@ public sealed partial class TodayPage : Page
         ScheduleInlineSave();
     }
 
-    private void EditorScheduleModeRadioButton_Checked(object sender, RoutedEventArgs e)
+    private void EditorAllDayToggleSwitch_Toggled(object sender, RoutedEventArgs e)
     {
         ScheduleInlineSave();
     }
@@ -222,6 +218,38 @@ public sealed partial class TodayPage : Page
 
         EditorDurationListView.SelectedItem = selectedOption;
         DispatcherQueue.TryEnqueue(() => CenterListViewItem(EditorDurationListView, selectedOption));
+    }
+
+    private void EditorDateFlyout_Opening(object sender, object e)
+    {
+        _syncingEditorDateSelection = true;
+
+        try
+        {
+            EditorDateCalendarView.SelectedDates.Clear();
+            EditorDateCalendarView.SelectedDates.Add(_plannerStateStore.EditorDate);
+        }
+        finally
+        {
+            _syncingEditorDateSelection = false;
+        }
+    }
+
+    private async void EditorDateCalendarView_SelectedDatesChanged(CalendarView sender, CalendarViewSelectedDatesChangedEventArgs args)
+    {
+        if (_syncingEditorDateSelection || sender.SelectedDates.Count == 0)
+            return;
+
+        DateTimeOffset selectedDate = sender.SelectedDates[0];
+        if (_plannerStateStore.EditorDate.Date == selectedDate.Date)
+        {
+            EditorDateFlyout.Hide();
+            return;
+        }
+
+        _plannerStateStore.EditorDate = selectedDate;
+        EditorDateFlyout.Hide();
+        await SaveInlineEditorNowAsync();
     }
 
     private void EditorDurationListView_ItemClick(object sender, ItemClickEventArgs e)

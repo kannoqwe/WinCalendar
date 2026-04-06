@@ -79,7 +79,7 @@ namespace WinCalendar
             titleBar.ButtonInactiveForegroundColor = Colors.Transparent;
             titleBar.ButtonHoverForegroundColor = Colors.Transparent;
             titleBar.ButtonPressedForegroundColor = Colors.Transparent;
-            titleBar.PreferredHeightOption = TitleBarHeightOption.Collapsed;
+            titleBar.PreferredHeightOption = TitleBarHeightOption.Standard;
             UpdateCaptionButtonIcons();
         }
 

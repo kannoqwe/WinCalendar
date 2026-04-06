@@ -14,68 +14,116 @@
     </Window.SystemBackdrop>
 
     <Grid x:Name="ContentRoot" Background="{ThemeResource AppPageBackgroundBrush}">
-        <controls:NavigationView
-            x:Name="ShellNavigationView"
-            AlwaysShowHeader="False"
-            CompactPaneLength="56"
-            OpenPaneLength="56"
-            IsBackEnabled="False"
-            IsBackButtonVisible="Collapsed"
-            IsPaneOpen="False"
-            IsPaneToggleButtonVisible="False"
-            PaneDisplayMode="LeftCompact"
-            SelectionChanged="ShellNavigationView_SelectionChanged">
-            <controls:NavigationView.MenuItems>
-                <controls:NavigationViewItem x:Name="TodayNavigationItem" Content="Week" Tag="today">
-                    <controls:NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Calendar" />
-                    </controls:NavigationViewItem.Icon>
-                </controls:NavigationViewItem>
-                <controls:NavigationViewItem Content="Calendar" Tag="calendar">
-                    <controls:NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="AllApps" />
-                    </controls:NavigationViewItem.Icon>
-                </controls:NavigationViewItem>
-                <controls:NavigationViewItem Content="Notes" Tag="notes">
-                    <controls:NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Edit" />
-                    </controls:NavigationViewItem.Icon>
-                </controls:NavigationViewItem>
-                <controls:NavigationViewItem Content="Settings" Tag="settings">
-                    <controls:NavigationViewItem.Icon>
-                        <SymbolIcon Symbol="Setting" />
-                    </controls:NavigationViewItem.Icon>
-                </controls:NavigationViewItem>
-            </controls:NavigationView.MenuItems>
+        <Grid RowSpacing="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="44" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-            <controls:NavigationView.PaneFooter>
-                <StackPanel
-                    HorizontalAlignment="Center"
-                    Spacing="8"
-                    Padding="0,12,0,12">
-                    <Button
-                        x:Name="CompactPanelButton"
-                        Width="36"
-                        Height="36"
-                        Padding="0"
-                        Click="CompactPanelButton_Click"
-                        CornerRadius="12"
-                        ToolTipService.ToolTip="Open Compact Panel">
-                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70F;" />
-                    </Button>
-                    <Button
-                        x:Name="MediumViewButton"
-                        Width="36"
-                        Height="36"
-                        Padding="0"
-                        Click="MediumViewButton_Click"
-                        CornerRadius="12"
-                        ToolTipService.ToolTip="Open Medium View">
-                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE740;" />
-                    </Button>
-                </StackPanel>
-            </controls:NavigationView.PaneFooter>
-            <ContentPresenter x:Name="PageHost" />
-        </controls:NavigationView>
+            <Border
+                Grid.Row="0"
+                Background="{ThemeResource AppShellBackgroundBrush}"
+                BorderBrush="{ThemeResource AppBorderBrush}"
+                BorderThickness="0,0,0,1">
+                <Grid x:Name="CustomTitleBar">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="48" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="138" />
+                    </Grid.ColumnDefinitions>
+
+                    <Grid
+                        x:Name="TitleBarDragRegion"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        Margin="14,0,14,0">
+                        <StackPanel Spacing="0">
+                            <TextBlock
+                                FontSize="11"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Text="WinCalendar" />
+                            <TextBlock
+                                x:Name="CurrentSectionTextBlock"
+                                FontFamily="Segoe UI Variable Display"
+                                FontSize="14"
+                                FontWeight="SemiBold"
+                                Text="Week" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <controls:NavigationView
+                Grid.Row="1"
+                x:Name="ShellNavigationView"
+                AlwaysShowHeader="False"
+                CompactPaneLength="56"
+                OpenPaneLength="56"
+                IsBackEnabled="False"
+                IsBackButtonVisible="Collapsed"
+                IsPaneOpen="False"
+                IsPaneToggleButtonVisible="False"
+                PaneDisplayMode="LeftCompact"
+                SelectionChanged="ShellNavigationView_SelectionChanged">
+                <controls:NavigationView.MenuItems>
+                    <controls:NavigationViewItem x:Name="TodayNavigationItem" Content="Week" Tag="today">
+                        <controls:NavigationViewItem.Icon>
+                            <SymbolIcon Symbol="Calendar" />
+                        </controls:NavigationViewItem.Icon>
+                    </controls:NavigationViewItem>
+                    <controls:NavigationViewItem Content="Calendar" Tag="calendar">
+                        <controls:NavigationViewItem.Icon>
+                            <SymbolIcon Symbol="AllApps" />
+                        </controls:NavigationViewItem.Icon>
+                    </controls:NavigationViewItem>
+                    <controls:NavigationViewItem Content="Notes" Tag="notes">
+                        <controls:NavigationViewItem.Icon>
+                            <SymbolIcon Symbol="Edit" />
+                        </controls:NavigationViewItem.Icon>
+                    </controls:NavigationViewItem>
+                    <controls:NavigationViewItem Content="Settings" Tag="settings">
+                        <controls:NavigationViewItem.Icon>
+                            <SymbolIcon Symbol="Setting" />
+                        </controls:NavigationViewItem.Icon>
+                    </controls:NavigationViewItem>
+                </controls:NavigationView.MenuItems>
+
+                <controls:NavigationView.PaneFooter>
+                    <StackPanel
+                        HorizontalAlignment="Center"
+                        Spacing="8"
+                        Padding="0,12,0,12">
+                        <Button
+                            x:Name="CompactPanelButton"
+                            Width="36"
+                            Height="36"
+                            Padding="0"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            BorderThickness="0"
+                            CornerRadius="10"
+                            Click="CompactPanelButton_Click"
+                            ToolTipService.ToolTip="Open Compact Panel">
+                            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE70F;" />
+                        </Button>
+                        <Button
+                            x:Name="MediumViewButton"
+                            Width="36"
+                            Height="36"
+                            Padding="0"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            BorderThickness="0"
+                            CornerRadius="10"
+                            Click="MediumViewButton_Click"
+                            ToolTipService.ToolTip="Open Medium View">
+                            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE740;" />
+                        </Button>
+                    </StackPanel>
+                </controls:NavigationView.PaneFooter>
+                <ContentPresenter x:Name="PageHost" />
+            </controls:NavigationView>
+        </Grid>
     </Grid>
 </Window>

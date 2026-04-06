@@ -73,6 +73,57 @@
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="Foreground" Value="{ThemeResource AppAccentBrush}" />
         </Style>
+
+        <Style x:Key="EditorFieldBorderStyle" TargetType="Border">
+            <Setter Property="Padding" Value="12,9" />
+            <Setter Property="Background" Value="{ThemeResource AppShellBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource AppBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+        </Style>
+
+        <Style x:Key="EditorTitleTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontFamily" Value="Segoe UI Variable Display" />
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <Style x:Key="EditorInlineComboBoxStyle" TargetType="ComboBox">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="MinWidth" Value="54" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="EditorInlineCalendarDatePickerStyle" TargetType="CalendarDatePicker">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+        </Style>
+
+        <Style x:Key="EditorDescriptionTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="AcceptsReturn" Value="True" />
+            <Setter Property="TextWrapping" Value="Wrap" />
+            <Setter Property="VerticalContentAlignment" Value="Top" />
+            <Setter Property="MinHeight" Value="96" />
+        </Style>
+
+        <Style x:Key="EditorGhostIconButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="28" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="8" />
+        </Style>
     </Page.Resources>
 
     <Grid
@@ -576,26 +627,8 @@
 
                     <Grid
                         Grid.Column="1"
-                        Padding="18,0,0,0"
-                        RowSpacing="14">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
-
-                        <StackPanel Spacing="2">
-                            <TextBlock
-                                FontSize="10"
-                                FontWeight="SemiBold"
-                                Foreground="{ThemeResource AppTextMutedBrush}"
-                                Text="EDITOR" />
-                            <TextBlock
-                                FontSize="13"
-                                Foreground="{ThemeResource AppTextMutedBrush}"
-                                Text="{Binding SelectedDateText}" />
-                        </StackPanel>
-
-                        <Grid Grid.Row="1">
+                        Padding="18,0,0,0">
+                        <Grid>
                             <StackPanel
                                 Spacing="10"
                                 Visibility="{Binding EmptySelectedTaskVisibility}">
@@ -618,134 +651,205 @@
                             <ScrollViewer
                                 HorizontalScrollBarVisibility="Disabled"
                                 Visibility="{Binding SelectedTaskVisibility}">
-                                <StackPanel Spacing="16">
+                                <StackPanel Spacing="14">
                                     <Grid ColumnSpacing="10">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
 
-                                        <StackPanel Spacing="4">
-                                            <TextBlock
-                                                FontSize="10"
-                                                FontWeight="SemiBold"
-                                                Foreground="{ThemeResource AppTextMutedBrush}"
-                                                Text="TASK" />
-                                            <TextBox
-                                                x:Name="EditorTitleTextBox"
-                                                Padding="0,0,0,6"
-                                                Background="Transparent"
-                                                BorderThickness="0"
-                                                FontFamily="Segoe UI Variable Display"
-                                                FontSize="20"
-                                                FontWeight="SemiBold"
-                                                PlaceholderText="Untitled"
-                                                Text="{Binding EditorTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                                TextChanged="EditorTitleTextBox_TextChanged"
-                                                LostFocus="EditorTitleTextBox_LostFocus" />
-                                        </StackPanel>
+                                        <TextBox
+                                            x:Name="EditorTitleTextBox"
+                                            Style="{StaticResource EditorTitleTextBoxStyle}"
+                                            PlaceholderText="Untitled"
+                                            Text="{Binding EditorTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            TextChanged="EditorTitleTextBox_TextChanged"
+                                            LostFocus="EditorTitleTextBox_LostFocus" />
 
                                         <Button
                                             Grid.Column="1"
                                             VerticalAlignment="Top"
-                                            Style="{StaticResource HeaderIconButtonStyle}"
+                                            Style="{StaticResource EditorGhostIconButtonStyle}"
                                             Click="CloseEditorButton_Click"
                                             ToolTipService.ToolTip="Close editor">
                                             <FontIcon FontFamily="Segoe Fluent Icons" FontSize="11" Glyph="&#xE711;" />
                                         </Button>
                                     </Grid>
 
-                                    <Border
-                                        BorderBrush="{ThemeResource AppBorderBrush}"
-                                        BorderThickness="0,1,0,0" />
+                                    <StackPanel Spacing="8">
+                                        <Border Style="{StaticResource EditorFieldBorderStyle}">
+                                            <Grid ColumnSpacing="12">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="56" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
 
-                                    <StackPanel Spacing="10">
-                                        <TextBlock
-                                            FontSize="10"
-                                            FontWeight="SemiBold"
-                                            Foreground="{ThemeResource AppTextMutedBrush}"
-                                            Text="SCHEDULE" />
+                                                <TextBlock
+                                                    VerticalAlignment="Center"
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                                    Text="Date" />
 
-                                        <CalendarDatePicker
-                                            x:Name="EditorDatePicker"
-                                            Date="{Binding EditorDate, Mode=TwoWay}"
-                                            DateChanged="EditorDatePicker_DateChanged"
-                                            Header="Date"
-                                            HorizontalAlignment="Stretch" />
+                                                <CalendarDatePicker
+                                                    x:Name="EditorDatePicker"
+                                                    Grid.Column="1"
+                                                    HorizontalAlignment="Stretch"
+                                                    Date="{Binding EditorDate, Mode=TwoWay}"
+                                                    DateChanged="EditorDatePicker_DateChanged"
+                                                    Style="{StaticResource EditorInlineCalendarDatePickerStyle}" />
+                                            </Grid>
+                                        </Border>
 
-                                        <CheckBox
-                                            Content="Time"
-                                            IsChecked="{Binding EditorHasTime, Mode=TwoWay}"
-                                            Click="EditorTimeToggle_Click" />
+                                        <Border Style="{StaticResource EditorFieldBorderStyle}">
+                                            <Grid
+                                                ColumnSpacing="12"
+                                                RowSpacing="8">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="56" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
 
-                                        <TimePicker
-                                            x:Name="EditorTimePicker"
-                                            ClockIdentifier="24HourClock"
-                                            Header="Start"
-                                            MinuteIncrement="15"
-                                            Time="{Binding EditorTime, Mode=TwoWay}"
-                                            TimeChanged="EditorTimePicker_TimeChanged"
-                                            Visibility="{Binding EditorTimeVisibility}" />
+                                                <TextBlock
+                                                    VerticalAlignment="Center"
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                                    Text="Time" />
 
-                                        <CheckBox
-                                            Content="Duration"
-                                            IsChecked="{Binding EditorHasDuration, Mode=TwoWay}"
-                                            Click="EditorDurationToggle_Click"
-                                            IsEnabled="{Binding EditorDurationToggleEnabled}" />
-
-                                        <NumberBox
-                                            x:Name="EditorDurationNumberBox"
-                                            Header="Minutes"
-                                            IsEnabled="{Binding EditorDurationInputEnabled}"
-                                            LargeChange="15"
-                                            Maximum="{Binding EditorMaxDurationMinutes}"
-                                            Minimum="15"
-                                            SmallChange="15"
-                                            SpinButtonPlacementMode="Compact"
-                                            Value="{Binding EditorDurationMinutes, Mode=TwoWay}"
-                                            ValueChanged="EditorDurationNumberBox_ValueChanged"
-                                            Visibility="{Binding EditorDurationVisibility}" />
-                                    </StackPanel>
-
-                                    <Border
-                                        BorderBrush="{ThemeResource AppBorderBrush}"
-                                        BorderThickness="0,1,0,0" />
-
-                                    <StackPanel Spacing="10">
-                                        <TextBlock
-                                            FontSize="10"
-                                            FontWeight="SemiBold"
-                                            Foreground="{ThemeResource AppTextMutedBrush}"
-                                            Text="ACTIONS" />
-
-                                        <Grid ColumnSpacing="8">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-
-                                            <Button
-                                                Style="{StaticResource HeaderToolbarButtonStyle}"
-                                                Click="CompleteTaskButton_Click"
-                                                Visibility="{Binding EditorCompleteVisibility}">
                                                 <StackPanel
-                                                    HorizontalAlignment="Center"
+                                                    Grid.Row="1"
+                                                    Grid.Column="1"
+                                                    Grid.ColumnSpan="2"
                                                     Orientation="Horizontal"
-                                                    Spacing="8">
-                                                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE73E;" />
-                                                    <TextBlock Text="{Binding EditorCompletionButtonText}" />
+                                                    Spacing="6"
+                                                    VerticalAlignment="Center"
+                                                    Visibility="{Binding EditorTimeVisibility}">
+                                                    <ComboBox
+                                                        x:Name="EditorHourComboBox"
+                                                        Width="64"
+                                                        DisplayMemberPath="Label"
+                                                        ItemsSource="{Binding EditorHourOptions}"
+                                                        SelectedValue="{Binding EditorHourValue, Mode=TwoWay}"
+                                                        SelectedValuePath="Value"
+                                                        SelectionChanged="EditorHourComboBox_SelectionChanged"
+                                                        Style="{StaticResource EditorInlineComboBoxStyle}" />
+                                                    <TextBlock
+                                                        VerticalAlignment="Center"
+                                                        FontSize="14"
+                                                        Foreground="{ThemeResource AppTextMutedBrush}"
+                                                        Text=":" />
+                                                    <ComboBox
+                                                        x:Name="EditorMinuteComboBox"
+                                                        Width="64"
+                                                        DisplayMemberPath="Label"
+                                                        ItemsSource="{Binding EditorMinuteOptions}"
+                                                        SelectedValue="{Binding EditorMinuteValue, Mode=TwoWay}"
+                                                        SelectedValuePath="Value"
+                                                        SelectionChanged="EditorMinuteComboBox_SelectionChanged"
+                                                        Style="{StaticResource EditorInlineComboBoxStyle}" />
                                                 </StackPanel>
-                                            </Button>
 
-                                            <Button
-                                                Grid.Column="1"
-                                                Style="{StaticResource HeaderIconButtonStyle}"
-                                                Click="DeleteSelectedTaskButton_Click"
-                                                Visibility="{Binding EditorDeleteVisibility}">
-                                                <FontIcon FontFamily="Segoe Fluent Icons" FontSize="11" Glyph="&#xE74D;" />
-                                            </Button>
-                                        </Grid>
+                                                <ToggleSwitch
+                                                    Grid.Column="2"
+                                                    VerticalAlignment="Center"
+                                                    IsOn="{Binding EditorHasTime, Mode=TwoWay}"
+                                                    OffContent=""
+                                                    OnContent=""
+                                                    Toggled="EditorTimeToggle_Toggled" />
+                                            </Grid>
+                                        </Border>
+
+                                        <Border
+                                            Style="{StaticResource EditorFieldBorderStyle}"
+                                            Visibility="{Binding EditorTimeVisibility}">
+                                            <Grid
+                                                ColumnSpacing="12"
+                                                RowSpacing="8">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="56" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock
+                                                    VerticalAlignment="Center"
+                                                    FontSize="12"
+                                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                                    Text="Length" />
+
+                                                <ComboBox
+                                                    x:Name="EditorDurationComboBox"
+                                                    Grid.Row="1"
+                                                    Grid.Column="1"
+                                                    Grid.ColumnSpan="2"
+                                                    DisplayMemberPath="Label"
+                                                    HorizontalAlignment="Stretch"
+                                                    IsEnabled="{Binding EditorDurationInputEnabled}"
+                                                    ItemsSource="{Binding EditorDurationOptions}"
+                                                    SelectedValue="{Binding EditorDurationSelectedValue, Mode=TwoWay}"
+                                                    SelectedValuePath="Value"
+                                                    SelectionChanged="EditorDurationComboBox_SelectionChanged"
+                                                    Style="{StaticResource EditorInlineComboBoxStyle}"
+                                                    Visibility="{Binding EditorDurationVisibility}" />
+
+                                                <ToggleSwitch
+                                                    Grid.Column="2"
+                                                    VerticalAlignment="Center"
+                                                    IsEnabled="{Binding EditorDurationToggleEnabled}"
+                                                    IsOn="{Binding EditorHasDuration, Mode=TwoWay}"
+                                                    OffContent=""
+                                                    OnContent=""
+                                                    Toggled="EditorDurationToggle_Toggled" />
+                                            </Grid>
+                                        </Border>
                                     </StackPanel>
+
+                                    <Border Style="{StaticResource EditorFieldBorderStyle}">
+                                        <TextBox
+                                            x:Name="EditorDescriptionTextBox"
+                                            Style="{StaticResource EditorDescriptionTextBoxStyle}"
+                                            PlaceholderText="Add description..."
+                                            Text="{Binding EditorDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                            TextChanged="EditorDescriptionTextBox_TextChanged"
+                                            LostFocus="EditorDescriptionTextBox_LostFocus" />
+                                    </Border>
+
+                                    <Grid ColumnSpacing="8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <Button
+                                            Style="{StaticResource HeaderToolbarButtonStyle}"
+                                            Click="CompleteTaskButton_Click"
+                                            Visibility="{Binding EditorCompleteVisibility}">
+                                            <StackPanel
+                                                HorizontalAlignment="Center"
+                                                Orientation="Horizontal"
+                                                Spacing="8">
+                                                <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE73E;" />
+                                                <TextBlock Text="{Binding EditorCompletionButtonText}" />
+                                            </StackPanel>
+                                        </Button>
+
+                                        <Button
+                                            Grid.Column="1"
+                                            Style="{StaticResource EditorGhostIconButtonStyle}"
+                                            Click="DeleteSelectedTaskButton_Click"
+                                            ToolTipService.ToolTip="Delete task"
+                                            Visibility="{Binding EditorDeleteVisibility}">
+                                            <FontIcon FontFamily="Segoe Fluent Icons" FontSize="11" Glyph="&#xE74D;" />
+                                        </Button>
+                                    </Grid>
                                 </StackPanel>
                             </ScrollViewer>
                         </Grid>

@@ -14,12 +14,18 @@ public sealed class UpdateTaskUseCase
         _taskRepository = taskRepository;
     }
 
-    public async Task<TaskItem> ExecuteAsync(Guid id, string title, DateOnly date, TimeOnly? time = null, int? durationMinutes = null)
+    public async Task<TaskItem> ExecuteAsync(
+        Guid id,
+        string title,
+        DateOnly date,
+        TimeOnly? time = null,
+        int? durationMinutes = null,
+        string? description = null)
     {
         TaskItem task = await _taskRepository.GetByIdAsync(id)
             ?? throw new InvalidOperationException($"Task with id '{id}' was not found.");
 
-        task.Update(title, date, time, durationMinutes);
+        task.Update(title, date, time, durationMinutes, description);
 
         await _taskRepository.UpdateAsync(task);
 

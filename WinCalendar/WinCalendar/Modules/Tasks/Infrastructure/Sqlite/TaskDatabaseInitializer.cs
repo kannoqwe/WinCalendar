@@ -26,6 +26,7 @@ public sealed class TaskDatabaseInitializer
             CREATE TABLE IF NOT EXISTS tasks (
                 id TEXT NOT NULL PRIMARY KEY,
                 title TEXT NOT NULL,
+                description TEXT NULL,
                 task_date TEXT NOT NULL,
                 task_time TEXT NULL,
                 duration_minutes INTEGER NULL,
@@ -39,6 +40,11 @@ public sealed class TaskDatabaseInitializer
             connection,
             "duration_minutes",
             "ALTER TABLE tasks ADD COLUMN duration_minutes INTEGER NULL;");
+
+        EnsureColumn(
+            connection,
+            "description",
+            "ALTER TABLE tasks ADD COLUMN description TEXT NULL;");
 
         connection.ExecuteNonQuery(
             """

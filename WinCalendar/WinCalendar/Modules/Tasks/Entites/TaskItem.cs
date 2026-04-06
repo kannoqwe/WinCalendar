@@ -10,6 +10,8 @@ public class TaskItem
 
     public string Title { get; private set; } = string.Empty;
 
+    public string Description { get; private set; } = string.Empty;
+
     public DateOnly Date { get; private set; }
 
     public TimeOnly? Time { get; private set; }
@@ -27,14 +29,14 @@ public class TaskItem
         Title = string.Empty;
     }
 
-    public TaskItem(string title, DateOnly date, TimeOnly? time = null, int? durationMinutes = null)
+    public TaskItem(string title, DateOnly date, TimeOnly? time = null, int? durationMinutes = null, string? description = null)
     {
         Id = Guid.NewGuid();
         IsCompleted = false;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = DateTime.UtcNow;
 
-        ApplyDetails(title, date, time, durationMinutes);
+        ApplyDetails(title, date, time, durationMinutes, description);
     }
 
     private TaskItem(
@@ -43,6 +45,7 @@ public class TaskItem
         DateOnly date,
         TimeOnly? time,
         int? durationMinutes,
+        string? description,
         bool isCompleted,
         DateTime createdAt,
         DateTime updatedAt)
@@ -52,7 +55,7 @@ public class TaskItem
         CreatedAt = createdAt;
         UpdatedAt = updatedAt;
 
-        ApplyDetails(title, date, time, durationMinutes);
+        ApplyDetails(title, date, time, durationMinutes, description);
     }
 
     public static TaskItem Restore(
@@ -61,16 +64,17 @@ public class TaskItem
         DateOnly date,
         TimeOnly? time,
         int? durationMinutes,
+        string? description,
         bool isCompleted,
         DateTime createdAt,
         DateTime updatedAt)
     {
-        return new TaskItem(id, title, date, time, durationMinutes, isCompleted, createdAt, updatedAt);
+        return new TaskItem(id, title, date, time, durationMinutes, description, isCompleted, createdAt, updatedAt);
     }
 
-    public void Update(string title, DateOnly date, TimeOnly? time, int? durationMinutes)
+    public void Update(string title, DateOnly date, TimeOnly? time, int? durationMinutes, string? description = null)
     {
-        ApplyDetails(title, date, time, durationMinutes);
+        ApplyDetails(title, date, time, durationMinutes, description);
         UpdatedAt = DateTime.UtcNow;
     }
 
@@ -86,9 +90,10 @@ public class TaskItem
         UpdatedAt = DateTime.UtcNow;
     }
 
-    private void ApplyDetails(string title, DateOnly date, TimeOnly? time, int? durationMinutes)
+    private void ApplyDetails(string title, DateOnly date, TimeOnly? time, int? durationMinutes, string? description)
     {
         Title = NormalizeTitle(title);
+        Description = NormalizeDescription(description);
         Date = date;
         Time = time;
         DurationMinutes = NormalizeDurationMinutes(time, durationMinutes);
@@ -100,6 +105,13 @@ public class TaskItem
             throw new ArgumentException("Title cannot be empty");
 
         return title.Trim();
+    }
+
+    private static string NormalizeDescription(string? description)
+    {
+        return string.IsNullOrWhiteSpace(description)
+            ? string.Empty
+            : description.Trim();
     }
 
     private static int? NormalizeDurationMinutes(TimeOnly? time, int? durationMinutes)

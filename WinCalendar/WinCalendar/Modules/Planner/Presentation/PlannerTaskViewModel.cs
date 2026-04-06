@@ -14,6 +14,7 @@ public sealed class PlannerTaskViewModel
 
         Id = task.Id;
         Title = task.Title;
+        Description = task.Description;
         Date = task.Date;
         Time = task.Time;
         DurationMinutes = task.DurationMinutes;
@@ -26,6 +27,8 @@ public sealed class PlannerTaskViewModel
     public Guid Id { get; }
 
     public string Title { get; }
+
+    public string Description { get; }
 
     public DateOnly Date { get; }
 

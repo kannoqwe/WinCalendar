@@ -14,9 +14,14 @@ public sealed class CreateTaskUseCase
         _taskRepository = taskRepository;
     }
 
-    public async Task<TaskItem> ExecuteAsync(string title, DateOnly date, TimeOnly? time = null, int? durationMinutes = null)
+    public async Task<TaskItem> ExecuteAsync(
+        string title,
+        DateOnly date,
+        TimeOnly? time = null,
+        int? durationMinutes = null,
+        string? description = null)
     {
-        TaskItem task = new TaskItem(title, date, time, durationMinutes);
+        TaskItem task = new TaskItem(title, date, time, durationMinutes, description);
 
         await _taskRepository.AddAsync(task);
 

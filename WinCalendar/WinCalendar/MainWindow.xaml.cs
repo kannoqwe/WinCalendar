@@ -2,7 +2,6 @@ using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using WinCalendar.Modules.Calendar.UI;
 using WinCalendar.Modules.Planner.Presentation;
 using WinCalendar.Modules.Planner.UI;
@@ -19,6 +18,7 @@ namespace WinCalendar
         private readonly PlannerWindowCoordinator _windowCoordinator;
         private AppWindow? _appWindow;
         private FrameworkElement? _titleBarDragRegion;
+        private FontIcon? _captionMaximizeIcon;
 
         public MainWindow(PlannerStateStore plannerStateStore, PlannerWindowCoordinator windowCoordinator)
         {
@@ -26,9 +26,11 @@ namespace WinCalendar
             _windowCoordinator = windowCoordinator;
             InitializeComponent();
             _titleBarDragRegion = ContentRoot.FindName("TitleBarDragRegion") as FrameworkElement;
+            _captionMaximizeIcon = ContentRoot.FindName("CaptionMaximizeIcon") as FontIcon;
             ConfigureCustomTitleBar();
             ShellNavigationView.SelectedItem = TodayNavigationItem;
             PageHost.Content = new TodayPage(_plannerStateStore, _windowCoordinator);
+            Closed += MainWindow_Closed;
         }
 
         private void ShellNavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -66,28 +68,43 @@ namespace WinCalendar
                 return;
 
             AppWindowTitleBar titleBar = _appWindow.TitleBar;
+            _appWindow.Changed += AppWindow_Changed;
             titleBar.ExtendsContentIntoTitleBar = true;
             titleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
             titleBar.ButtonBackgroundColor = Colors.Transparent;
             titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
-            titleBar.ButtonForegroundColor = ResolveBrushColor("AppTextMutedBrush", Colors.Gray);
-            titleBar.ButtonInactiveForegroundColor = ResolveBrushColor("AppTextMutedBrush", Colors.Gray);
-            titleBar.ButtonHoverForegroundColor = ResolveBrushColor("TextFillColorPrimaryBrush", Colors.Black);
-            titleBar.ButtonPressedForegroundColor = ResolveBrushColor("TextFillColorPrimaryBrush", Colors.Black);
-            titleBar.ButtonHoverBackgroundColor = ResolveColor(0x12, 0x00, 0x00, 0x00);
-            titleBar.ButtonPressedBackgroundColor = ResolveColor(0x1E, 0x00, 0x00, 0x00);
+            titleBar.ButtonHoverBackgroundColor = Colors.Transparent;
+            titleBar.ButtonPressedBackgroundColor = Colors.Transparent;
+            titleBar.ButtonForegroundColor = Colors.Transparent;
+            titleBar.ButtonInactiveForegroundColor = Colors.Transparent;
+            titleBar.ButtonHoverForegroundColor = Colors.Transparent;
+            titleBar.ButtonPressedForegroundColor = Colors.Transparent;
             titleBar.PreferredHeightOption = TitleBarHeightOption.Collapsed;
+            UpdateCaptionButtonIcons();
         }
 
-        private static Windows.UI.Color ResolveColor(byte alpha, byte red, byte green, byte blue)
+        private void AppWindow_Changed(AppWindow sender, AppWindowChangedEventArgs args)
         {
-            return Windows.UI.Color.FromArgb(alpha, red, green, blue);
+            if (!args.DidPresenterChange && !args.DidSizeChange)
+                return;
+
+            DispatcherQueue.TryEnqueue(UpdateCaptionButtonIcons);
         }
 
-        private static Windows.UI.Color ResolveBrushColor(string resourceKey, Windows.UI.Color fallback)
+        private void UpdateCaptionButtonIcons()
         {
-            object? resource = Application.Current.Resources[resourceKey];
-            return resource is SolidColorBrush brush ? brush.Color : fallback;
+            if (_captionMaximizeIcon is null || _appWindow?.Presenter is not OverlappedPresenter presenter)
+                return;
+
+            _captionMaximizeIcon.Glyph = presenter.State == OverlappedPresenterState.Maximized
+                ? "\uE923"
+                : "\uE922";
+        }
+
+        private void MainWindow_Closed(object sender, WindowEventArgs args)
+        {
+            if (_appWindow is not null)
+                _appWindow.Changed -= AppWindow_Changed;
         }
     }
 }

@@ -162,7 +162,7 @@
                 ColumnSpacing="16">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="280" />
+                    <ColumnDefinition Width="256" />
                 </Grid.ColumnDefinitions>
 
                 <Grid

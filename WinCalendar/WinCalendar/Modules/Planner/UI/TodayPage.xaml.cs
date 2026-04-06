@@ -157,42 +157,27 @@ public sealed partial class TodayPage : Page
         await SaveInlineEditorNowAsync();
     }
 
-    private async void EditorDescriptionTextBox_LostFocus(object sender, RoutedEventArgs e)
-    {
-        await SaveInlineEditorNowAsync();
-    }
-
     private void EditorTitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         ScheduleInlineSave();
     }
 
-    private void EditorDescriptionTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    private void EditorTimeToggle_Click(object sender, RoutedEventArgs e)
     {
         ScheduleInlineSave();
     }
 
-    private void EditorTimeToggle_Toggled(object sender, RoutedEventArgs e)
+    private void EditorDurationToggle_Click(object sender, RoutedEventArgs e)
     {
         ScheduleInlineSave();
     }
 
-    private void EditorDurationToggle_Toggled(object sender, RoutedEventArgs e)
+    private void EditorTimePicker_TimeChanged(object sender, TimePickerValueChangedEventArgs args)
     {
         ScheduleInlineSave();
     }
 
-    private void EditorHourComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        ScheduleInlineSave();
-    }
-
-    private void EditorMinuteComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        ScheduleInlineSave();
-    }
-
-    private void EditorDurationComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void EditorDurationNumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
     {
         ScheduleInlineSave();
     }
@@ -401,9 +386,6 @@ public sealed partial class TodayPage : Page
     {
         if (_suppressInlineSave || _isInlineSaveInProgress)
             return;
-
-        if (_inlineSaveTimer.IsRunning)
-            _inlineSaveTimer.Stop();
 
         if (string.IsNullOrWhiteSpace(_plannerStateStore.EditorTitle))
             return;

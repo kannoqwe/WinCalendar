@@ -33,6 +33,10 @@ public sealed class PlannerWeekTaskBlockViewModel
 
     public string TimeText => Task.TimeRangeText;
 
+    public string InlineTimeText => Task.TimeText;
+
+    public string BottomTimeText => Task.CompactTimeText;
+
     public SolidColorBrush BackgroundBrush => Task.TaskBackgroundBrush;
 
     public SolidColorBrush BorderBrush => Task.TaskBorderBrush;
@@ -41,26 +45,34 @@ public sealed class PlannerWeekTaskBlockViewModel
 
     public Thickness ContentPadding =>
         Height >= 72
-            ? new Thickness(6, 5, 6, 5)
+            ? new Thickness(5, 4, 5, 4)
             : Height >= 44
-                ? new Thickness(5, 4, 5, 4)
-                : new Thickness(4, 3, 4, 3);
+                ? new Thickness(4, 3, 4, 3)
+                : new Thickness(4, 2, 4, 2);
 
     public int TitleMaxLines =>
-        Height >= 124
-            ? 4
-            : Height >= 88
-                ? 3
-                : Height >= 52
-                    ? 2
-                    : 1;
+        UsesInlineTimeLayout
+            ? Height >= 42 ? 2 : 1
+            : Height >= 112
+                ? 4
+                : Height >= 76
+                    ? 3
+                    : Height >= 52
+                        ? 2
+                        : 1;
 
     public TextWrapping TitleWrapping =>
         TitleMaxLines > 1 ? TextWrapping.WrapWholeWords : TextWrapping.NoWrap;
 
-    public double TitleFontSize => Height >= 52 ? 11 : 10;
+    public double TitleFontSize => Height >= 60 ? 11 : 10;
 
-    public double TimeFontSize => Height >= 44 ? 10 : 9;
+    public double TimeFontSize => Height >= 60 ? 10 : 9;
+
+    public bool UsesInlineTimeLayout => Height <= 44;
+
+    public Visibility InlineTimeVisibility => UsesInlineTimeLayout ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility BottomTimeVisibility => UsesInlineTimeLayout ? Visibility.Collapsed : Visibility.Visible;
 
     public double ContentOpacity => Task.ContentOpacity;
 }

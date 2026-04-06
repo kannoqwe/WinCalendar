@@ -346,46 +346,52 @@
                                                 <Grid
                                                     Background="Transparent"
                                                     Tapped="WeekAllDayLane_Tapped">
-                                                    <StackPanel
-                                                        Padding="8,8,8,6"
-                                                        Spacing="4">
+                                                    <Grid Padding="6,6,4,4">
+                                                        <Grid.RowDefinitions>
+                                                            <RowDefinition Height="Auto" />
+                                                            <RowDefinition Height="*" />
+                                                        </Grid.RowDefinitions>
+
                                                         <TextBlock
                                                             Visibility="{Binding EmptyAllDayVisibility}"
                                                             FontSize="10"
                                                             Foreground="{ThemeResource AppTextMutedBrush}"
                                                             Text="Add task" />
 
-                                                        <ItemsControl ItemsSource="{Binding VisibleAllDayTasks}">
-                                                            <ItemsControl.ItemTemplate>
-                                                                <DataTemplate>
-                                                                    <Button
-                                                                        HorizontalContentAlignment="Stretch"
-                                                                        Style="{StaticResource FlatButtonStyle}"
-                                                                        Click="WeekAllDayTaskButton_Click">
-                                                                        <Border
-                                                                            Padding="6,4"
-                                                                            Background="{Binding TaskBackgroundBrush}"
-                                                                            BorderBrush="{Binding TaskBorderBrush}"
-                                                                            BorderThickness="1"
-                                                                            CornerRadius="6"
-                                                                            Opacity="{Binding ContentOpacity}">
-                                                                            <TextBlock
-                                                                                FontSize="11"
-                                                                                FontWeight="SemiBold"
-                                                                                Text="{Binding Title}"
-                                                                                TextTrimming="CharacterEllipsis" />
-                                                                        </Border>
-                                                                    </Button>
-                                                                </DataTemplate>
-                                                            </ItemsControl.ItemTemplate>
-                                                        </ItemsControl>
-
-                                                        <TextBlock
-                                                            Visibility="{Binding HiddenAllDayTaskCountVisibility}"
-                                                            FontSize="10"
-                                                            Foreground="{ThemeResource AppTextMutedBrush}"
-                                                            Text="{Binding HiddenAllDayTaskCountText}" />
-                                                    </StackPanel>
+                                                        <ScrollViewer
+                                                            Grid.Row="1"
+                                                            Margin="0,4,0,0"
+                                                            HorizontalScrollBarVisibility="Disabled"
+                                                            VerticalScrollBarVisibility="Auto"
+                                                            VerticalScrollMode="Enabled"
+                                                            ZoomMode="Disabled">
+                                                            <ItemsControl ItemsSource="{Binding VisibleAllDayTasks}">
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Button
+                                                                            Margin="0,0,0,2"
+                                                                            HorizontalContentAlignment="Stretch"
+                                                                            Style="{StaticResource FlatButtonStyle}"
+                                                                            Click="WeekAllDayTaskButton_Click">
+                                                                            <Border
+                                                                                Padding="5,2"
+                                                                                Background="{Binding TaskBackgroundBrush}"
+                                                                                BorderBrush="{Binding TaskBorderBrush}"
+                                                                                BorderThickness="1"
+                                                                                CornerRadius="5"
+                                                                                Opacity="{Binding ContentOpacity}">
+                                                                                <TextBlock
+                                                                                    FontSize="10"
+                                                                                    FontWeight="SemiBold"
+                                                                                    Text="{Binding Title}"
+                                                                                    TextTrimming="CharacterEllipsis" />
+                                                                            </Border>
+                                                                        </Button>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </ScrollViewer>
+                                                    </Grid>
                                                 </Grid>
                                             </Grid>
                                         </DataTemplate>
@@ -488,43 +494,60 @@
                                                                                 Y="{Binding Top}" />
                                                                         </Button.RenderTransform>
                                                                         <Border
+                                                                            Padding="{Binding ContentPadding}"
                                                                             Background="{Binding BackgroundBrush}"
                                                                             BorderBrush="{Binding BorderBrush}"
                                                                             BorderThickness="1"
                                                                             CornerRadius="6"
                                                                             Opacity="{Binding ContentOpacity}">
-                                                                            <Grid ColumnSpacing="6">
+                                                                            <Grid ColumnSpacing="5">
                                                                                 <Grid.ColumnDefinitions>
-                                                                                    <ColumnDefinition Width="3" />
+                                                                                    <ColumnDefinition Width="2" />
                                                                                     <ColumnDefinition Width="*" />
                                                                                 </Grid.ColumnDefinitions>
 
                                                                                 <Border
-                                                                                    Margin="4,4,0,4"
+                                                                                    Margin="0,1,0,1"
                                                                                     Background="{Binding AccentBrush}"
                                                                                     CornerRadius="2" />
 
                                                                                 <Grid
                                                                                     Grid.Column="1"
-                                                                                    Margin="2,4,6,4"
                                                                                     RowSpacing="2">
                                                                                     <Grid.RowDefinitions>
                                                                                         <RowDefinition Height="Auto" />
                                                                                         <RowDefinition Height="*" />
                                                                                     </Grid.RowDefinitions>
 
-                                                                                    <TextBlock
-                                                                                        FontSize="{Binding TimeFontSize}"
-                                                                                        Foreground="{Binding AccentBrush}"
-                                                                                        Text="{Binding TimeText}" />
+                                                                                    <Grid ColumnSpacing="4">
+                                                                                        <Grid.ColumnDefinitions>
+                                                                                            <ColumnDefinition Width="*" />
+                                                                                            <ColumnDefinition Width="Auto" />
+                                                                                        </Grid.ColumnDefinitions>
+
+                                                                                        <TextBlock
+                                                                                            FontSize="{Binding TitleFontSize}"
+                                                                                            FontWeight="SemiBold"
+                                                                                            MaxLines="{Binding TitleMaxLines}"
+                                                                                            Text="{Binding Title}"
+                                                                                            TextTrimming="CharacterEllipsis"
+                                                                                            TextWrapping="{Binding TitleWrapping}" />
+                                                                                        <TextBlock
+                                                                                            Grid.Column="1"
+                                                                                            VerticalAlignment="Top"
+                                                                                            FontSize="{Binding TimeFontSize}"
+                                                                                            Foreground="{Binding AccentBrush}"
+                                                                                            Text="{Binding InlineTimeText}"
+                                                                                            Visibility="{Binding InlineTimeVisibility}" />
+                                                                                    </Grid>
+
                                                                                     <TextBlock
                                                                                         Grid.Row="1"
-                                                                                        FontSize="{Binding TitleFontSize}"
-                                                                                        FontWeight="SemiBold"
-                                                                                        MaxLines="{Binding TitleMaxLines}"
-                                                                                        Text="{Binding Title}"
+                                                                                        FontSize="{Binding TimeFontSize}"
+                                                                                        Foreground="{Binding AccentBrush}"
+                                                                                        Text="{Binding BottomTimeText}"
                                                                                         TextTrimming="CharacterEllipsis"
-                                                                                        TextWrapping="{Binding TitleWrapping}" />
+                                                                                        Visibility="{Binding BottomTimeVisibility}" />
                                                                                 </Grid>
                                                                             </Grid>
                                                                         </Border>

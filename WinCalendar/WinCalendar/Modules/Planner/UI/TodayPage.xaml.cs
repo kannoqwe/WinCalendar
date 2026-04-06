@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Windows.Foundation;
 using WinCalendar.Modules.Planner.Presentation;
 using WinCalendar.Shared.Windowing;
 
@@ -17,6 +18,7 @@ public sealed partial class TodayPage : Page
     private readonly PlannerStateStore _plannerStateStore;
     private readonly DispatcherQueueTimer _currentTimeTimer;
     private readonly DispatcherQueueTimer _inlineSaveTimer;
+    private bool _syncingEditorTimeSelection;
     private bool _timersInitialized;
     private bool _suppressInlineSave;
     private bool _isInlineSaveInProgress;
@@ -26,9 +28,11 @@ public sealed partial class TodayPage : Page
     private bool _syncingWeekHorizontalScroll;
     private bool _syncingWeekVerticalScroll;
 
-    public string[] EditorTimeOptions { get; } = Enumerable.Range(0, 24 * 4)
-        .Select(index => $"{index / 4:00}:{(index % 4) * 15:00}")
+    public string[] EditorHourOptions { get; } = Enumerable.Range(0, 24)
+        .Select(hour => hour.ToString("00"))
         .ToArray();
+
+    public string[] EditorMinuteOptions { get; } = ["00", "15", "30", "45"];
 
     public TodayPage(PlannerStateStore plannerStateStore, PlannerWindowCoordinator windowCoordinator)
     {
@@ -178,22 +182,28 @@ public sealed partial class TodayPage : Page
 
     private void EditorTimeFlyout_Opening(object sender, object e)
     {
-        string selectedTime = _plannerStateStore.EditorTimeText;
-        EditorTimeListView.SelectedItem = selectedTime;
-        DispatcherQueue.TryEnqueue(() => EditorTimeListView.ScrollIntoView(selectedTime));
-    }
+        _syncingEditorTimeSelection = true;
 
-    private void EditorTimeListView_ItemClick(object sender, ItemClickEventArgs e)
-    {
-        if (e.ClickedItem is not string timeText)
+        try
         {
-            return;
+            EditorHourListView.SelectedItem = _plannerStateStore.EditorTime.Hours.ToString("00");
+            EditorMinuteListView.SelectedItem = _plannerStateStore.EditorTime.Minutes.ToString("00");
+        }
+        finally
+        {
+            _syncingEditorTimeSelection = false;
         }
 
-        string[] parts = timeText.Split(':');
-        if (parts.Length != 2
-            || !int.TryParse(parts[0], out int hour)
-            || !int.TryParse(parts[1], out int minute))
+        DispatcherQueue.TryEnqueue(CenterEditorTimeSelectionInView);
+    }
+
+    private void EditorTimeListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_syncingEditorTimeSelection
+            || EditorHourListView.SelectedItem is not string hourText
+            || EditorMinuteListView.SelectedItem is not string minuteText
+            || !int.TryParse(hourText, out int hour)
+            || !int.TryParse(minuteText, out int minute))
         {
             return;
         }
@@ -201,13 +211,58 @@ public sealed partial class TodayPage : Page
         TimeSpan nextTime = new(hour, minute, 0);
         if (_plannerStateStore.EditorTime == nextTime)
         {
-            EditorTimeFlyout.Hide();
+            DispatcherQueue.TryEnqueue(CenterEditorTimeSelectionInView);
             return;
         }
 
         _plannerStateStore.EditorTime = nextTime;
         ScheduleInlineSave();
-        EditorTimeFlyout.Hide();
+        DispatcherQueue.TryEnqueue(CenterEditorTimeSelectionInView);
+    }
+
+    private void CenterEditorTimeSelectionInView()
+    {
+        CenterListViewItem(EditorHourListView, EditorHourListView.SelectedItem);
+        CenterListViewItem(EditorMinuteListView, EditorMinuteListView.SelectedItem);
+    }
+
+    private static void CenterListViewItem(ListView listView, object? item)
+    {
+        if (item is null)
+            return;
+
+        listView.UpdateLayout();
+        listView.ScrollIntoView(item);
+        listView.UpdateLayout();
+
+        if (listView.ContainerFromItem(item) is not ListViewItem container)
+            return;
+
+        if (FindScrollViewer(listView) is not ScrollViewer scrollViewer)
+            return;
+
+        Point itemPosition = container.TransformToVisual(listView).TransformPoint(new Point(0, 0));
+        double targetOffset = scrollViewer.VerticalOffset
+            + itemPosition.Y
+            - ((scrollViewer.ViewportHeight - container.ActualHeight) / 2d);
+        double clampedOffset = Math.Clamp(targetOffset, 0d, Math.Max(0d, scrollViewer.ScrollableHeight));
+        scrollViewer.ChangeView(null, clampedOffset, null, true);
+    }
+
+    private static ScrollViewer? FindScrollViewer(DependencyObject root)
+    {
+        if (root is ScrollViewer scrollViewer)
+            return scrollViewer;
+
+        int childCount = VisualTreeHelper.GetChildrenCount(root);
+        for (int index = 0; index < childCount; index++)
+        {
+            ScrollViewer? match = FindScrollViewer(VisualTreeHelper.GetChild(root, index));
+            if (match is not null)
+                return match;
+        }
+
+        return null;
     }
 
     private void EditorDurationNumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)

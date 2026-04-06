@@ -724,30 +724,80 @@
                                                         Opening="EditorTimeFlyout_Opening"
                                                         Placement="BottomEdgeAlignedLeft">
                                                         <Border
-                                                            Width="108"
-                                                            Padding="6"
+                                                            Width="124"
+                                                            Padding="4"
                                                             Background="{ThemeResource AppShellBackgroundBrush}"
                                                             BorderBrush="{ThemeResource AppBorderBrush}"
                                                             BorderThickness="1"
                                                             CornerRadius="10">
-                                                            <ListView
-                                                                x:Name="EditorTimeListView"
-                                                                IsItemClickEnabled="True"
-                                                                ItemsSource="{x:Bind EditorTimeOptions}"
-                                                                ItemClick="EditorTimeListView_ItemClick"
-                                                                MaxHeight="220"
-                                                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                                                ScrollViewer.HorizontalScrollMode="Disabled"
-                                                                SelectionMode="Single">
-                                                                <ListView.ItemTemplate>
-                                                                    <DataTemplate>
-                                                                        <TextBlock
-                                                                            Padding="6,4"
-                                                                            FontSize="13"
-                                                                            Text="{Binding}" />
-                                                                    </DataTemplate>
-                                                                </ListView.ItemTemplate>
-                                                            </ListView>
+                                                            <Grid ColumnSpacing="4">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="*" />
+                                                                    <ColumnDefinition Width="1" />
+                                                                    <ColumnDefinition Width="*" />
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <ListView
+                                                                    x:Name="EditorHourListView"
+                                                                    Grid.Column="0"
+                                                                    ItemsSource="{x:Bind EditorHourOptions}"
+                                                                    MaxHeight="156"
+                                                                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                                    ScrollViewer.HorizontalScrollMode="Disabled"
+                                                                    ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                                                    SelectionChanged="EditorTimeListView_SelectionChanged"
+                                                                    SelectionMode="Single">
+                                                                    <ListView.ItemContainerStyle>
+                                                                        <Style TargetType="ListViewItem">
+                                                                            <Setter Property="MinHeight" Value="24" />
+                                                                            <Setter Property="Padding" Value="0" />
+                                                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                                                        </Style>
+                                                                    </ListView.ItemContainerStyle>
+                                                                    <ListView.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <TextBlock
+                                                                                Padding="0,3"
+                                                                                HorizontalAlignment="Center"
+                                                                                FontSize="12"
+                                                                                Text="{Binding}" />
+                                                                        </DataTemplate>
+                                                                    </ListView.ItemTemplate>
+                                                                </ListView>
+
+                                                                <Border
+                                                                    Grid.Column="1"
+                                                                    Margin="0,4"
+                                                                    Background="{ThemeResource AppBorderBrush}" />
+
+                                                                <ListView
+                                                                    x:Name="EditorMinuteListView"
+                                                                    Grid.Column="2"
+                                                                    ItemsSource="{x:Bind EditorMinuteOptions}"
+                                                                    MaxHeight="156"
+                                                                    ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                                    ScrollViewer.HorizontalScrollMode="Disabled"
+                                                                    ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                                                    SelectionChanged="EditorTimeListView_SelectionChanged"
+                                                                    SelectionMode="Single">
+                                                                    <ListView.ItemContainerStyle>
+                                                                        <Style TargetType="ListViewItem">
+                                                                            <Setter Property="MinHeight" Value="24" />
+                                                                            <Setter Property="Padding" Value="0" />
+                                                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                                                        </Style>
+                                                                    </ListView.ItemContainerStyle>
+                                                                    <ListView.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <TextBlock
+                                                                                Padding="0,3"
+                                                                                HorizontalAlignment="Center"
+                                                                                FontSize="12"
+                                                                                Text="{Binding}" />
+                                                                        </DataTemplate>
+                                                                    </ListView.ItemTemplate>
+                                                                </ListView>
+                                                            </Grid>
                                                         </Border>
                                                     </Flyout>
                                                 </Button.Flyout>

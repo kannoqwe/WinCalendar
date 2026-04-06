@@ -44,6 +44,35 @@
             <Setter Property="CornerRadius" Value="12" />
             <Setter Property="Foreground" Value="White" />
         </Style>
+
+        <Style x:Key="HeaderIconButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="{ThemeResource AppPageBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource AppBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+        </Style>
+
+        <Style x:Key="HeaderToolbarButtonStyle" TargetType="Button">
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{ThemeResource AppBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+        </Style>
+
+        <Style x:Key="HeaderPrimaryButtonStyle" TargetType="Button">
+            <Setter Property="MinHeight" Value="32" />
+            <Setter Property="Padding" Value="12,0" />
+            <Setter Property="Background" Value="{ThemeResource AppAccentMutedBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource AppAccentBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Foreground" Value="{ThemeResource AppAccentBrush}" />
+        </Style>
     </Page.Resources>
 
     <Grid
@@ -57,17 +86,12 @@
             </Grid.RowDefinitions>
 
             <Border
-                Background="{ThemeResource AppShellBackgroundBrush}"
+                Padding="0,0,0,12"
                 BorderBrush="{ThemeResource AppBorderBrush}"
-                BorderThickness="1"
-                CornerRadius="20"
-                Padding="16">
+                BorderThickness="0,0,0,1">
                 <Grid ColumnSpacing="12">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
@@ -76,43 +100,60 @@
                         Spacing="2"
                         VerticalAlignment="Center">
                         <TextBlock
-                            FontFamily="Segoe UI Variable Display"
-                            FontSize="28"
+                            FontSize="10"
                             FontWeight="SemiBold"
-                            Text="{Binding MonthLabel}" />
-                        <TextBlock
-                            FontSize="12"
                             Foreground="{ThemeResource AppTextMutedBrush}"
-                            Text="{Binding WeekLabel}" />
+                            Text="WEEK" />
+                        <Grid ColumnSpacing="12">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock
+                                FontFamily="Segoe UI Variable Display"
+                                FontSize="26"
+                                FontWeight="SemiBold"
+                                Text="{Binding MonthLabel}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                VerticalAlignment="Bottom"
+                                Margin="0,0,0,2"
+                                FontSize="13"
+                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Text="{Binding WeekLabel}" />
+                        </Grid>
                     </StackPanel>
 
-                    <Button
+                    <StackPanel
                         Grid.Column="1"
-                        Style="{StaticResource IconButtonStyle}"
-                        Click="PreviousWeekButton_Click"
-                        ToolTipService.ToolTip="Previous week">
-                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="12" Glyph="&#xE76B;" />
-                    </Button>
+                        Orientation="Horizontal"
+                        Spacing="8"
+                        VerticalAlignment="Center">
+                        <Button
+                            Style="{StaticResource HeaderIconButtonStyle}"
+                            Click="PreviousWeekButton_Click"
+                            ToolTipService.ToolTip="Previous week">
+                            <FontIcon FontFamily="Segoe Fluent Icons" FontSize="11" Glyph="&#xE76B;" />
+                        </Button>
 
-                    <Button
-                        Grid.Column="2"
-                        Style="{StaticResource ToolbarButtonStyle}"
-                        Click="CurrentWeekButton_Click"
-                        Content="Today" />
+                        <Button
+                            Style="{StaticResource HeaderToolbarButtonStyle}"
+                            Click="CurrentWeekButton_Click"
+                            Content="Today" />
 
-                    <Button
-                        Grid.Column="3"
-                        Style="{StaticResource IconButtonStyle}"
-                        Click="NextWeekButton_Click"
-                        ToolTipService.ToolTip="Next week">
-                        <FontIcon FontFamily="Segoe Fluent Icons" FontSize="12" Glyph="&#xE76C;" />
-                    </Button>
+                        <Button
+                            Style="{StaticResource HeaderIconButtonStyle}"
+                            Click="NextWeekButton_Click"
+                            ToolTipService.ToolTip="Next week">
+                            <FontIcon FontFamily="Segoe Fluent Icons" FontSize="11" Glyph="&#xE76C;" />
+                        </Button>
 
-                    <Button
-                        Grid.Column="4"
-                        Style="{StaticResource PrimaryToolbarButtonStyle}"
-                        Click="AddTaskButton_Click"
-                        Content="New task" />
+                        <Button
+                            Style="{StaticResource HeaderPrimaryButtonStyle}"
+                            Click="AddTaskButton_Click"
+                            Content="New task" />
+                    </StackPanel>
                 </Grid>
             </Border>
 

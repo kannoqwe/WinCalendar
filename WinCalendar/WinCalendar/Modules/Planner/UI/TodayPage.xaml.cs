@@ -161,7 +161,17 @@ public sealed partial class TodayPage : Page
         await SaveInlineEditorNowAsync();
     }
 
+    private async void EditorDescriptionTextBox_LostFocus(object sender, RoutedEventArgs e)
+    {
+        await SaveInlineEditorNowAsync();
+    }
+
     private void EditorTitleTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        ScheduleInlineSave();
+    }
+
+    private void EditorDescriptionTextBox_TextChanged(object sender, TextChangedEventArgs e)
     {
         ScheduleInlineSave();
     }

@@ -45,6 +45,7 @@ public sealed class PlannerStateStore : ObservableObject
     private string _weekSummary = string.Empty;
     private string _weekViewSummary = string.Empty;
     private string _editorTitle = string.Empty;
+    private string _editorDescription = string.Empty;
     private bool _editorHasTime;
     private bool _editorHasDuration;
     private TimeSpan _editorTime = new(9, 0, 0);
@@ -248,6 +249,16 @@ public sealed class PlannerStateStore : ObservableObject
         set
         {
             if (!SetProperty(ref _editorTitle, value))
+                return;
+        }
+    }
+
+    public string EditorDescription
+    {
+        get => _editorDescription;
+        set
+        {
+            if (!SetProperty(ref _editorDescription, value))
                 return;
         }
     }
@@ -497,6 +508,7 @@ public sealed class PlannerStateStore : ObservableObject
         SelectedTask = null;
         SetTaskEditorMode(TaskEditorMode.New);
         EditorTitle = string.Empty;
+        EditorDescription = string.Empty;
         EditorDate = new DateTimeOffset(date.ToDateTime(TimeOnly.MinValue));
         EditorTime = (time ?? new TimeOnly(9, 0)).ToTimeSpan();
         EditorDurationMinutes = EditorDefaultDurationMinutes;
@@ -511,6 +523,7 @@ public sealed class PlannerStateStore : ObservableObject
         {
             SetTaskEditorMode(TaskEditorMode.None);
             EditorTitle = string.Empty;
+            EditorDescription = string.Empty;
             EditorTime = new TimeSpan(9, 0, 0);
             EditorDurationMinutes = EditorDefaultDurationMinutes;
             EditorHasTime = false;
@@ -520,6 +533,7 @@ public sealed class PlannerStateStore : ObservableObject
 
         SetTaskEditorMode(TaskEditorMode.Edit);
         EditorTitle = task.Title;
+        EditorDescription = task.Description;
         EditorTime = task.Time?.ToTimeSpan() ?? new TimeSpan(9, 0, 0);
         EditorDurationMinutes = task.DurationMinutes ?? EditorDefaultDurationMinutes;
         EditorHasTime = task.HasTime;
@@ -536,16 +550,20 @@ public sealed class PlannerStateStore : ObservableObject
         int? durationMinutes = EditorHasTime && EditorHasDuration
             ? (int)NormalizeDurationValue(EditorDurationMinutes, EditorMaxDurationMinutes)
             : null;
+        string? description = string.IsNullOrWhiteSpace(EditorDescription)
+            ? null
+            : EditorDescription;
 
         TaskItem task = _taskEditorMode switch
         {
-            TaskEditorMode.New => await _createTaskUseCase.ExecuteAsync(EditorTitle, date, time, durationMinutes),
+            TaskEditorMode.New => await _createTaskUseCase.ExecuteAsync(EditorTitle, date, time, durationMinutes, description),
             TaskEditorMode.Edit when SelectedTask is not null => await _updateTaskUseCase.ExecuteAsync(
                 SelectedTask.Id,
                 EditorTitle,
                 date,
                 time,
-                durationMinutes),
+                durationMinutes,
+                description),
             _ => throw new InvalidOperationException("Task editor is not ready to save.")
         };
 

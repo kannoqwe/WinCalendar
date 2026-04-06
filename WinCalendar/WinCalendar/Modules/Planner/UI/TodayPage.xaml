@@ -983,6 +983,25 @@
                                                 </Button.Flyout>
                                             </Button>
                                         </StackPanel>
+
+                                        <StackPanel Spacing="6">
+                                            <TextBlock
+                                                FontSize="11"
+                                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                                Text="Description" />
+                                            <TextBox
+                                                x:Name="EditorDescriptionTextBox"
+                                                MinHeight="84"
+                                                Padding="0"
+                                                AcceptsReturn="True"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                PlaceholderText="Add description..."
+                                                Text="{Binding EditorDescription, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                TextChanged="EditorDescriptionTextBox_TextChanged"
+                                                LostFocus="EditorDescriptionTextBox_LostFocus"
+                                                TextWrapping="Wrap" />
+                                        </StackPanel>
                                     </StackPanel>
 
                                     <Border

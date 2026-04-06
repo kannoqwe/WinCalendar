@@ -84,6 +84,25 @@
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="Foreground" Value="White" />
         </Style>
+
+        <Style x:Key="HeaderGhostIconButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="24" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="6" />
+        </Style>
+
+        <Style x:Key="HeaderGhostTextButtonStyle" TargetType="Button">
+            <Setter Property="MinHeight" Value="24" />
+            <Setter Property="Padding" Value="2,0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="6" />
+        </Style>
     </Page.Resources>
 
     <Grid
@@ -139,32 +158,49 @@
                     <StackPanel
                         Grid.Column="1"
                         Orientation="Horizontal"
-                        Spacing="8"
+                        Spacing="4"
                         VerticalAlignment="Center">
                         <Button
-                            Style="{StaticResource HeaderIconButtonStyle}"
+                            Style="{StaticResource HeaderGhostIconButtonStyle}"
                             Click="PreviousWeekButton_Click"
                             ToolTipService.ToolTip="Previous week">
-                            <FontIcon FontFamily="Segoe Fluent Icons" FontSize="11" Glyph="&#xE76B;" />
+                            <FontIcon
+                                FontFamily="Segoe Fluent Icons"
+                                FontSize="10"
+                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Glyph="&#xE76B;" />
                         </Button>
 
                         <Button
-                            Style="{StaticResource HeaderToolbarButtonStyle}"
-                            Click="CurrentWeekButton_Click"
-                            Content="Today" />
-
-                        <Button
-                            Style="{StaticResource HeaderIconButtonStyle}"
+                            Style="{StaticResource HeaderGhostIconButtonStyle}"
                             Click="NextWeekButton_Click"
                             ToolTipService.ToolTip="Next week">
-                            <FontIcon FontFamily="Segoe Fluent Icons" FontSize="11" Glyph="&#xE76C;" />
+                            <FontIcon
+                                FontFamily="Segoe Fluent Icons"
+                                FontSize="10"
+                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Glyph="&#xE76C;" />
                         </Button>
 
                         <Button
-                            Style="{StaticResource HeaderPrimaryIconButtonStyle}"
+                            Style="{StaticResource HeaderGhostIconButtonStyle}"
                             Click="AddTaskButton_Click"
                             ToolTipService.ToolTip="New task">
-                            <FontIcon FontFamily="Segoe Fluent Icons" FontSize="11" Glyph="&#xE710;" />
+                            <FontIcon
+                                FontFamily="Segoe Fluent Icons"
+                                FontSize="10"
+                                Foreground="{ThemeResource AppAccentBrush}"
+                                Glyph="&#xE710;" />
+                        </Button>
+
+                        <Button
+                            Style="{StaticResource HeaderGhostTextButtonStyle}"
+                            Click="CurrentWeekButton_Click">
+                            <TextBlock
+                                FontSize="13"
+                                FontWeight="SemiBold"
+                                Foreground="{ThemeResource AppTextBrush}"
+                                Text="Today" />
                         </Button>
                     </StackPanel>
                 </Grid>

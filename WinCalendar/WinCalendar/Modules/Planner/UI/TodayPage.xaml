@@ -73,6 +73,17 @@
             <Setter Property="CornerRadius" Value="8" />
             <Setter Property="Foreground" Value="{ThemeResource AppAccentBrush}" />
         </Style>
+
+        <Style x:Key="HeaderPrimaryIconButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="{ThemeResource AppAccentBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource AppAccentBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Foreground" Value="White" />
+        </Style>
     </Page.Resources>
 
     <Grid
@@ -150,9 +161,11 @@
                         </Button>
 
                         <Button
-                            Style="{StaticResource HeaderPrimaryButtonStyle}"
+                            Style="{StaticResource HeaderPrimaryIconButtonStyle}"
                             Click="AddTaskButton_Click"
-                            Content="New task" />
+                            ToolTipService.ToolTip="New task">
+                            <FontIcon FontFamily="Segoe Fluent Icons" FontSize="11" Glyph="&#xE710;" />
+                        </Button>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -610,9 +623,15 @@
                                     TextWrapping="WrapWholeWords" />
                                 <Button
                                     HorizontalAlignment="Left"
-                                    Style="{StaticResource HeaderPrimaryButtonStyle}"
-                                    Click="AddTaskButton_Click"
-                                    Content="New task" />
+                                    Style="{StaticResource PrimaryToolbarButtonStyle}"
+                                    Click="AddTaskButton_Click">
+                                    <StackPanel
+                                        Orientation="Horizontal"
+                                        Spacing="8">
+                                        <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE710;" />
+                                        <TextBlock Text="New task" />
+                                    </StackPanel>
+                                </Button>
                             </StackPanel>
 
                             <ScrollViewer

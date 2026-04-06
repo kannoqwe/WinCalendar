@@ -14,6 +14,7 @@ namespace WinCalendar.Modules.Planner.Presentation;
 public sealed class PlannerStateStore : ObservableObject
 {
     private const int MonthGridCellCount = 42;
+    private const int EditorDefaultDurationMinutes = 15;
     private const double WeekTimelineHourHeightValue = 40;
     private const double WeekTimelineDayWidthValue = 132;
     private const double WeekTimelineAnyTimeLaneHeightValue = 64;
@@ -75,9 +76,12 @@ public sealed class PlannerStateStore : ObservableObject
         WeekAgendaDays = [];
         WeekTimelineHours = [];
         WeekTimelineDays = [];
+        EditorDurationOptions = [];
 
         for (int hour = 0; hour < 24; hour++)
             WeekTimelineHours.Add(new PlannerWeekHourViewModel(hour));
+
+        UpdateEditorDurationOptions();
     }
 
     public ObservableCollection<PlannerMonthDayViewModel> MonthDays { get; }
@@ -91,6 +95,8 @@ public sealed class PlannerStateStore : ObservableObject
     public ObservableCollection<PlannerWeekHourViewModel> WeekTimelineHours { get; }
 
     public ObservableCollection<PlannerWeekDayTimelineViewModel> WeekTimelineDays { get; }
+
+    public ObservableCollection<PlannerEditorDurationOptionViewModel> EditorDurationOptions { get; }
 
     public DateOnly SelectedDate => _selectedDate;
 
@@ -254,14 +260,21 @@ public sealed class PlannerStateStore : ObservableObject
             if (!SetProperty(ref _editorHasTime, value))
                 return;
 
-            if (!value)
+            if (value && !EditorHasDuration)
+                EditorHasDuration = true;
+
+            if (!value && EditorHasDuration)
                 EditorHasDuration = false;
 
             ClampEditorDuration();
+            UpdateEditorDurationOptions();
+            OnPropertyChanged(nameof(EditorIsAllDay));
+            OnPropertyChanged(nameof(EditorTimeInputEnabled));
             OnPropertyChanged(nameof(EditorDurationToggleEnabled));
             OnPropertyChanged(nameof(EditorDurationInputEnabled));
             OnPropertyChanged(nameof(EditorTimeVisibility));
             OnPropertyChanged(nameof(EditorDurationVisibility));
+            OnPropertyChanged(nameof(EditorDurationText));
             OnPropertyChanged(nameof(EditorMaxDurationMinutes));
         }
     }
@@ -275,8 +288,10 @@ public sealed class PlannerStateStore : ObservableObject
                 return;
 
             ClampEditorDuration();
+            UpdateEditorDurationOptions();
             OnPropertyChanged(nameof(EditorMaxDurationMinutes));
             OnPropertyChanged(nameof(EditorTimeText));
+            OnPropertyChanged(nameof(EditorDurationText));
         }
     }
 
@@ -303,6 +318,8 @@ public sealed class PlannerStateStore : ObservableObject
         {
             if (!SetProperty(ref _editorDurationMinutes, NormalizeDurationValue(value, EditorMaxDurationMinutes)))
                 return;
+
+            OnPropertyChanged(nameof(EditorDurationText));
         }
     }
 
@@ -315,6 +332,14 @@ public sealed class PlannerStateStore : ObservableObject
         }
     }
 
+    public bool EditorIsAllDay
+    {
+        get => !EditorHasTime;
+        set => EditorHasTime = !value;
+    }
+
+    public bool EditorTimeInputEnabled => EditorHasTime;
+
     public bool EditorDurationToggleEnabled => EditorHasTime;
 
     public bool EditorDurationInputEnabled => EditorHasTime && EditorHasDuration;
@@ -326,6 +351,8 @@ public sealed class PlannerStateStore : ObservableObject
         EditorHasTime && EditorHasDuration ? Visibility.Visible : Visibility.Collapsed;
 
     public string EditorTimeText => $"{EditorTime.Hours:00}:{EditorTime.Minutes:00}";
+
+    public string EditorDurationText => BuildEditorDurationSummary((int)NormalizeDurationValue(EditorDurationMinutes, EditorMaxDurationMinutes));
 
     public double EditorMaxDurationMinutes =>
         EditorHasTime
@@ -466,10 +493,9 @@ public sealed class PlannerStateStore : ObservableObject
         SetTaskEditorMode(TaskEditorMode.New);
         EditorTitle = string.Empty;
         EditorDate = new DateTimeOffset(date.ToDateTime(TimeOnly.MinValue));
-        EditorHasTime = time is not null;
         EditorTime = (time ?? new TimeOnly(9, 0)).ToTimeSpan();
-        EditorHasDuration = false;
-        EditorDurationMinutes = WeekTaskDefaultDurationMinutes;
+        EditorDurationMinutes = EditorDefaultDurationMinutes;
+        EditorHasTime = time is not null;
     }
 
     public void SelectTask(PlannerTaskViewModel? task)
@@ -480,20 +506,18 @@ public sealed class PlannerStateStore : ObservableObject
         {
             SetTaskEditorMode(TaskEditorMode.None);
             EditorTitle = string.Empty;
-            EditorHasTime = false;
             EditorTime = new TimeSpan(9, 0, 0);
-            EditorHasDuration = false;
-            EditorDurationMinutes = WeekTaskDefaultDurationMinutes;
+            EditorDurationMinutes = EditorDefaultDurationMinutes;
+            EditorHasTime = false;
             EditorDate = new DateTimeOffset(_selectedDate.ToDateTime(TimeOnly.MinValue));
             return;
         }
 
         SetTaskEditorMode(TaskEditorMode.Edit);
         EditorTitle = task.Title;
-        EditorHasTime = task.HasTime;
         EditorTime = task.Time?.ToTimeSpan() ?? new TimeSpan(9, 0, 0);
-        EditorHasDuration = task.HasDuration;
-        EditorDurationMinutes = task.DurationMinutes ?? WeekTaskDefaultDurationMinutes;
+        EditorDurationMinutes = task.DurationMinutes ?? EditorDefaultDurationMinutes;
+        EditorHasTime = task.HasTime;
         EditorDate = new DateTimeOffset(task.Date.ToDateTime(TimeOnly.MinValue));
     }
 
@@ -831,15 +855,62 @@ public sealed class PlannerStateStore : ObservableObject
 
         _editorDurationMinutes = normalizedDuration;
         OnPropertyChanged(nameof(EditorDurationMinutes));
+        OnPropertyChanged(nameof(EditorDurationText));
     }
 
     private static double NormalizeDurationValue(double value, double maxDurationMinutes)
     {
         double normalizedValue = double.IsNaN(value)
-            ? WeekTaskDefaultDurationMinutes
+            ? EditorDefaultDurationMinutes
             : Math.Round(value / 15d) * 15d;
 
         return Math.Clamp(normalizedValue, 15d, maxDurationMinutes);
+    }
+
+    private void UpdateEditorDurationOptions()
+    {
+        EditorDurationOptions.Clear();
+
+        TimeOnly startTime = TimeOnly.FromTimeSpan(EditorTime);
+        int maxDurationMinutes = (int)GetMaxDurationMinutes(startTime);
+
+        for (int duration = 15; duration <= maxDurationMinutes; duration += 15)
+        {
+            int endMinutes = Math.Min(24 * 60, (int)startTime.ToTimeSpan().TotalMinutes + duration);
+            string endTimeText = endMinutes == 24 * 60
+                ? "24:00"
+                : TimeOnly.MinValue.Add(TimeSpan.FromMinutes(endMinutes)).ToString("HH:mm");
+
+            EditorDurationOptions.Add(new PlannerEditorDurationOptionViewModel(
+                duration,
+                endTimeText,
+                FormatEditorDurationDescription(duration)));
+        }
+    }
+
+    private string BuildEditorDurationSummary(int durationMinutes)
+    {
+        int endMinutes = Math.Min(24 * 60, (int)EditorTime.TotalMinutes + durationMinutes);
+        string endTimeText = endMinutes == 24 * 60
+            ? "24:00"
+            : TimeOnly.MinValue.Add(TimeSpan.FromMinutes(endMinutes)).ToString("HH:mm");
+
+        return $"{endTimeText} | {FormatEditorDurationDescription(durationMinutes)}";
+    }
+
+    private static string FormatEditorDurationDescription(int durationMinutes)
+    {
+        int hours = durationMinutes / 60;
+        int minutes = durationMinutes % 60;
+
+        if (hours == 0)
+            return $"{minutes} min";
+
+        if (minutes == 0)
+            return hours == 1 ? "1 hour" : $"{hours} hours";
+
+        string hourText = hours == 1 ? "1 hour" : $"{hours} hours";
+        return $"{hourText} {minutes} min";
     }
 
     private static double GetMaxDurationMinutes(TimeOnly time)

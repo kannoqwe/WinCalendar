@@ -170,12 +170,7 @@ public sealed partial class TodayPage : Page
         ScheduleInlineSave();
     }
 
-    private void EditorTimeToggle_Click(object sender, RoutedEventArgs e)
-    {
-        ScheduleInlineSave();
-    }
-
-    private void EditorDurationToggle_Click(object sender, RoutedEventArgs e)
+    private void EditorScheduleModeRadioButton_Checked(object sender, RoutedEventArgs e)
     {
         ScheduleInlineSave();
     }
@@ -218,6 +213,32 @@ public sealed partial class TodayPage : Page
         _plannerStateStore.EditorTime = nextTime;
         ScheduleInlineSave();
         DispatcherQueue.TryEnqueue(CenterEditorTimeSelectionInView);
+    }
+
+    private void EditorDurationFlyout_Opening(object sender, object e)
+    {
+        PlannerEditorDurationOptionViewModel? selectedOption = _plannerStateStore.EditorDurationOptions
+            .FirstOrDefault(option => option.DurationMinutes == (int)Math.Round(_plannerStateStore.EditorDurationMinutes));
+
+        EditorDurationListView.SelectedItem = selectedOption;
+        DispatcherQueue.TryEnqueue(() => CenterListViewItem(EditorDurationListView, selectedOption));
+    }
+
+    private void EditorDurationListView_ItemClick(object sender, ItemClickEventArgs e)
+    {
+        if (e.ClickedItem is not PlannerEditorDurationOptionViewModel option)
+            return;
+
+        double nextDuration = option.DurationMinutes;
+        if (Math.Abs(_plannerStateStore.EditorDurationMinutes - nextDuration) < double.Epsilon)
+        {
+            EditorDurationFlyout.Hide();
+            return;
+        }
+
+        _plannerStateStore.EditorDurationMinutes = nextDuration;
+        ScheduleInlineSave();
+        EditorDurationFlyout.Hide();
     }
 
     private void CenterEditorTimeSelectionInView()
@@ -263,11 +284,6 @@ public sealed partial class TodayPage : Page
         }
 
         return null;
-    }
-
-    private void EditorDurationNumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
-    {
-        ScheduleInlineSave();
     }
 
     private async void InlineSaveTimer_Tick(DispatcherQueueTimer sender, object args)

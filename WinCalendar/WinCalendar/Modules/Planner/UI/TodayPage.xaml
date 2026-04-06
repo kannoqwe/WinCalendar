@@ -666,29 +666,41 @@
                                             Foreground="{ThemeResource AppTextMutedBrush}"
                                             Text="SCHEDULE" />
 
-                                        <CalendarDatePicker
-                                            x:Name="EditorDatePicker"
-                                            Date="{Binding EditorDate, Mode=TwoWay}"
-                                            DateChanged="EditorDatePicker_DateChanged"
-                                            Header="Date"
-                                            HorizontalAlignment="Stretch" />
-
-                                        <CheckBox
-                                            Content="Time"
-                                            IsChecked="{Binding EditorHasTime, Mode=TwoWay}"
-                                            Click="EditorTimeToggle_Click" />
-
                                         <StackPanel
-                                            Spacing="6"
-                                            Visibility="{Binding EditorTimeVisibility}">
-                                            <TextBlock
-                                                FontSize="11"
-                                                Foreground="{ThemeResource AppTextMutedBrush}"
-                                                Text="Start" />
+                                            Spacing="6">
+                                            <Grid ColumnSpacing="8">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <TextBlock
+                                                    VerticalAlignment="Center"
+                                                    FontSize="11"
+                                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                                    Text="Time" />
+
+                                                <RadioButton
+                                                    Grid.Column="1"
+                                                    GroupName="EditorScheduleMode"
+                                                    IsChecked="{Binding EditorHasTime, Mode=TwoWay}"
+                                                    Checked="EditorScheduleModeRadioButton_Checked"
+                                                    Content="Timed" />
+
+                                                <RadioButton
+                                                    Grid.Column="2"
+                                                    GroupName="EditorScheduleMode"
+                                                    IsChecked="{Binding EditorIsAllDay, Mode=TwoWay}"
+                                                    Checked="EditorScheduleModeRadioButton_Checked"
+                                                    Content="All Day" />
+                                            </Grid>
+
                                             <Button
                                                 x:Name="EditorTimeButton"
                                                 HorizontalAlignment="Stretch"
                                                 HorizontalContentAlignment="Stretch"
+                                                IsEnabled="{Binding EditorTimeInputEnabled}"
                                                 Style="{StaticResource HeaderToolbarButtonStyle}">
                                                 <Grid ColumnSpacing="8">
                                                     <Grid.ColumnDefinitions>
@@ -806,24 +818,107 @@
                                             </Button>
                                         </StackPanel>
 
-                                        <CheckBox
-                                            Content="Duration"
-                                            IsChecked="{Binding EditorHasDuration, Mode=TwoWay}"
-                                            Click="EditorDurationToggle_Click"
-                                            IsEnabled="{Binding EditorDurationToggleEnabled}" />
+                                        <StackPanel Spacing="6">
+                                            <TextBlock
+                                                FontSize="11"
+                                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                                Text="Duration" />
+                                            <Button
+                                                x:Name="EditorDurationButton"
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Stretch"
+                                                IsEnabled="{Binding EditorDurationInputEnabled}"
+                                                Style="{StaticResource HeaderToolbarButtonStyle}">
+                                                <Grid ColumnSpacing="8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
 
-                                        <NumberBox
-                                            x:Name="EditorDurationNumberBox"
-                                            Header="Minutes"
-                                            IsEnabled="{Binding EditorDurationInputEnabled}"
-                                            LargeChange="15"
-                                            Maximum="{Binding EditorMaxDurationMinutes}"
-                                            Minimum="15"
-                                            SmallChange="15"
-                                            SpinButtonPlacementMode="Compact"
-                                            Value="{Binding EditorDurationMinutes, Mode=TwoWay}"
-                                            ValueChanged="EditorDurationNumberBox_ValueChanged"
-                                            Visibility="{Binding EditorDurationVisibility}" />
+                                                    <StackPanel
+                                                        Orientation="Horizontal"
+                                                        Spacing="8">
+                                                        <FontIcon
+                                                            FontFamily="Segoe Fluent Icons"
+                                                            FontSize="11"
+                                                            Foreground="{ThemeResource AppTextMutedBrush}"
+                                                            Glyph="&#xE916;" />
+                                                        <TextBlock
+                                                            FontWeight="SemiBold"
+                                                            Text="{Binding EditorDurationText}" />
+                                                    </StackPanel>
+
+                                                    <FontIcon
+                                                        Grid.Column="1"
+                                                        VerticalAlignment="Center"
+                                                        FontFamily="Segoe Fluent Icons"
+                                                        FontSize="10"
+                                                        Foreground="{ThemeResource AppTextMutedBrush}"
+                                                        Glyph="&#xE70D;" />
+                                                </Grid>
+
+                                                <Button.Flyout>
+                                                    <Flyout
+                                                        x:Name="EditorDurationFlyout"
+                                                        Opening="EditorDurationFlyout_Opening"
+                                                        Placement="BottomEdgeAlignedLeft">
+                                                        <Border
+                                                            Width="196"
+                                                            Padding="4"
+                                                            Background="{ThemeResource AppShellBackgroundBrush}"
+                                                            BorderBrush="{ThemeResource AppBorderBrush}"
+                                                            BorderThickness="1"
+                                                            CornerRadius="10">
+                                                            <ListView
+                                                                x:Name="EditorDurationListView"
+                                                                Height="140"
+                                                                IsItemClickEnabled="True"
+                                                                ItemsSource="{Binding EditorDurationOptions}"
+                                                                ItemClick="EditorDurationListView_ItemClick"
+                                                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                                ScrollViewer.HorizontalScrollMode="Disabled"
+                                                                ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                                                SelectionMode="Single">
+                                                                <ListView.ItemContainerStyle>
+                                                                    <Style TargetType="ListViewItem">
+                                                                        <Setter Property="MinHeight" Value="28" />
+                                                                        <Setter Property="Padding" Value="0" />
+                                                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                                                    </Style>
+                                                                </ListView.ItemContainerStyle>
+                                                                <ListView.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <StackPanel
+                                                                            Orientation="Horizontal"
+                                                                            Spacing="8">
+                                                                            <TextBlock
+                                                                                FontSize="13"
+                                                                                FontWeight="SemiBold"
+                                                                                Text="{Binding EndTimeText}" />
+                                                                            <TextBlock
+                                                                                FontSize="13"
+                                                                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                                                                Text="|" />
+                                                                            <TextBlock
+                                                                                FontSize="13"
+                                                                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                                                                Text="{Binding DescriptionText}" />
+                                                                        </StackPanel>
+                                                                    </DataTemplate>
+                                                                </ListView.ItemTemplate>
+                                                            </ListView>
+                                                        </Border>
+                                                    </Flyout>
+                                                </Button.Flyout>
+                                            </Button>
+                                        </StackPanel>
+
+                                        <CalendarDatePicker
+                                            x:Name="EditorDatePicker"
+                                            Date="{Binding EditorDate, Mode=TwoWay}"
+                                            DateChanged="EditorDatePicker_DateChanged"
+                                            Header="Date"
+                                            HorizontalAlignment="Stretch" />
                                     </StackPanel>
 
                                     <Border

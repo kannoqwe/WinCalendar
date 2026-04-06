@@ -513,7 +513,7 @@
 
                                                                                 <Grid
                                                                                     Grid.Column="1"
-                                                                                    RowSpacing="2">
+                                                                                    RowSpacing="0">
                                                                                     <Grid.RowDefinitions>
                                                                                         <RowDefinition Height="Auto" />
                                                                                         <RowDefinition Height="*" />

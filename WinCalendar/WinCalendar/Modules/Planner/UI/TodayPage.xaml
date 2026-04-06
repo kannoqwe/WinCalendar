@@ -196,11 +196,11 @@
                         <Button
                             Style="{StaticResource HeaderGhostTextButtonStyle}"
                             Click="CurrentWeekButton_Click">
-                            <TextBlock
-                                FontSize="13"
-                                FontWeight="SemiBold"
-                                Foreground="{ThemeResource AppTextBrush}"
-                                Text="Today" />
+                             <TextBlock
+                                 FontSize="13"
+                                 FontWeight="SemiBold"
+                                 Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                 Text="Today" />
                         </Button>
                     </StackPanel>
                 </Grid>

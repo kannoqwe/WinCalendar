@@ -19,7 +19,6 @@ namespace WinCalendar
         private readonly PlannerWindowCoordinator _windowCoordinator;
         private AppWindow? _appWindow;
         private FrameworkElement? _titleBarDragRegion;
-        private TextBlock? _currentSectionTextBlock;
 
         public MainWindow(PlannerStateStore plannerStateStore, PlannerWindowCoordinator windowCoordinator)
         {
@@ -27,11 +26,9 @@ namespace WinCalendar
             _windowCoordinator = windowCoordinator;
             InitializeComponent();
             _titleBarDragRegion = ContentRoot.FindName("TitleBarDragRegion") as FrameworkElement;
-            _currentSectionTextBlock = ContentRoot.FindName("CurrentSectionTextBlock") as TextBlock;
             ConfigureCustomTitleBar();
             ShellNavigationView.SelectedItem = TodayNavigationItem;
             PageHost.Content = new TodayPage(_plannerStateStore, _windowCoordinator);
-            UpdateCurrentSectionTitle(TodayNavigationItem);
         }
 
         private void ShellNavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
@@ -46,8 +43,6 @@ namespace WinCalendar
                 "settings" => new SettingsPage(),
                 _ => new TodayPage(_plannerStateStore, _windowCoordinator)
             };
-
-            UpdateCurrentSectionTitle(item);
         }
 
         private void CompactPanelButton_Click(object sender, RoutedEventArgs e)
@@ -81,13 +76,7 @@ namespace WinCalendar
             titleBar.ButtonPressedForegroundColor = ResolveBrushColor("TextFillColorPrimaryBrush", Colors.Black);
             titleBar.ButtonHoverBackgroundColor = ResolveColor(0x12, 0x00, 0x00, 0x00);
             titleBar.ButtonPressedBackgroundColor = ResolveColor(0x1E, 0x00, 0x00, 0x00);
-            titleBar.PreferredHeightOption = TitleBarHeightOption.Standard;
-        }
-
-        private void UpdateCurrentSectionTitle(NavigationViewItem item)
-        {
-            if (_currentSectionTextBlock is not null)
-                _currentSectionTextBlock.Text = item.Content?.ToString() ?? "WinCalendar";
+            titleBar.PreferredHeightOption = TitleBarHeightOption.Collapsed;
         }
 
         private static Windows.UI.Color ResolveColor(byte alpha, byte red, byte green, byte blue)

@@ -16,18 +16,16 @@
     <Grid x:Name="ContentRoot" Background="{ThemeResource AppPageBackgroundBrush}">
         <Grid RowSpacing="0">
             <Grid.RowDefinitions>
-                <RowDefinition Height="44" />
+                <RowDefinition Height="34" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
             <Border
                 Grid.Row="0"
-                Background="{ThemeResource AppShellBackgroundBrush}"
-                BorderBrush="{ThemeResource AppBorderBrush}"
-                BorderThickness="0,0,0,1">
+                Background="{ThemeResource AppPageBackgroundBrush}">
                 <Grid x:Name="CustomTitleBar">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="48" />
+                        <ColumnDefinition Width="40" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="138" />
                     </Grid.ColumnDefinitions>
@@ -35,22 +33,7 @@
                     <Grid
                         x:Name="TitleBarDragRegion"
                         Grid.Column="1"
-                        VerticalAlignment="Center"
-                        Margin="14,0,14,0">
-                        <StackPanel Spacing="0">
-                            <TextBlock
-                                FontSize="11"
-                                FontWeight="SemiBold"
-                                Foreground="{ThemeResource AppTextMutedBrush}"
-                                Text="WinCalendar" />
-                            <TextBlock
-                                x:Name="CurrentSectionTextBlock"
-                                FontFamily="Segoe UI Variable Display"
-                                FontSize="14"
-                                FontWeight="SemiBold"
-                                Text="Week" />
-                        </StackPanel>
-                    </Grid>
+                        Margin="8,0,8,0" />
                 </Grid>
             </Border>
 

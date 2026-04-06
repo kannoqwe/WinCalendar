@@ -52,7 +52,7 @@
                             VerticalAlignment="Center">
                             <FontIcon
                                 FontFamily="Segoe Fluent Icons"
-                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Foreground="Black"
                                 Glyph="&#xE921;" />
                         </Viewbox>
 
@@ -65,7 +65,7 @@
                             <FontIcon
                                 x:Name="CaptionMaximizeIcon"
                                 FontFamily="Segoe Fluent Icons"
-                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Foreground="Black"
                                 Glyph="&#xE922;" />
                         </Viewbox>
 
@@ -77,7 +77,7 @@
                             VerticalAlignment="Center">
                             <FontIcon
                                 FontFamily="Segoe Fluent Icons"
-                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Foreground="Black"
                                 Glyph="&#xE8BB;" />
                         </Viewbox>
                     </Grid>

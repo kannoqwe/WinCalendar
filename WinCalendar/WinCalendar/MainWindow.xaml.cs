@@ -73,8 +73,8 @@ namespace WinCalendar
             titleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
             titleBar.ButtonBackgroundColor = Colors.Transparent;
             titleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
-            titleBar.ButtonHoverBackgroundColor = Colors.Transparent;
-            titleBar.ButtonPressedBackgroundColor = Colors.Transparent;
+            titleBar.ButtonHoverBackgroundColor = ColorHelper.FromArgb(0x14, 0x00, 0x00, 0x00);
+            titleBar.ButtonPressedBackgroundColor = ColorHelper.FromArgb(0x22, 0x00, 0x00, 0x00);
             titleBar.ButtonForegroundColor = Colors.Transparent;
             titleBar.ButtonInactiveForegroundColor = Colors.Transparent;
             titleBar.ButtonHoverForegroundColor = Colors.Transparent;

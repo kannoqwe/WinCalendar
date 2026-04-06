@@ -17,7 +17,6 @@ public sealed partial class TodayPage : Page
     private readonly PlannerStateStore _plannerStateStore;
     private readonly DispatcherQueueTimer _currentTimeTimer;
     private readonly DispatcherQueueTimer _inlineSaveTimer;
-    private bool _syncingEditorTimeFlyout;
     private bool _timersInitialized;
     private bool _suppressInlineSave;
     private bool _isInlineSaveInProgress;
@@ -27,11 +26,9 @@ public sealed partial class TodayPage : Page
     private bool _syncingWeekHorizontalScroll;
     private bool _syncingWeekVerticalScroll;
 
-    public string[] EditorHourOptions { get; } = Enumerable.Range(0, 24)
-        .Select(hour => hour.ToString("00"))
+    public string[] EditorTimeOptions { get; } = Enumerable.Range(0, 24 * 4)
+        .Select(index => $"{index / 4:00}:{(index % 4) * 15:00}")
         .ToArray();
-
-    public string[] EditorMinuteOptions { get; } = ["00", "15", "30", "45"];
 
     public TodayPage(PlannerStateStore plannerStateStore, PlannerWindowCoordinator windowCoordinator)
     {
@@ -181,36 +178,36 @@ public sealed partial class TodayPage : Page
 
     private void EditorTimeFlyout_Opening(object sender, object e)
     {
-        _syncingEditorTimeFlyout = true;
-
-        try
-        {
-            EditorHourComboBox.SelectedItem = _plannerStateStore.EditorTime.Hours.ToString("00");
-            EditorMinuteComboBox.SelectedItem = _plannerStateStore.EditorTime.Minutes.ToString("00");
-        }
-        finally
-        {
-            _syncingEditorTimeFlyout = false;
-        }
+        string selectedTime = _plannerStateStore.EditorTimeText;
+        EditorTimeListView.SelectedItem = selectedTime;
+        DispatcherQueue.TryEnqueue(() => EditorTimeListView.ScrollIntoView(selectedTime));
     }
 
-    private void EditorTimePartComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void EditorTimeListView_ItemClick(object sender, ItemClickEventArgs e)
     {
-        if (_syncingEditorTimeFlyout
-            || EditorHourComboBox.SelectedItem is not string hourText
-            || EditorMinuteComboBox.SelectedItem is not string minuteText
-            || !int.TryParse(hourText, out int hour)
-            || !int.TryParse(minuteText, out int minute))
+        if (e.ClickedItem is not string timeText)
+        {
+            return;
+        }
+
+        string[] parts = timeText.Split(':');
+        if (parts.Length != 2
+            || !int.TryParse(parts[0], out int hour)
+            || !int.TryParse(parts[1], out int minute))
         {
             return;
         }
 
         TimeSpan nextTime = new(hour, minute, 0);
         if (_plannerStateStore.EditorTime == nextTime)
+        {
+            EditorTimeFlyout.Hide();
             return;
+        }
 
         _plannerStateStore.EditorTime = nextTime;
         ScheduleInlineSave();
+        EditorTimeFlyout.Hide();
     }
 
     private void EditorDurationNumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)

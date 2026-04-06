@@ -724,43 +724,30 @@
                                                         Opening="EditorTimeFlyout_Opening"
                                                         Placement="BottomEdgeAlignedLeft">
                                                         <Border
-                                                            Padding="10"
+                                                            Width="108"
+                                                            Padding="6"
                                                             Background="{ThemeResource AppShellBackgroundBrush}"
                                                             BorderBrush="{ThemeResource AppBorderBrush}"
                                                             BorderThickness="1"
                                                             CornerRadius="10">
-                                                            <Grid ColumnSpacing="8">
-                                                                <Grid.ColumnDefinitions>
-                                                                    <ColumnDefinition Width="80" />
-                                                                    <ColumnDefinition Width="Auto" />
-                                                                    <ColumnDefinition Width="80" />
-                                                                </Grid.ColumnDefinitions>
-
-                                                                <ComboBox
-                                                                    x:Name="EditorHourComboBox"
-                                                                    HorizontalAlignment="Stretch"
-                                                                    HorizontalContentAlignment="Center"
-                                                                    ItemsSource="{x:Bind EditorHourOptions}"
-                                                                    PlaceholderText="HH"
-                                                                    SelectionChanged="EditorTimePartComboBox_SelectionChanged" />
-
-                                                                <TextBlock
-                                                                    Grid.Column="1"
-                                                                    VerticalAlignment="Center"
-                                                                    FontSize="14"
-                                                                    FontWeight="SemiBold"
-                                                                    Foreground="{ThemeResource AppTextMutedBrush}"
-                                                                    Text=":" />
-
-                                                                <ComboBox
-                                                                    x:Name="EditorMinuteComboBox"
-                                                                    Grid.Column="2"
-                                                                    HorizontalAlignment="Stretch"
-                                                                    HorizontalContentAlignment="Center"
-                                                                    ItemsSource="{x:Bind EditorMinuteOptions}"
-                                                                    PlaceholderText="MM"
-                                                                    SelectionChanged="EditorTimePartComboBox_SelectionChanged" />
-                                                            </Grid>
+                                                            <ListView
+                                                                x:Name="EditorTimeListView"
+                                                                IsItemClickEnabled="True"
+                                                                ItemsSource="{x:Bind EditorTimeOptions}"
+                                                                ItemClick="EditorTimeListView_ItemClick"
+                                                                MaxHeight="220"
+                                                                ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                                                ScrollViewer.HorizontalScrollMode="Disabled"
+                                                                SelectionMode="Single">
+                                                                <ListView.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <TextBlock
+                                                                            Padding="6,4"
+                                                                            FontSize="13"
+                                                                            Text="{Binding}" />
+                                                                    </DataTemplate>
+                                                                </ListView.ItemTemplate>
+                                                            </ListView>
                                                         </Border>
                                                     </Flyout>
                                                 </Button.Flyout>

@@ -244,7 +244,7 @@ public sealed partial class TodayPage : Page
         Point itemPosition = container.TransformToVisual(listView).TransformPoint(new Point(0, 0));
         double targetOffset = scrollViewer.VerticalOffset
             + itemPosition.Y
-            - ((scrollViewer.ViewportHeight - container.ActualHeight) / 2d);
+            - container.ActualHeight;
         double clampedOffset = Math.Clamp(targetOffset, 0d, Math.Max(0d, scrollViewer.ScrollableHeight));
         scrollViewer.ChangeView(null, clampedOffset, null, true);
     }

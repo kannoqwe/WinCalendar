@@ -51,6 +51,52 @@ public sealed class SqliteTaskRepository : ITaskRepository
         return Task.FromResult<IReadOnlyList<TaskItem>>(tasks);
     }
 
+    public Task<IReadOnlyList<TaskItem>> GetIncompleteTimedTasksDueBeforeAsync(DateOnly date, TimeOnly time)
+    {
+        List<TaskItem> tasks = [];
+
+        using SqliteConnection connection = OpenConnection();
+        using SqliteStatement statement = connection.Prepare(
+            """
+            SELECT
+                id,
+                title,
+                description,
+                task_date,
+                task_time,
+                duration_minutes,
+                is_completed,
+                created_at_utc,
+                updated_at_utc
+            FROM tasks
+            WHERE
+                is_completed = 0
+                AND task_time IS NOT NULL
+                AND duration_minutes IS NOT NULL
+                AND (
+                    task_date < ?
+                    OR (
+                        task_date = ?
+                        AND time(task_time, '+' || duration_minutes || ' minutes') <= ?
+                    )
+                )
+            ORDER BY
+                task_date,
+                task_time,
+                created_at_utc;
+            """);
+
+        string targetDate = FormatDate(date);
+        statement.BindText(1, targetDate);
+        statement.BindText(2, targetDate);
+        statement.BindText(3, FormatTime(time) ?? "00:00:00");
+
+        while (statement.Read())
+            tasks.Add(Map(statement));
+
+        return Task.FromResult<IReadOnlyList<TaskItem>>(tasks);
+    }
+
     public Task<TaskItem?> GetByIdAsync(Guid id)
     {
         using SqliteConnection connection = OpenConnection();

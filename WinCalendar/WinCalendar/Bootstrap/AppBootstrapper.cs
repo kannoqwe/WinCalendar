@@ -25,6 +25,7 @@ public sealed class AppBootstrapper
 
         CreateTaskUseCase createTaskUseCase = new(taskRepository);
         GetTasksForRangeUseCase getTasksForRangeUseCase = new(taskRepository);
+        AutoCompleteElapsedTimedTasksUseCase autoCompleteElapsedTimedTasksUseCase = new(taskRepository);
         SetTaskCompletionStatusUseCase setTaskCompletionStatusUseCase = new(taskRepository);
         DeleteTaskUseCase deleteTaskUseCase = new(taskRepository);
         UpdateTaskUseCase updateTaskUseCase = new(taskRepository);
@@ -32,6 +33,7 @@ public sealed class AppBootstrapper
         _plannerStateStore = new(
             createTaskUseCase,
             getTasksForRangeUseCase,
+            autoCompleteElapsedTimedTasksUseCase,
             setTaskCompletionStatusUseCase,
             deleteTaskUseCase,
             updateTaskUseCase);

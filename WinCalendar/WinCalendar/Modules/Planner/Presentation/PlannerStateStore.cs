@@ -26,6 +26,7 @@ public sealed class PlannerStateStore : ObservableObject
     private readonly CreateTaskUseCase _createTaskUseCase;
     private readonly DeleteTaskUseCase _deleteTaskUseCase;
     private readonly GetTasksForRangeUseCase _getTasksForRangeUseCase;
+    private readonly AutoCompleteElapsedTimedTasksUseCase _autoCompleteElapsedTimedTasksUseCase;
     private readonly SetTaskCompletionStatusUseCase _setTaskCompletionStatusUseCase;
     private readonly UpdateTaskUseCase _updateTaskUseCase;
     private readonly Dictionary<DateOnly, bool> _agendaState = [];
@@ -56,12 +57,14 @@ public sealed class PlannerStateStore : ObservableObject
     public PlannerStateStore(
         CreateTaskUseCase createTaskUseCase,
         GetTasksForRangeUseCase getTasksForRangeUseCase,
+        AutoCompleteElapsedTimedTasksUseCase autoCompleteElapsedTimedTasksUseCase,
         SetTaskCompletionStatusUseCase setTaskCompletionStatusUseCase,
         DeleteTaskUseCase deleteTaskUseCase,
         UpdateTaskUseCase updateTaskUseCase)
     {
         _createTaskUseCase = createTaskUseCase;
         _getTasksForRangeUseCase = getTasksForRangeUseCase;
+        _autoCompleteElapsedTimedTasksUseCase = autoCompleteElapsedTimedTasksUseCase;
         _setTaskCompletionStatusUseCase = setTaskCompletionStatusUseCase;
         _deleteTaskUseCase = deleteTaskUseCase;
         _updateTaskUseCase = updateTaskUseCase;
@@ -381,7 +384,9 @@ public sealed class PlannerStateStore : ObservableObject
             return;
 
         _isInitialized = true;
-        await ReloadAsync();
+        bool didAutoCompleteTasks = await AutoCompleteElapsedTimedTasksAsync();
+        if (!didAutoCompleteTasks)
+            await ReloadAsync();
     }
 
     public void RefreshCurrentTimeIndicator()
@@ -488,6 +493,16 @@ public sealed class PlannerStateStore : ObservableObject
     {
         await _setTaskCompletionStatusUseCase.ExecuteAsync(id, isCompleted);
         await ReloadAsync();
+    }
+
+    public async Task<bool> AutoCompleteElapsedTimedTasksAsync()
+    {
+        bool didCompleteTasks = await _autoCompleteElapsedTimedTasksUseCase.ExecuteAsync(DateTime.Now);
+        if (!didCompleteTasks)
+            return false;
+
+        await ReloadAsync();
+        return true;
     }
 
     public async Task DeleteTaskAsync(Guid id)

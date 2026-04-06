@@ -361,9 +361,13 @@ public sealed partial class TodayPage : Page
         ResumeInlineEditor(focusTitleEditor: false);
     }
 
-    private void CurrentTimeTimer_Tick(DispatcherQueueTimer sender, object args)
+    private async void CurrentTimeTimer_Tick(DispatcherQueueTimer sender, object args)
     {
+        if (_inlineSaveTimer.IsRunning)
+            await SaveInlineEditorNowAsync();
+
         _plannerStateStore.RefreshCurrentTimeIndicator();
+        await _plannerStateStore.AutoCompleteElapsedTimedTasksAsync();
     }
 
     private void TodayPage_Unloaded(object sender, RoutedEventArgs e)

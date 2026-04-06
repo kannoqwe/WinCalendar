@@ -15,8 +15,8 @@ public sealed class PlannerStateStore : ObservableObject
 {
     private const int MonthGridCellCount = 42;
     private const double WeekTimelineHourHeightValue = 40;
-    private const double WeekTimelineDayWidthValue = 104;
-    private const double WeekTimelineAnyTimeLaneHeightValue = 54;
+    private const double WeekTimelineDayWidthValue = 132;
+    private const double WeekTimelineAnyTimeLaneHeightValue = 64;
     private const double WeekTaskHorizontalPaddingValue = 4;
     private const double WeekTaskColumnGapValue = 4;
     private const int WeekTaskDefaultDurationMinutes = 45;

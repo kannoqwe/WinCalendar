@@ -678,14 +678,94 @@
                                             IsChecked="{Binding EditorHasTime, Mode=TwoWay}"
                                             Click="EditorTimeToggle_Click" />
 
-                                        <TimePicker
-                                            x:Name="EditorTimePicker"
-                                            ClockIdentifier="24HourClock"
-                                            Header="Start"
-                                            MinuteIncrement="15"
-                                            Time="{Binding EditorTime, Mode=TwoWay}"
-                                            TimeChanged="EditorTimePicker_TimeChanged"
-                                            Visibility="{Binding EditorTimeVisibility}" />
+                                        <StackPanel
+                                            Spacing="6"
+                                            Visibility="{Binding EditorTimeVisibility}">
+                                            <TextBlock
+                                                FontSize="11"
+                                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                                Text="Start" />
+                                            <Button
+                                                x:Name="EditorTimeButton"
+                                                HorizontalAlignment="Stretch"
+                                                HorizontalContentAlignment="Stretch"
+                                                Style="{StaticResource HeaderToolbarButtonStyle}">
+                                                <Grid ColumnSpacing="8">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <StackPanel
+                                                        Orientation="Horizontal"
+                                                        Spacing="8">
+                                                        <FontIcon
+                                                            FontFamily="Segoe Fluent Icons"
+                                                            FontSize="11"
+                                                            Foreground="{ThemeResource AppTextMutedBrush}"
+                                                            Glyph="&#xE823;" />
+                                                        <TextBlock
+                                                            FontWeight="SemiBold"
+                                                            Text="{Binding EditorTimeText}" />
+                                                    </StackPanel>
+
+                                                    <FontIcon
+                                                        Grid.Column="1"
+                                                        VerticalAlignment="Center"
+                                                        FontFamily="Segoe Fluent Icons"
+                                                        FontSize="10"
+                                                        Foreground="{ThemeResource AppTextMutedBrush}"
+                                                        Glyph="&#xE70D;" />
+                                                </Grid>
+
+                                                <Button.Flyout>
+                                                    <Flyout
+                                                        x:Name="EditorTimeFlyout"
+                                                        Opening="EditorTimeFlyout_Opening"
+                                                        Placement="BottomEdgeAlignedLeft">
+                                                        <Border
+                                                            Padding="10"
+                                                            Background="{ThemeResource AppShellBackgroundBrush}"
+                                                            BorderBrush="{ThemeResource AppBorderBrush}"
+                                                            BorderThickness="1"
+                                                            CornerRadius="10">
+                                                            <Grid ColumnSpacing="8">
+                                                                <Grid.ColumnDefinitions>
+                                                                    <ColumnDefinition Width="80" />
+                                                                    <ColumnDefinition Width="Auto" />
+                                                                    <ColumnDefinition Width="80" />
+                                                                </Grid.ColumnDefinitions>
+
+                                                                <ComboBox
+                                                                    x:Name="EditorHourComboBox"
+                                                                    HorizontalAlignment="Stretch"
+                                                                    HorizontalContentAlignment="Center"
+                                                                    ItemsSource="{x:Bind EditorHourOptions}"
+                                                                    PlaceholderText="HH"
+                                                                    SelectionChanged="EditorTimePartComboBox_SelectionChanged" />
+
+                                                                <TextBlock
+                                                                    Grid.Column="1"
+                                                                    VerticalAlignment="Center"
+                                                                    FontSize="14"
+                                                                    FontWeight="SemiBold"
+                                                                    Foreground="{ThemeResource AppTextMutedBrush}"
+                                                                    Text=":" />
+
+                                                                <ComboBox
+                                                                    x:Name="EditorMinuteComboBox"
+                                                                    Grid.Column="2"
+                                                                    HorizontalAlignment="Stretch"
+                                                                    HorizontalContentAlignment="Center"
+                                                                    ItemsSource="{x:Bind EditorMinuteOptions}"
+                                                                    PlaceholderText="MM"
+                                                                    SelectionChanged="EditorTimePartComboBox_SelectionChanged" />
+                                                            </Grid>
+                                                        </Border>
+                                                    </Flyout>
+                                                </Button.Flyout>
+                                            </Button>
+                                        </StackPanel>
 
                                         <CheckBox
                                             Content="Duration"

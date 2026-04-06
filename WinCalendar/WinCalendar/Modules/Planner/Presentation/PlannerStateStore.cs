@@ -276,6 +276,7 @@ public sealed class PlannerStateStore : ObservableObject
 
             ClampEditorDuration();
             OnPropertyChanged(nameof(EditorMaxDurationMinutes));
+            OnPropertyChanged(nameof(EditorTimeText));
         }
     }
 
@@ -323,6 +324,8 @@ public sealed class PlannerStateStore : ObservableObject
 
     public Visibility EditorDurationVisibility =>
         EditorHasTime && EditorHasDuration ? Visibility.Visible : Visibility.Collapsed;
+
+    public string EditorTimeText => $"{EditorTime.Hours:00}:{EditorTime.Minutes:00}";
 
     public double EditorMaxDurationMinutes =>
         EditorHasTime

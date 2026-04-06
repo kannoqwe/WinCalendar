@@ -17,6 +17,7 @@ public sealed partial class TodayPage : Page
     private readonly PlannerStateStore _plannerStateStore;
     private readonly DispatcherQueueTimer _currentTimeTimer;
     private readonly DispatcherQueueTimer _inlineSaveTimer;
+    private bool _syncingEditorTimeFlyout;
     private bool _timersInitialized;
     private bool _suppressInlineSave;
     private bool _isInlineSaveInProgress;
@@ -25,6 +26,12 @@ public sealed partial class TodayPage : Page
     private bool _initialized;
     private bool _syncingWeekHorizontalScroll;
     private bool _syncingWeekVerticalScroll;
+
+    public string[] EditorHourOptions { get; } = Enumerable.Range(0, 24)
+        .Select(hour => hour.ToString("00"))
+        .ToArray();
+
+    public string[] EditorMinuteOptions { get; } = ["00", "15", "30", "45"];
 
     public TodayPage(PlannerStateStore plannerStateStore, PlannerWindowCoordinator windowCoordinator)
     {
@@ -172,8 +179,37 @@ public sealed partial class TodayPage : Page
         ScheduleInlineSave();
     }
 
-    private void EditorTimePicker_TimeChanged(object sender, TimePickerValueChangedEventArgs args)
+    private void EditorTimeFlyout_Opening(object sender, object e)
     {
+        _syncingEditorTimeFlyout = true;
+
+        try
+        {
+            EditorHourComboBox.SelectedItem = _plannerStateStore.EditorTime.Hours.ToString("00");
+            EditorMinuteComboBox.SelectedItem = _plannerStateStore.EditorTime.Minutes.ToString("00");
+        }
+        finally
+        {
+            _syncingEditorTimeFlyout = false;
+        }
+    }
+
+    private void EditorTimePartComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_syncingEditorTimeFlyout
+            || EditorHourComboBox.SelectedItem is not string hourText
+            || EditorMinuteComboBox.SelectedItem is not string minuteText
+            || !int.TryParse(hourText, out int hour)
+            || !int.TryParse(minuteText, out int minute))
+        {
+            return;
+        }
+
+        TimeSpan nextTime = new(hour, minute, 0);
+        if (_plannerStateStore.EditorTime == nextTime)
+            return;
+
+        _plannerStateStore.EditorTime = nextTime;
         ScheduleInlineSave();
     }
 

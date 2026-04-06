@@ -86,22 +86,22 @@
         </Style>
 
         <Style x:Key="HeaderGhostIconButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="24" />
-            <Setter Property="Height" Value="24" />
+            <Setter Property="Width" Value="28" />
+            <Setter Property="Height" Value="28" />
             <Setter Property="Padding" Value="0" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="CornerRadius" Value="8" />
         </Style>
 
         <Style x:Key="HeaderGhostTextButtonStyle" TargetType="Button">
-            <Setter Property="MinHeight" Value="24" />
-            <Setter Property="Padding" Value="2,0" />
+            <Setter Property="MinHeight" Value="28" />
+            <Setter Property="Padding" Value="0,0,2,0" />
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="CornerRadius" Value="8" />
         </Style>
     </Page.Resources>
 
@@ -119,14 +119,74 @@
                 Padding="0,0,0,12"
                 BorderBrush="{ThemeResource AppBorderBrush}"
                 BorderThickness="0,0,0,1">
-                <Grid ColumnSpacing="12">
+                <Grid ColumnSpacing="18">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
                     <StackPanel
                         Grid.Column="0"
+                        Orientation="Horizontal"
+                        Spacing="6"
+                        VerticalAlignment="Center">
+                        <Button
+                            Style="{StaticResource HeaderGhostTextButtonStyle}"
+                            Click="CurrentWeekButton_Click">
+                            <TextBlock
+                                FontSize="14"
+                                FontWeight="Normal"
+                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Text="Today" />
+                        </Button>
+
+                        <Button
+                            Style="{StaticResource HeaderGhostIconButtonStyle}"
+                            Click="PreviousWeekButton_Click"
+                            ToolTipService.ToolTip="Previous week">
+                            <Viewbox Width="13" Height="13">
+                                <Path
+                                    Data="M8,2 L4,6 L8,10"
+                                    Stroke="{ThemeResource AppTextMutedBrush}"
+                                    StrokeLineJoin="Round"
+                                    StrokeStartLineCap="Round"
+                                    StrokeEndLineCap="Round"
+                                    StrokeThickness="1.8" />
+                            </Viewbox>
+                        </Button>
+
+                        <Button
+                            Style="{StaticResource HeaderGhostIconButtonStyle}"
+                            Click="NextWeekButton_Click"
+                            ToolTipService.ToolTip="Next week">
+                            <Viewbox Width="13" Height="13">
+                                <Path
+                                    Data="M4,2 L8,6 L4,10"
+                                    Stroke="{ThemeResource AppTextMutedBrush}"
+                                    StrokeLineJoin="Round"
+                                    StrokeStartLineCap="Round"
+                                    StrokeEndLineCap="Round"
+                                    StrokeThickness="1.8" />
+                            </Viewbox>
+                        </Button>
+
+                        <Button
+                            Style="{StaticResource HeaderGhostIconButtonStyle}"
+                            Click="AddTaskButton_Click"
+                            ToolTipService.ToolTip="New task">
+                            <Viewbox Width="13" Height="13">
+                                <Path
+                                    Data="M6,2.5 V9.5 M2.5,6 H9.5"
+                                    Stroke="{ThemeResource AppAccentBrush}"
+                                    StrokeStartLineCap="Round"
+                                    StrokeEndLineCap="Round"
+                                    StrokeThickness="1.8" />
+                            </Viewbox>
+                        </Button>
+                    </StackPanel>
+
+                    <StackPanel
+                        Grid.Column="1"
                         Spacing="2"
                         VerticalAlignment="Center">
                         <TextBlock
@@ -153,55 +213,6 @@
                                 Foreground="{ThemeResource AppTextMutedBrush}"
                                 Text="{Binding WeekLabel}" />
                         </Grid>
-                    </StackPanel>
-
-                    <StackPanel
-                        Grid.Column="1"
-                        Orientation="Horizontal"
-                        Spacing="4"
-                        VerticalAlignment="Center">
-                        <Button
-                            Style="{StaticResource HeaderGhostIconButtonStyle}"
-                            Click="PreviousWeekButton_Click"
-                            ToolTipService.ToolTip="Previous week">
-                            <FontIcon
-                                FontFamily="Segoe Fluent Icons"
-                                FontSize="10"
-                                Foreground="{ThemeResource AppTextMutedBrush}"
-                                Glyph="&#xE76B;" />
-                        </Button>
-
-                        <Button
-                            Style="{StaticResource HeaderGhostIconButtonStyle}"
-                            Click="NextWeekButton_Click"
-                            ToolTipService.ToolTip="Next week">
-                            <FontIcon
-                                FontFamily="Segoe Fluent Icons"
-                                FontSize="10"
-                                Foreground="{ThemeResource AppTextMutedBrush}"
-                                Glyph="&#xE76C;" />
-                        </Button>
-
-                        <Button
-                            Style="{StaticResource HeaderGhostIconButtonStyle}"
-                            Click="AddTaskButton_Click"
-                            ToolTipService.ToolTip="New task">
-                            <FontIcon
-                                FontFamily="Segoe Fluent Icons"
-                                FontSize="10"
-                                Foreground="{ThemeResource AppAccentBrush}"
-                                Glyph="&#xE710;" />
-                        </Button>
-
-                        <Button
-                            Style="{StaticResource HeaderGhostTextButtonStyle}"
-                            Click="CurrentWeekButton_Click">
-                             <TextBlock
-                                 FontSize="13"
-                                 FontWeight="SemiBold"
-                                 Foreground="{ThemeResource TextFillColorPrimaryBrush}"
-                                 Text="Today" />
-                        </Button>
                     </StackPanel>
                 </Grid>
             </Border>

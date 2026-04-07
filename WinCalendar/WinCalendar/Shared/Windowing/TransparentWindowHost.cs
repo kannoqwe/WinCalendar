@@ -170,7 +170,7 @@ internal static class TransparentWindowHost
         int cy,
         uint uFlags);
 
-    [DllImport("user32.dll", SetLastError = true)]
+    [DllImport("gdi32.dll", SetLastError = true)]
     private static extern nint CreateRoundRectRgn(
         int nLeftRect,
         int nTopRect,

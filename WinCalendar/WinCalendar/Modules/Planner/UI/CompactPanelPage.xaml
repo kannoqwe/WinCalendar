@@ -5,7 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Background="{ThemeResource AppPageBackgroundBrush}"
+    Background="Transparent"
     mc:Ignorable="d">
 
     <Page.Resources>
@@ -40,7 +40,7 @@
         </Style>
     </Page.Resources>
 
-    <Grid x:Name="Root" Loaded="Root_Loaded" Padding="{Binding CompactPanelRootPadding}">
+    <Grid x:Name="Root" Loaded="Root_Loaded" Padding="0">
         <Border
             Background="{ThemeResource AppCardBackgroundBrush}"
             BorderBrush="{ThemeResource AppBorderBrush}"
@@ -67,10 +67,10 @@
 
                     <Button
                         Style="{StaticResource CompactActionButtonStyle}"
-                        Click="ToggleSidebarButton_Click"
-                        ToolTipService.ToolTip="Toggle tasks list">
+                        Click="ToggleSidebarButton_Click">
                         <FontIcon FontFamily="Segoe Fluent Icons" FontSize="13" Glyph="&#xE700;" />
                     </Button>
+
                     <TextBlock
                         Grid.Column="1"
                         VerticalAlignment="Center"
@@ -78,42 +78,41 @@
                         FontSize="20"
                         FontWeight="SemiBold"
                         Text="{Binding MonthLabel}" />
+
                     <Button
                         Grid.Column="2"
                         Style="{StaticResource CompactArrowButtonStyle}"
-                        Click="PreviousMonthButton_Click"
-                        ToolTipService.ToolTip="Previous month">
+                        Click="PreviousMonthButton_Click">
                         <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE76B;" />
                     </Button>
+
                     <Button
                         Grid.Column="3"
                         Style="{StaticResource CompactArrowButtonStyle}"
-                        Click="NextMonthButton_Click"
-                        ToolTipService.ToolTip="Next month">
+                        Click="NextMonthButton_Click">
                         <FontIcon FontFamily="Segoe Fluent Icons" FontSize="14" Glyph="&#xE76C;" />
                     </Button>
+
                     <Button
                         Grid.Column="4"
                         Style="{StaticResource CompactActionButtonStyle}"
-                        Click="AddTaskButton_Click"
-                        ToolTipService.ToolTip="Add task">
+                        Click="AddTaskButton_Click">
                         <FontIcon FontFamily="Segoe Fluent Icons" FontSize="13" Glyph="&#xE710;" />
                     </Button>
+
                     <Button
                         Grid.Column="5"
                         Style="{StaticResource CompactActionButtonStyle}"
-                        Click="OpenFullButton_Click"
-                        ToolTipService.ToolTip="Open app">
+                        Click="OpenFullButton_Click">
                         <FontIcon FontFamily="Segoe Fluent Icons" FontSize="13" Glyph="&#xE80F;" />
                     </Button>
                 </Grid>
 
-                <Grid Grid.Row="1">
-                    <TextBlock
-                        VerticalAlignment="Center"
-                        Foreground="{ThemeResource AppTextMutedBrush}"
-                        Text="{Binding SelectedDateText}" />
-                </Grid>
+                <TextBlock
+                    Grid.Row="1"
+                    VerticalAlignment="Center"
+                    Foreground="{ThemeResource AppTextMutedBrush}"
+                    Text="{Binding SelectedDateText}" />
 
                 <Grid Grid.Row="2">
                     <Grid.ColumnDefinitions>
@@ -141,6 +140,7 @@
                     SelectionMode="None"
                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                     ScrollViewer.VerticalScrollBarVisibility="Disabled">
+
                     <GridView.ItemsPanel>
                         <ItemsPanelTemplate>
                             <ItemsWrapGrid MaximumRowsOrColumns="7" Orientation="Horizontal" />
@@ -192,6 +192,7 @@
                             </Button>
                         </DataTemplate>
                     </GridView.ItemTemplate>
+
                 </GridView>
             </Grid>
         </Border>

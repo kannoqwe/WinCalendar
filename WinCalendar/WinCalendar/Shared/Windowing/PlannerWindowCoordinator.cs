@@ -129,6 +129,7 @@ public sealed class PlannerWindowCoordinator
         appWindow.SetPresenter(presenter);
         appWindow.Resize(new SizeInt32(CompactWindowWidth, CompactWindowHeight));
         PositionCompactWindow(appWindow);
+        TransparentWindowHost.Apply(window);
     }
 
     private static void ConfigureMainWindow(Window window)
@@ -193,6 +194,7 @@ public sealed class PlannerWindowCoordinator
         appWindow.SetPresenter(presenter);
         appWindow.Resize(new SizeInt32(CompactSidebarWindowWidth, CompactWindowHeight));
         PositionCompactSidebarWindow(appWindow);
+        TransparentWindowHost.Apply(window);
     }
 
     private static void ConfigureMediumWindow(Window window)

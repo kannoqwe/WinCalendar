@@ -14,6 +14,7 @@ public sealed class PlannerWindowCoordinator
     private const int CompactWindowWidth = 420;
     private const int CompactWindowHeight = 500;
     private const int CompactSidebarWindowWidth = 228;
+    private const int CompactWindowCornerRadius = 22;
     private const int MediumWindowWidth = 980;
     private const int MediumWindowHeight = 760;
 
@@ -71,7 +72,7 @@ public sealed class PlannerWindowCoordinator
         }
         else
         {
-            PositionCompactWindow(_compactWindow.GetAppWindow());
+            ConfigureCompactWindow(_compactWindow);
         }
 
         if (_plannerStateStore.IsCompactSidebarOpen)
@@ -96,6 +97,8 @@ public sealed class PlannerWindowCoordinator
         if (_plannerStateStore.IsCompactSidebarOpen)
         {
             CloseCompactSidebar(updateState: true);
+            if (_compactWindow is not null)
+                ConfigureCompactWindow(_compactWindow);
             _compactWindow?.Activate();
             return;
         }
@@ -116,7 +119,7 @@ public sealed class PlannerWindowCoordinator
         _mediumWindow.Activate();
     }
 
-    private static void ConfigureCompactWindow(Window window)
+    private void ConfigureCompactWindow(Window window)
     {
         AppWindow appWindow = window.GetAppWindow();
         OverlappedPresenter presenter = OverlappedPresenter.CreateForToolWindow();
@@ -129,7 +132,14 @@ public sealed class PlannerWindowCoordinator
         appWindow.SetPresenter(presenter);
         appWindow.Resize(new SizeInt32(CompactWindowWidth, CompactWindowHeight));
         PositionCompactWindow(appWindow);
-        TransparentWindowHost.Apply(window);
+        TransparentWindowHost.Apply(
+            window,
+            CompactWindowWidth,
+            CompactWindowHeight,
+            CompactWindowCornerRadius,
+            _plannerStateStore.IsCompactSidebarOpen
+                ? TransparentWindowHost.WindowOutlineShape.RightRounded
+                : TransparentWindowHost.WindowOutlineShape.AllRounded);
     }
 
     private static void ConfigureMainWindow(Window window)
@@ -158,6 +168,8 @@ public sealed class PlannerWindowCoordinator
                 }
 
                 _plannerStateStore.SetCompactSidebarOpen(false);
+                if (_compactWindow is not null)
+                    ConfigureCompactWindow(_compactWindow);
             };
             ConfigureCompactSidebarWindow(_compactSidebarWindow);
         }
@@ -194,7 +206,12 @@ public sealed class PlannerWindowCoordinator
         appWindow.SetPresenter(presenter);
         appWindow.Resize(new SizeInt32(CompactSidebarWindowWidth, CompactWindowHeight));
         PositionCompactSidebarWindow(appWindow);
-        TransparentWindowHost.Apply(window);
+        TransparentWindowHost.Apply(
+            window,
+            CompactSidebarWindowWidth,
+            CompactWindowHeight,
+            CompactWindowCornerRadius,
+            TransparentWindowHost.WindowOutlineShape.LeftRounded);
     }
 
     private static void ConfigureMediumWindow(Window window)

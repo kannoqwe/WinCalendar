@@ -1,4 +1,5 @@
 using System;
+using WinCalendar.Core.Time;
 using WinCalendar.Shared.Windowing;
 
 namespace WinCalendar.Modules.Shell.UI;
@@ -6,15 +7,17 @@ namespace WinCalendar.Modules.Shell.UI;
 public sealed class ShellExperienceCoordinator : IDisposable
 {
     private readonly PlannerWindowCoordinator _plannerWindowCoordinator;
+    private readonly IClock _clock;
     private readonly Action _requestExit;
-    private TaskbarClockOverlayHost? _taskbarClockOverlayHost;
+    private TaskbarCornerButtonHost? _taskbarCornerButtonHost;
     private TrayIconHost? _trayIconHost;
     private bool _started;
     private bool _isStopping;
 
-    public ShellExperienceCoordinator(PlannerWindowCoordinator plannerWindowCoordinator, Action requestExit)
+    public ShellExperienceCoordinator(PlannerWindowCoordinator plannerWindowCoordinator, IClock clock, Action requestExit)
     {
         _plannerWindowCoordinator = plannerWindowCoordinator;
+        _clock = clock;
         _requestExit = requestExit;
     }
 
@@ -26,15 +29,15 @@ public sealed class ShellExperienceCoordinator : IDisposable
         _started = true;
         _trayIconHost = new TrayIconHost(
             _plannerWindowCoordinator.ShowFullApp,
-            _plannerWindowCoordinator.ShowCompactPanel,
             _requestExit);
 
         Microsoft.UI.Dispatching.DispatcherQueue? dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
         if (dispatcherQueue is not null)
         {
-            _taskbarClockOverlayHost = new TaskbarClockOverlayHost(
+            _taskbarCornerButtonHost = new TaskbarCornerButtonHost(
                 dispatcherQueue,
-                _plannerWindowCoordinator.ToggleCompactPanel);
+                _clock,
+                _plannerWindowCoordinator.ShowFullApp);
         }
     }
 
@@ -44,8 +47,8 @@ public sealed class ShellExperienceCoordinator : IDisposable
             return;
 
         _isStopping = true;
-        _taskbarClockOverlayHost?.Dispose();
-        _taskbarClockOverlayHost = null;
+        _taskbarCornerButtonHost?.Dispose();
+        _taskbarCornerButtonHost = null;
         _trayIconHost?.Dispose();
         _trayIconHost = null;
     }

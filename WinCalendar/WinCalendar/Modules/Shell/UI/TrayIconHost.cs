@@ -9,11 +9,9 @@ public sealed class TrayIconHost : IDisposable
     private const uint NotifyIconId = 1;
     private const uint TrayCallbackMessage = 0x8000 + 7;
     private const nuint OpenPlannerCommandId = 1001;
-    private const nuint OpenCompactPanelCommandId = 1002;
     private const nuint ExitCommandId = 1003;
 
     private readonly Action _openFullApp;
-    private readonly Action _openCompactPanel;
     private readonly Action _exitApplication;
     private readonly TrayNative.WndProc _windowProcedure;
     private readonly string _windowClassName;
@@ -22,10 +20,9 @@ public sealed class TrayIconHost : IDisposable
     private nint _windowHandle;
     private bool _isDisposed;
 
-    public TrayIconHost(Action openFullApp, Action openCompactPanel, Action exitApplication)
+    public TrayIconHost(Action openFullApp, Action exitApplication)
     {
         _openFullApp = openFullApp;
-        _openCompactPanel = openCompactPanel;
         _exitApplication = exitApplication;
         _windowProcedure = WindowProcedure;
         _windowClassName = $"WinCalendar.TrayIcon.{Environment.ProcessId}";
@@ -117,7 +114,7 @@ public sealed class TrayIconHost : IDisposable
         {
             case TrayNative.WM_LBUTTONUP:
             case TrayNative.WM_LBUTTONDBLCLK:
-                _openCompactPanel();
+                _openFullApp();
                 return nint.Zero;
             case TrayNative.WM_RBUTTONUP:
             case TrayNative.WM_CONTEXTMENU:
@@ -137,9 +134,6 @@ public sealed class TrayIconHost : IDisposable
             case OpenPlannerCommandId:
                 _openFullApp();
                 return nint.Zero;
-            case OpenCompactPanelCommandId:
-                _openCompactPanel();
-                return nint.Zero;
             case ExitCommandId:
                 _exitApplication();
                 return nint.Zero;
@@ -157,7 +151,6 @@ public sealed class TrayIconHost : IDisposable
         try
         {
             TrayNative.AppendMenu(menuHandle, TrayNative.MF_STRING, OpenPlannerCommandId, "Open Planner");
-            TrayNative.AppendMenu(menuHandle, TrayNative.MF_STRING, OpenCompactPanelCommandId, "Open Compact Panel");
             TrayNative.AppendMenu(menuHandle, TrayNative.MF_SEPARATOR, 0, lpNewItem: null);
             TrayNative.AppendMenu(menuHandle, TrayNative.MF_STRING, ExitCommandId, "Exit");
 

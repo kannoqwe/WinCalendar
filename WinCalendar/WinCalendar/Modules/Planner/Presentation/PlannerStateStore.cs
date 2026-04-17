@@ -15,7 +15,6 @@ namespace WinCalendar.Modules.Planner.Presentation;
 public sealed class PlannerStateStore : ObservableObject
 {
     private const int MonthGridCellCount = 42;
-    private const int CompactTaskPageSize = 2;
 
     private readonly CreateTaskUseCase _createTaskUseCase;
     private readonly DeleteTaskUseCase _deleteTaskUseCase;
@@ -32,7 +31,6 @@ public sealed class PlannerStateStore : ObservableObject
     private TaskEditorMode _taskEditorMode;
     private DateOnly _selectedDate;
     private DateOnly _displayMonth;
-    private int _compactTaskPageIndex;
     private Guid? _selectedTaskId;
     private PlannerTaskViewModel? _selectedTask;
     private string _selectedDateText = string.Empty;
@@ -70,7 +68,6 @@ public sealed class PlannerStateStore : ObservableObject
         MonthDays = [];
         SelectedDayTasks = [];
         TodayTasks = [];
-        CompactVisibleTodayTasks = [];
         WeekAgendaDays = [];
         WeekTimelineHours = [];
         WeekTimelineDays = [];
@@ -85,8 +82,6 @@ public sealed class PlannerStateStore : ObservableObject
 
     public ObservableCollection<PlannerTaskViewModel> TodayTasks { get; }
 
-    public ObservableCollection<PlannerTaskViewModel> CompactVisibleTodayTasks { get; }
-
     public ObservableCollection<PlannerAgendaDayViewModel> WeekAgendaDays { get; }
 
     public ObservableCollection<PlannerWeekHourViewModel> WeekTimelineHours { get; }
@@ -94,8 +89,6 @@ public sealed class PlannerStateStore : ObservableObject
     public ObservableCollection<PlannerWeekDayTimelineViewModel> WeekTimelineDays { get; }
 
     public ObservableCollection<PlannerEditorDurationOptionViewModel> EditorDurationOptions => _taskEditor.EditorDurationOptions;
-
-    public DateOnly Today => _clock.Today;
 
     public DateOnly SelectedDate => _selectedDate;
 
@@ -183,21 +176,6 @@ public sealed class PlannerStateStore : ObservableObject
 
     public Visibility EmptyWeekAgendaVisibility =>
         WeekAgendaDays.Any(day => day.Tasks.Count > 0) ? Visibility.Collapsed : Visibility.Visible;
-
-    public Visibility CompactTaskListVisibility =>
-        CompactVisibleTodayTasks.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
-
-    public Visibility CompactEmptyTasksVisibility =>
-        CompactVisibleTodayTasks.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
-
-    public Visibility CompactTaskNavigationVisibility =>
-        TodayTasks.Count > CompactTaskPageSize ? Visibility.Visible : Visibility.Collapsed;
-
-    public bool CanGoToPreviousCompactTaskPage => _compactTaskPageIndex > 0;
-
-    public bool CanGoToNextCompactTaskPage => _compactTaskPageIndex < CompactTaskPageCount - 1;
-
-    public string CompactTaskPageText => $"{Math.Min(_compactTaskPageIndex + 1, CompactTaskPageCount)}/{CompactTaskPageCount}";
 
     public PlannerTaskViewModel? SelectedTask
     {
@@ -384,24 +362,6 @@ public sealed class PlannerStateStore : ObservableObject
         await ReloadAsync();
     }
 
-    public void GoToPreviousCompactTaskPage()
-    {
-        if (!CanGoToPreviousCompactTaskPage)
-            return;
-
-        _compactTaskPageIndex--;
-        RebuildCompactVisibleTodayTasks();
-    }
-
-    public void GoToNextCompactTaskPage()
-    {
-        if (!CanGoToNextCompactTaskPage)
-            return;
-
-        _compactTaskPageIndex++;
-        RebuildCompactVisibleTodayTasks();
-    }
-
     public void ToggleAgendaDayExpanded(PlannerAgendaDayViewModel day)
     {
         bool nextState = !day.IsExpanded;
@@ -583,15 +543,10 @@ public sealed class PlannerStateStore : ObservableObject
         TodayTasks.Clear();
 
         if (!taskLookup.TryGetValue(today, out List<PlannerTaskViewModel>? tasksForToday))
-        {
-            RebuildCompactVisibleTodayTasks();
             return;
-        }
 
         foreach (PlannerTaskViewModel task in tasksForToday)
             TodayTasks.Add(task);
-
-        RebuildCompactVisibleTodayTasks();
     }
 
     private void BuildWeekAgenda(
@@ -715,28 +670,6 @@ public sealed class PlannerStateStore : ObservableObject
     private void TaskEditor_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         OnPropertyChanged(e.PropertyName);
-    }
-
-    private int CompactTaskPageCount => Math.Max(1, (int)Math.Ceiling(TodayTasks.Count / (double)CompactTaskPageSize));
-
-    private void RebuildCompactVisibleTodayTasks()
-    {
-        _compactTaskPageIndex = Math.Clamp(_compactTaskPageIndex, 0, CompactTaskPageCount - 1);
-        CompactVisibleTodayTasks.Clear();
-
-        foreach (PlannerTaskViewModel task in TodayTasks
-            .Skip(_compactTaskPageIndex * CompactTaskPageSize)
-            .Take(CompactTaskPageSize))
-        {
-            CompactVisibleTodayTasks.Add(task);
-        }
-
-        OnPropertyChanged(nameof(CompactTaskListVisibility));
-        OnPropertyChanged(nameof(CompactEmptyTasksVisibility));
-        OnPropertyChanged(nameof(CompactTaskNavigationVisibility));
-        OnPropertyChanged(nameof(CanGoToPreviousCompactTaskPage));
-        OnPropertyChanged(nameof(CanGoToNextCompactTaskPage));
-        OnPropertyChanged(nameof(CompactTaskPageText));
     }
 
     private void UpdateAgendaState(PlannerAgendaDayViewModel day)

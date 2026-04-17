@@ -6,9 +6,6 @@ internal static class AppLaunchArguments
 {
     public static AppLaunchMode Parse(string? rawArguments)
     {
-        if (ContainsArgument(rawArguments, "--compact"))
-            return AppLaunchMode.CompactPanel;
-
         if (ContainsArgument(rawArguments, "--background"))
             return AppLaunchMode.BackgroundShell;
 
@@ -18,7 +15,6 @@ internal static class AppLaunchArguments
     public static string ToPipePayload(AppLaunchMode launchMode) => launchMode switch
     {
         AppLaunchMode.BackgroundShell => "background",
-        AppLaunchMode.CompactPanel => "compact",
         _ => "full"
     };
 
@@ -28,9 +24,6 @@ internal static class AppLaunchArguments
         {
             case "background":
                 launchMode = AppLaunchMode.BackgroundShell;
-                return true;
-            case "compact":
-                launchMode = AppLaunchMode.CompactPanel;
                 return true;
             case "full":
                 launchMode = AppLaunchMode.FullApp;

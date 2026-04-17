@@ -42,7 +42,7 @@ public sealed class AppBootstrapper
             updateTaskUseCase);
 
         _plannerWindowCoordinator = new(_plannerStateStore, CreateMainWindow);
-        _shellExperienceCoordinator = new(_plannerWindowCoordinator, requestExit);
+        _shellExperienceCoordinator = new(_plannerWindowCoordinator, clock, requestExit);
     }
 
     public MainWindow CreateMainWindow()
@@ -60,9 +60,6 @@ public sealed class AppBootstrapper
         switch (launchMode)
         {
             case AppLaunchMode.BackgroundShell:
-                return;
-            case AppLaunchMode.CompactPanel:
-                _plannerWindowCoordinator.ShowCompactPanel();
                 return;
             default:
                 _plannerWindowCoordinator.ShowFullApp();

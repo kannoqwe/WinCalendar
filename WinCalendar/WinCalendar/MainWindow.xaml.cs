@@ -44,11 +44,6 @@ namespace WinCalendar
             };
         }
 
-        private void CompactPanelButton_Click(object sender, RoutedEventArgs e)
-        {
-            _windowCoordinator.ShowCompactPanel();
-        }
-
         private void MediumViewButton_Click(object sender, RoutedEventArgs e)
         {
             _windowCoordinator.ShowMediumView();

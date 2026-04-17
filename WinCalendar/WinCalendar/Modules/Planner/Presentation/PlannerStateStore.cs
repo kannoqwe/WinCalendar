@@ -15,13 +15,6 @@ public sealed class PlannerStateStore : ObservableObject
 {
     private const int MonthGridCellCount = 42;
     private const int EditorDefaultDurationMinutes = 15;
-    private const double WeekTimelineHourHeightValue = 40;
-    private const double WeekTimelineDayWidthValue = 132;
-    private const double WeekTimelineAnyTimeLaneHeightValue = 64;
-    private const double WeekTaskHorizontalPaddingValue = 4;
-    private const double WeekTaskColumnGapValue = 4;
-    private const int WeekTaskDefaultDurationMinutes = 45;
-    private const double WeekTaskMinimumHeightValue = 28;
 
     private readonly CreateTaskUseCase _createTaskUseCase;
     private readonly DeleteTaskUseCase _deleteTaskUseCase;
@@ -51,7 +44,7 @@ public sealed class PlannerStateStore : ObservableObject
     private bool _editorHasTime;
     private bool _editorHasDuration;
     private TimeSpan _editorTime = new(9, 0, 0);
-    private double _editorDurationMinutes = WeekTaskDefaultDurationMinutes;
+    private double _editorDurationMinutes = PlannerWeekTimelineLayout.DefaultTaskDurationMinutes;
     private DateTimeOffset _editorDate = DateTimeOffset.Now;
     private double _currentTimeIndicatorTop;
 
@@ -155,15 +148,15 @@ public sealed class PlannerStateStore : ObservableObject
 
     public string QuickAddTargetText => SelectedDateText;
 
-    public double WeekTimelineHeight => WeekTimelineAnyTimeLaneHeightValue + WeekTimelineTimedHeight;
+    public double WeekTimelineHeight => PlannerWeekTimelineLayout.AnyTimeLaneHeight + WeekTimelineTimedHeight;
 
-    public double WeekTimelineTimedHeight => WeekTimelineHours.Count * WeekTimelineHourHeightValue;
+    public double WeekTimelineTimedHeight => WeekTimelineHours.Count * PlannerWeekTimelineLayout.HourHeight;
 
-    public double WeekTimelineHourHeight => WeekTimelineHourHeightValue;
+    public double WeekTimelineHourHeight => PlannerWeekTimelineLayout.HourHeight;
 
-    public double WeekTimelineDayWidth => WeekTimelineDayWidthValue;
+    public double WeekTimelineDayWidth => PlannerWeekTimelineLayout.DayWidth;
 
-    public double WeekTimelineAnyTimeLaneHeight => WeekTimelineAnyTimeLaneHeightValue;
+    public double WeekTimelineAnyTimeLaneHeight => PlannerWeekTimelineLayout.AnyTimeLaneHeight;
 
     public double CurrentTimeIndicatorTop
     {
@@ -177,7 +170,7 @@ public sealed class PlannerStateStore : ObservableObject
         }
     }
 
-    public double CurrentWeekTimeIndicatorTop => WeekTimelineAnyTimeLaneHeightValue + CurrentTimeIndicatorTop;
+    public double CurrentWeekTimeIndicatorTop => PlannerWeekTimelineLayout.AnyTimeLaneHeight + CurrentTimeIndicatorTop;
 
     public Visibility CurrentWeekTimeIndicatorVisibility =>
         GetWeekStart(_selectedDate) == GetWeekStart(DateOnly.FromDateTime(DateTime.Today))
@@ -407,7 +400,7 @@ public sealed class PlannerStateStore : ObservableObject
 
     public void RefreshCurrentTimeIndicator()
     {
-        double top = (TimeOnly.FromDateTime(DateTime.Now).ToTimeSpan().TotalMinutes / 60d) * WeekTimelineHourHeightValue;
+        double top = (TimeOnly.FromDateTime(DateTime.Now).ToTimeSpan().TotalMinutes / 60d) * PlannerWeekTimelineLayout.HourHeight;
         CurrentTimeIndicatorTop = Math.Clamp(top, 0d, Math.Max(0d, WeekTimelineTimedHeight - 2d));
         OnPropertyChanged(nameof(CurrentWeekTimeIndicatorVisibility));
     }
@@ -722,7 +715,7 @@ public sealed class PlannerStateStore : ObservableObject
                 .Where(task => !task.HasTime)
                 .ToList();
 
-            List<PlannerWeekTaskBlockViewModel> timedTaskBlocks = BuildWeekTimedTaskBlocks(tasksForDay);
+            List<PlannerWeekTaskBlockViewModel> timedTaskBlocks = PlannerWeekTimelineLayout.BuildTimedTaskBlocks(tasksForDay);
 
             WeekTimelineDays.Add(new PlannerWeekDayTimelineViewModel(
                 date,
@@ -731,105 +724,6 @@ public sealed class PlannerStateStore : ObservableObject
                 date == today,
                 date == _selectedDate));
         }
-    }
-
-    private static int GetTaskStartMinutes(PlannerTaskViewModel task)
-    {
-        TimeSpan time = task.Time!.Value.ToTimeSpan();
-        return (time.Hours * 60) + time.Minutes;
-    }
-
-    private static int GetTaskEndMinutes(PlannerTaskViewModel task)
-    {
-        int durationMinutes = task.DurationMinutes ?? WeekTaskDefaultDurationMinutes;
-        return Math.Min(24 * 60, GetTaskStartMinutes(task) + durationMinutes);
-    }
-
-    private static List<List<WeekTaskLayoutItem>> BuildWeekTaskGroups(List<WeekTaskLayoutItem> items)
-    {
-        List<List<WeekTaskLayoutItem>> groups = [];
-
-        foreach (WeekTaskLayoutItem item in items)
-        {
-            if (groups.Count == 0)
-            {
-                groups.Add([item]);
-                continue;
-            }
-
-            List<WeekTaskLayoutItem> currentGroup = groups[^1];
-            int currentGroupEnd = currentGroup.Max(current => current.EndMinutes);
-
-            if (item.StartMinutes < currentGroupEnd)
-            {
-                currentGroup.Add(item);
-                continue;
-            }
-
-            groups.Add([item]);
-        }
-
-        return groups;
-    }
-
-    private static void AssignWeekTaskColumns(List<WeekTaskLayoutItem> group)
-    {
-        List<WeekTaskLayoutItem> activeItems = [];
-        int totalColumns = 1;
-
-        foreach (WeekTaskLayoutItem item in group.OrderBy(current => current.StartMinutes))
-        {
-            activeItems.RemoveAll(current => current.EndMinutes <= item.StartMinutes);
-
-            int column = 0;
-            while (activeItems.Any(current => current.Column == column))
-                column++;
-
-            item.Column = column;
-            activeItems.Add(item);
-            totalColumns = Math.Max(totalColumns, activeItems.Max(current => current.Column) + 1);
-        }
-
-        foreach (WeekTaskLayoutItem item in group)
-            item.TotalColumns = totalColumns;
-    }
-
-    private static PlannerWeekTaskBlockViewModel CreateWeekTaskBlock(WeekTaskLayoutItem item)
-    {
-        double usableWidth = WeekTimelineDayWidthValue - (WeekTaskHorizontalPaddingValue * 2);
-        double width = (usableWidth - ((item.TotalColumns - 1) * WeekTaskColumnGapValue)) / item.TotalColumns;
-        double clampedWidth = Math.Max(32, width);
-        double top = (item.StartMinutes / 60d) * WeekTimelineHourHeightValue;
-        double height = Math.Max(
-            WeekTaskMinimumHeightValue,
-            ((item.EndMinutes - item.StartMinutes) / 60d) * WeekTimelineHourHeightValue);
-
-        return new PlannerWeekTaskBlockViewModel(
-            item.Task,
-            top,
-            WeekTaskHorizontalPaddingValue + (item.Column * (clampedWidth + WeekTaskColumnGapValue)),
-            clampedWidth,
-            height);
-    }
-
-    private static List<PlannerWeekTaskBlockViewModel> BuildWeekTimedTaskBlocks(IEnumerable<PlannerTaskViewModel> tasks)
-    {
-        List<WeekTaskLayoutItem> items = tasks
-            .Where(task => task.HasTime)
-            .OrderBy(task => task.Time)
-            .ThenBy(task => task.Title)
-            .Select(task => new WeekTaskLayoutItem(task, GetTaskStartMinutes(task), GetTaskEndMinutes(task)))
-            .ToList();
-
-        if (items.Count == 0)
-            return [];
-
-        foreach (List<WeekTaskLayoutItem> group in BuildWeekTaskGroups(items))
-            AssignWeekTaskColumns(group);
-
-        return items
-            .Select(CreateWeekTaskBlock)
-            .ToList();
     }
 
     private void UpdateSummaries(DateOnly weekStart, DateOnly weekEnd)
@@ -960,26 +854,6 @@ public sealed class PlannerStateStore : ObservableObject
     private static double GetMaxDurationMinutes(TimeOnly time)
     {
         return (24 * 60) - time.ToTimeSpan().TotalMinutes;
-    }
-
-    private sealed class WeekTaskLayoutItem
-    {
-        public WeekTaskLayoutItem(PlannerTaskViewModel task, int startMinutes, int endMinutes)
-        {
-            Task = task;
-            StartMinutes = startMinutes;
-            EndMinutes = endMinutes;
-        }
-
-        public PlannerTaskViewModel Task { get; }
-
-        public int StartMinutes { get; }
-
-        public int EndMinutes { get; }
-
-        public int Column { get; set; }
-
-        public int TotalColumns { get; set; } = 1;
     }
 
     private static DateOnly GetMonthGridStart(DateOnly monthStart)

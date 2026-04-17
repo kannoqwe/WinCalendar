@@ -21,6 +21,8 @@ internal sealed class SqliteConnection : IDisposable
 
             SqliteException.ThrowIfError(result, failedHandle, "Opening database");
         }
+
+        ConfigureConnection();
     }
 
     public nint Handle => _handle;
@@ -35,6 +37,18 @@ internal sealed class SqliteConnection : IDisposable
     {
         using SqliteStatement statement = Prepare(sql);
         statement.ExecuteNonQuery();
+    }
+
+    public void ExecuteToCompletion(string sql)
+    {
+        using SqliteStatement statement = Prepare(sql);
+        statement.ExecuteToCompletion();
+    }
+
+    private void ConfigureConnection()
+    {
+        ExecuteToCompletion("PRAGMA busy_timeout = 5000;");
+        ExecuteToCompletion("PRAGMA foreign_keys = ON;");
     }
 
     public void Dispose()

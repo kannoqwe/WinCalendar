@@ -5,6 +5,7 @@ namespace Planner.App.Modules.Tasks.Infrastructure.Sqlite;
 
 public sealed class TaskDatabaseInitializer
 {
+    private const int CurrentSchemaVersion = 1;
     private readonly string _databasePath;
 
     public TaskDatabaseInitializer(string databasePath)
@@ -20,6 +21,7 @@ public sealed class TaskDatabaseInitializer
             Directory.CreateDirectory(directoryPath);
 
         using SqliteConnection connection = new(_databasePath);
+        connection.ExecuteToCompletion("PRAGMA journal_mode = WAL;");
 
         connection.ExecuteNonQuery(
             """
@@ -51,6 +53,14 @@ public sealed class TaskDatabaseInitializer
             CREATE INDEX IF NOT EXISTS idx_tasks_task_date
             ON tasks(task_date);
             """);
+
+        connection.ExecuteNonQuery(
+            """
+            CREATE INDEX IF NOT EXISTS idx_tasks_task_date_task_time_created_at
+            ON tasks(task_date, task_time, created_at_utc);
+            """);
+
+        connection.ExecuteToCompletion($"PRAGMA user_version = {CurrentSchemaVersion};");
     }
 
     private static void EnsureColumn(SqliteConnection connection, string columnName, string alterSql)

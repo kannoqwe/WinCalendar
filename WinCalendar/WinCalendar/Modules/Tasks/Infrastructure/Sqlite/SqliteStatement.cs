@@ -77,6 +77,22 @@ internal sealed class SqliteStatement : IDisposable
         SqliteException.ThrowIfError(result, _connection.Handle, "Executing statement");
     }
 
+    public void ExecuteToCompletion()
+    {
+        while (true)
+        {
+            int result = SqliteNative.sqlite3_step(_handle);
+
+            if (result == SqliteNative.Done)
+                return;
+
+            if (result == SqliteNative.Row)
+                continue;
+
+            SqliteException.ThrowIfError(result, _connection.Handle, "Executing statement");
+        }
+    }
+
     public bool Read()
     {
         int result = SqliteNative.sqlite3_step(_handle);

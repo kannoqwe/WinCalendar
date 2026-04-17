@@ -32,6 +32,7 @@ public sealed class PlannerStateStore : ObservableObject
     private readonly Dictionary<DateOnly, bool> _agendaState = [];
 
     private bool _isInitialized;
+    private Task? _initializationTask;
     private bool _isCompactSidebarOpen;
     private TaskEditorMode _taskEditorMode;
     private DateOnly _selectedDate;
@@ -378,15 +379,30 @@ public sealed class PlannerStateStore : ObservableObject
             ? GetMaxDurationMinutes(TimeOnly.FromTimeSpan(EditorTime))
             : 24 * 60;
 
-    public async Task EnsureInitializedAsync()
+    public Task EnsureInitializedAsync()
     {
         if (_isInitialized)
-            return;
+            return Task.CompletedTask;
 
-        _isInitialized = true;
-        bool didAutoCompleteTasks = await AutoCompleteElapsedTimedTasksAsync();
-        if (!didAutoCompleteTasks)
-            await ReloadAsync();
+        _initializationTask ??= InitializeAsync();
+        return _initializationTask;
+    }
+
+    private async Task InitializeAsync()
+    {
+        try
+        {
+            bool didAutoCompleteTasks = await AutoCompleteElapsedTimedTasksAsync();
+            if (!didAutoCompleteTasks)
+                await ReloadAsync();
+
+            _isInitialized = true;
+        }
+        catch
+        {
+            _initializationTask = null;
+            throw;
+        }
     }
 
     public void RefreshCurrentTimeIndicator()

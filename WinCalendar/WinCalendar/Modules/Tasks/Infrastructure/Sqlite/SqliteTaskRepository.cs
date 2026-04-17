@@ -77,7 +77,11 @@ public sealed class SqliteTaskRepository : ITaskRepository
                     task_date < ?
                     OR (
                         task_date = ?
-                        AND time(task_time, '+' || duration_minutes || ' minutes') <= ?
+                        AND (
+                            (CAST(strftime('%H', task_time) AS INTEGER) * 60)
+                            + CAST(strftime('%M', task_time) AS INTEGER)
+                            + duration_minutes
+                        ) <= ?
                     )
                 )
             ORDER BY
@@ -89,7 +93,7 @@ public sealed class SqliteTaskRepository : ITaskRepository
         string targetDate = FormatDate(date);
         statement.BindText(1, targetDate);
         statement.BindText(2, targetDate);
-        statement.BindText(3, FormatTime(time) ?? "00:00:00");
+        statement.BindInt(3, GetMinutesSinceStartOfDay(time));
 
         while (statement.Read())
             tasks.Add(Map(statement));
@@ -252,6 +256,11 @@ public sealed class SqliteTaskRepository : ITaskRepository
             return null;
 
         return TimeOnly.ParseExact(value, TimeFormat, CultureInfo.InvariantCulture);
+    }
+
+    private static int GetMinutesSinceStartOfDay(TimeOnly value)
+    {
+        return (int)value.ToTimeSpan().TotalMinutes;
     }
 
     private static string FormatTimestamp(DateTime value)

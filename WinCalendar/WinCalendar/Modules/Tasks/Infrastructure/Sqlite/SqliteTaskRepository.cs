@@ -51,6 +51,41 @@ public sealed class SqliteTaskRepository : ITaskRepository
         return Task.FromResult<IReadOnlyList<TaskItem>>(tasks);
     }
 
+    public Task<IReadOnlyList<TaskItem>> GetByDateRangeAsync(DateOnly startDate, DateOnly endDate)
+    {
+        List<TaskItem> tasks = [];
+
+        using SqliteConnection connection = OpenConnection();
+        using SqliteStatement statement = connection.Prepare(
+            """
+            SELECT
+                id,
+                title,
+                description,
+                task_date,
+                task_time,
+                duration_minutes,
+                is_completed,
+                created_at_utc,
+                updated_at_utc
+            FROM tasks
+            WHERE task_date BETWEEN ? AND ?
+            ORDER BY
+                task_date,
+                CASE WHEN task_time IS NULL THEN 1 ELSE 0 END,
+                task_time,
+                created_at_utc;
+            """);
+
+        statement.BindText(1, FormatDate(startDate));
+        statement.BindText(2, FormatDate(endDate));
+
+        while (statement.Read())
+            tasks.Add(Map(statement));
+
+        return Task.FromResult<IReadOnlyList<TaskItem>>(tasks);
+    }
+
     public Task<IReadOnlyList<TaskItem>> GetIncompleteTimedTasksDueBeforeAsync(DateOnly date, TimeOnly time)
     {
         List<TaskItem> tasks = [];

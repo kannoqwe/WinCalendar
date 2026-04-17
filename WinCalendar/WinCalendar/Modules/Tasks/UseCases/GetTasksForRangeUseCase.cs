@@ -15,21 +15,11 @@ public sealed class GetTasksForRangeUseCase
         _taskRepository = taskRepository;
     }
 
-    public async Task<IReadOnlyList<TaskItem>> ExecuteAsync(DateOnly startDate, DateOnly endDate)
+    public Task<IReadOnlyList<TaskItem>> ExecuteAsync(DateOnly startDate, DateOnly endDate)
     {
         if (endDate < startDate)
             throw new ArgumentException("End date must be greater than or equal to start date.");
 
-        List<TaskItem> tasks = [];
-
-        for (DateOnly date = startDate; date <= endDate; date = date.AddDays(1))
-        {
-            IReadOnlyList<TaskItem> tasksForDay = await _taskRepository.GetByDateAsync(date);
-
-            foreach (TaskItem task in tasksForDay)
-                tasks.Add(task);
-        }
-
-        return tasks;
+        return _taskRepository.GetByDateRangeAsync(startDate, endDate);
     }
 }

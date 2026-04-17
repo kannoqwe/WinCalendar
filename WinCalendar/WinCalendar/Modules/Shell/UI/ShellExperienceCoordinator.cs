@@ -37,7 +37,7 @@ public sealed class ShellExperienceCoordinator : IDisposable
             _taskbarCornerButtonHost = new TaskbarCornerButtonHost(
                 dispatcherQueue,
                 _clock,
-                _plannerWindowCoordinator.ShowFullApp);
+                _plannerWindowCoordinator.ToggleCompactPanel);
         }
     }
 

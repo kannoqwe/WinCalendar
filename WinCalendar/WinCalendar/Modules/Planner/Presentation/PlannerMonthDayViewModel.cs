@@ -39,6 +39,8 @@ public sealed class PlannerMonthDayViewModel : ObservableObject
 
     public bool IsToday { get; }
 
+    public bool HasTasks => _hasTasks;
+
     public string DayNumberText => Date.Day.ToString();
 
     public string DayButtonText => Date.Day.ToString();

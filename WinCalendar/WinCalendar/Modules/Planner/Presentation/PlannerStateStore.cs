@@ -90,6 +90,8 @@ public sealed class PlannerStateStore : ObservableObject
 
     public ObservableCollection<PlannerEditorDurationOptionViewModel> EditorDurationOptions => _taskEditor.EditorDurationOptions;
 
+    public DateOnly Today => _clock.Today;
+
     public DateOnly SelectedDate => _selectedDate;
 
     public string SelectedDateText
@@ -353,6 +355,11 @@ public sealed class PlannerStateStore : ObservableObject
     public Task GoToTodayAsync()
     {
         return SelectDateAsync(_clock.Today);
+    }
+
+    public bool HasTasksOn(DateOnly date)
+    {
+        return MonthDays.Any(day => day.Date == date && day.HasTasks);
     }
 
     public async Task SelectDateAsync(DateOnly date)

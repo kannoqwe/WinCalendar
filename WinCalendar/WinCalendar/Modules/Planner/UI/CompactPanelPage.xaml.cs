@@ -4,20 +4,17 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using WinCalendar.Modules.Planner.Presentation;
-using WinCalendar.Shared.Windowing;
 
 namespace WinCalendar.Modules.Planner.UI;
 
 public sealed partial class CompactPanelPage : Page
 {
     private readonly PlannerStateStore _plannerStateStore;
-    private readonly PlannerWindowCoordinator _windowCoordinator;
     private bool _initialized;
 
-    public CompactPanelPage(PlannerStateStore plannerStateStore, PlannerWindowCoordinator windowCoordinator)
+    public CompactPanelPage(PlannerStateStore plannerStateStore)
     {
         _plannerStateStore = plannerStateStore;
-        _windowCoordinator = windowCoordinator;
         InitializeComponent();
         DataContext = _plannerStateStore;
     }
@@ -29,21 +26,6 @@ public sealed partial class CompactPanelPage : Page
 
         _initialized = true;
         await _plannerStateStore.EnsureInitializedAsync();
-    }
-
-    private void ToggleSidebarButton_Click(object sender, RoutedEventArgs e)
-    {
-        _windowCoordinator.ToggleCompactSidebar();
-    }
-
-    private async void PreviousMonthButton_Click(object sender, RoutedEventArgs e)
-    {
-        await _plannerStateStore.BrowsePreviousMonthAsync();
-    }
-
-    private async void NextMonthButton_Click(object sender, RoutedEventArgs e)
-    {
-        await _plannerStateStore.BrowseNextMonthAsync();
     }
 
     private async void MonthDayButton_Click(object sender, RoutedEventArgs e)
@@ -65,11 +47,33 @@ public sealed partial class CompactPanelPage : Page
 
     private async void AddTaskButton_Click(object sender, RoutedEventArgs e)
     {
-        await TaskComposerDialogService.ShowAddTaskAsync(XamlRoot, _plannerStateStore, _plannerStateStore.SelectedDate);
+        await TaskComposerDialogService.ShowAddTaskAsync(XamlRoot, _plannerStateStore, _plannerStateStore.Today);
     }
 
-    private void OpenFullButton_Click(object sender, RoutedEventArgs e)
+    private async void CompactTaskCompletionCheckBox_Click(object sender, RoutedEventArgs e)
     {
-        _windowCoordinator.ShowFullApp();
+        if (sender is not CheckBox { DataContext: PlannerTaskViewModel task } checkBox)
+            return;
+
+        checkBox.IsEnabled = false;
+
+        try
+        {
+            await _plannerStateStore.ToggleTaskCompletionAsync(task.Id, checkBox.IsChecked == true);
+        }
+        finally
+        {
+            checkBox.IsEnabled = true;
+        }
+    }
+
+    private void PreviousTaskPageButton_Click(object sender, RoutedEventArgs e)
+    {
+        _plannerStateStore.GoToPreviousCompactTaskPage();
+    }
+
+    private void NextTaskPageButton_Click(object sender, RoutedEventArgs e)
+    {
+        _plannerStateStore.GoToNextCompactTaskPage();
     }
 }

@@ -51,9 +51,17 @@ public sealed class PlannerMonthDayViewModel : ObservableObject
 
     public Visibility TodayVisibility => IsToday ? Visibility.Visible : Visibility.Collapsed;
 
+    public Visibility CompactSelectedCircleVisibility => _isSelected ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility CompactTodayRingVisibility => IsToday ? Visibility.Visible : Visibility.Collapsed;
+
     public Visibility CompactTodayNumberVisibility => IsToday ? Visibility.Visible : Visibility.Collapsed;
 
     public Visibility CompactNormalNumberVisibility => IsToday ? Visibility.Collapsed : Visibility.Visible;
+
+    public Visibility CompactSelectedNumberVisibility => _isSelected ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility CompactUnselectedNumberVisibility => _isSelected ? Visibility.Collapsed : Visibility.Visible;
 
     public Visibility SelectionVisibility => _isSelected ? Visibility.Visible : Visibility.Collapsed;
 
@@ -72,6 +80,9 @@ public sealed class PlannerMonthDayViewModel : ObservableObject
 
             OnPropertyChanged(nameof(SelectionVisibility));
             OnPropertyChanged(nameof(CompactSelectionVisibility));
+            OnPropertyChanged(nameof(CompactSelectedCircleVisibility));
+            OnPropertyChanged(nameof(CompactSelectedNumberVisibility));
+            OnPropertyChanged(nameof(CompactUnselectedNumberVisibility));
         }
     }
 }

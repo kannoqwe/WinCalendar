@@ -1,14 +1,15 @@
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using WinCalendar.Modules.Planner.Presentation;
-using WinCalendar.Shared.Windowing;
 
 namespace WinCalendar.Modules.Planner.UI;
 
 public sealed class CompactPanelWindow : Window
 {
-    public CompactPanelWindow(PlannerStateStore plannerStateStore, PlannerWindowCoordinator windowCoordinator)
+    public CompactPanelWindow(PlannerStateStore plannerStateStore)
     {
         Title = "Planner Compact";
-        Content = new CompactPanelPage(plannerStateStore, windowCoordinator);
+        SystemBackdrop = new DesktopAcrylicBackdrop();
+        Content = new CompactPanelPage(plannerStateStore);
     }
 }

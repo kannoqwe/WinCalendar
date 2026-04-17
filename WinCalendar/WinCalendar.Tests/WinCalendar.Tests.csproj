@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Platforms>x86;x64;ARM64</Platforms>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\WinCalendar\Core\Time\IClock.cs" Link="Production\Core\Time\IClock.cs" />
+    <Compile Include="..\WinCalendar\Modules\Tasks\Contracts\ITaskRepository.cs" Link="Production\Modules\Tasks\Contracts\ITaskRepository.cs" />
+    <Compile Include="..\WinCalendar\Modules\Tasks\Entites\TaskItem.cs" Link="Production\Modules\Tasks\Entites\TaskItem.cs" />
+    <Compile Include="..\WinCalendar\Modules\Tasks\UseCases\CreateTaskUseCase.cs" Link="Production\Modules\Tasks\UseCases\CreateTaskUseCase.cs" />
+    <Compile Include="..\WinCalendar\Modules\Tasks\UseCases\SetTaskCompletionStatusUseCase.cs" Link="Production\Modules\Tasks\UseCases\SetTaskCompletionStatusUseCase.cs" />
+  </ItemGroup>
+</Project>

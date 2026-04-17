@@ -2,6 +2,7 @@ using System;
 using Planner.App.Modules.Tasks.Contracts;
 using Planner.App.Modules.Tasks.Infrastructure.Sqlite;
 using Planner.App.Modules.Tasks.UseCases;
+using WinCalendar.Core.Time;
 using WinCalendar.Modules.Shell.UI;
 using WinCalendar.Modules.Planner.Presentation;
 using WinCalendar.Shared.Windowing;
@@ -21,16 +22,18 @@ public sealed class AppBootstrapper
         TaskDatabaseInitializer databaseInitializer = new(databasePath);
         databaseInitializer.Initialize();
 
+        IClock clock = new SystemClock();
         ITaskRepository taskRepository = new SqliteTaskRepository(databasePath);
 
-        CreateTaskUseCase createTaskUseCase = new(taskRepository);
+        CreateTaskUseCase createTaskUseCase = new(taskRepository, clock);
         GetTasksForRangeUseCase getTasksForRangeUseCase = new(taskRepository);
-        AutoCompleteElapsedTimedTasksUseCase autoCompleteElapsedTimedTasksUseCase = new(taskRepository);
-        SetTaskCompletionStatusUseCase setTaskCompletionStatusUseCase = new(taskRepository);
+        AutoCompleteElapsedTimedTasksUseCase autoCompleteElapsedTimedTasksUseCase = new(taskRepository, clock);
+        SetTaskCompletionStatusUseCase setTaskCompletionStatusUseCase = new(taskRepository, clock);
         DeleteTaskUseCase deleteTaskUseCase = new(taskRepository);
-        UpdateTaskUseCase updateTaskUseCase = new(taskRepository);
+        UpdateTaskUseCase updateTaskUseCase = new(taskRepository, clock);
 
         _plannerStateStore = new(
+            clock,
             createTaskUseCase,
             getTasksForRangeUseCase,
             autoCompleteElapsedTimedTasksUseCase,

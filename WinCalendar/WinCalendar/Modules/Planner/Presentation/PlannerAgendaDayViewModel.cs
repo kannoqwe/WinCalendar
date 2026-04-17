@@ -9,14 +9,17 @@ namespace WinCalendar.Modules.Planner.Presentation;
 
 public sealed class PlannerAgendaDayViewModel : ObservableObject
 {
+    private readonly DateOnly _today;
     private bool _isExpanded;
 
     public PlannerAgendaDayViewModel(
         DateOnly date,
         IEnumerable<PlannerTaskViewModel> tasks,
+        DateOnly today,
         bool isExpanded)
     {
         Date = date;
+        _today = today;
         _isExpanded = isExpanded;
         Tasks = [];
 
@@ -30,7 +33,7 @@ public sealed class PlannerAgendaDayViewModel : ObservableObject
 
     public string HeaderText => PlannerDateTimeFormatter.FormatShortDay(Date);
 
-    public string CompactHeaderLabel => PlannerDateTimeFormatter.FormatAgendaHeader(Date);
+    public string CompactHeaderLabel => PlannerDateTimeFormatter.FormatAgendaHeader(Date, _today);
 
     public string CompactHeaderDetails => $"{HeaderText} - {SummaryText}";
 

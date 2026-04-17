@@ -29,12 +29,18 @@ public class TaskItem
         Title = string.Empty;
     }
 
-    public TaskItem(string title, DateOnly date, TimeOnly? time = null, int? durationMinutes = null, string? description = null)
+    public TaskItem(
+        string title,
+        DateOnly date,
+        DateTime createdAtUtc,
+        TimeOnly? time = null,
+        int? durationMinutes = null,
+        string? description = null)
     {
         Id = Guid.NewGuid();
         IsCompleted = false;
-        CreatedAt = DateTime.UtcNow;
-        UpdatedAt = DateTime.UtcNow;
+        CreatedAt = NormalizeUtc(createdAtUtc);
+        UpdatedAt = CreatedAt;
 
         ApplyDetails(title, date, time, durationMinutes, description);
     }
@@ -52,8 +58,8 @@ public class TaskItem
     {
         Id = id;
         IsCompleted = isCompleted;
-        CreatedAt = createdAt;
-        UpdatedAt = updatedAt;
+        CreatedAt = NormalizeUtc(createdAt);
+        UpdatedAt = NormalizeUtc(updatedAt);
 
         ApplyDetails(title, date, time, durationMinutes, description);
     }
@@ -72,22 +78,28 @@ public class TaskItem
         return new TaskItem(id, title, date, time, durationMinutes, description, isCompleted, createdAt, updatedAt);
     }
 
-    public void Update(string title, DateOnly date, TimeOnly? time, int? durationMinutes, string? description = null)
+    public void Update(
+        string title,
+        DateOnly date,
+        TimeOnly? time,
+        int? durationMinutes,
+        DateTime updatedAtUtc,
+        string? description = null)
     {
         ApplyDetails(title, date, time, durationMinutes, description);
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = NormalizeUtc(updatedAtUtc);
     }
 
-    public void Complete()
+    public void Complete(DateTime updatedAtUtc)
     {
         IsCompleted = true;
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = NormalizeUtc(updatedAtUtc);
     }
 
-    public void Uncomplete()
+    public void Uncomplete(DateTime updatedAtUtc)
     {
         IsCompleted = false;
-        UpdatedAt = DateTime.UtcNow;
+        UpdatedAt = NormalizeUtc(updatedAtUtc);
     }
 
     private void ApplyDetails(string title, DateOnly date, TimeOnly? time, int? durationMinutes, string? description)
@@ -133,5 +145,15 @@ public class TaskItem
     private static int GetMaxDurationMinutes(TimeOnly time)
     {
         return (24 * 60) - (int)time.ToTimeSpan().TotalMinutes;
+    }
+
+    private static DateTime NormalizeUtc(DateTime value)
+    {
+        return value.Kind switch
+        {
+            DateTimeKind.Utc => value,
+            DateTimeKind.Local => value.ToUniversalTime(),
+            _ => DateTime.SpecifyKind(value, DateTimeKind.Utc)
+        };
     }
 }

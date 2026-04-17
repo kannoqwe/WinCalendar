@@ -22,6 +22,7 @@ public sealed class PlannerStateStore : ObservableObject
     private readonly AutoCompleteElapsedTimedTasksUseCase _autoCompleteElapsedTimedTasksUseCase;
     private readonly SetTaskCompletionStatusUseCase _setTaskCompletionStatusUseCase;
     private readonly UpdateTaskUseCase _updateTaskUseCase;
+    private readonly IClock _clock;
     private readonly Dictionary<DateOnly, bool> _agendaState = [];
 
     private bool _isInitialized;
@@ -45,10 +46,11 @@ public sealed class PlannerStateStore : ObservableObject
     private bool _editorHasDuration;
     private TimeSpan _editorTime = new(9, 0, 0);
     private double _editorDurationMinutes = PlannerWeekTimelineLayout.DefaultTaskDurationMinutes;
-    private DateTimeOffset _editorDate = DateTimeOffset.Now;
+    private DateTimeOffset _editorDate;
     private double _currentTimeIndicatorTop;
 
     public PlannerStateStore(
+        IClock clock,
         CreateTaskUseCase createTaskUseCase,
         GetTasksForRangeUseCase getTasksForRangeUseCase,
         AutoCompleteElapsedTimedTasksUseCase autoCompleteElapsedTimedTasksUseCase,
@@ -56,6 +58,7 @@ public sealed class PlannerStateStore : ObservableObject
         DeleteTaskUseCase deleteTaskUseCase,
         UpdateTaskUseCase updateTaskUseCase)
     {
+        _clock = clock;
         _createTaskUseCase = createTaskUseCase;
         _getTasksForRangeUseCase = getTasksForRangeUseCase;
         _autoCompleteElapsedTimedTasksUseCase = autoCompleteElapsedTimedTasksUseCase;
@@ -63,7 +66,7 @@ public sealed class PlannerStateStore : ObservableObject
         _deleteTaskUseCase = deleteTaskUseCase;
         _updateTaskUseCase = updateTaskUseCase;
 
-        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+        DateOnly today = _clock.Today;
         _selectedDate = today;
         _displayMonth = new DateOnly(today.Year, today.Month, 1);
         _editorDate = new DateTimeOffset(today.ToDateTime(TimeOnly.MinValue));
@@ -173,7 +176,7 @@ public sealed class PlannerStateStore : ObservableObject
     public double CurrentWeekTimeIndicatorTop => PlannerWeekTimelineLayout.AnyTimeLaneHeight + CurrentTimeIndicatorTop;
 
     public Visibility CurrentWeekTimeIndicatorVisibility =>
-        GetWeekStart(_selectedDate) == GetWeekStart(DateOnly.FromDateTime(DateTime.Today))
+        GetWeekStart(_selectedDate) == GetWeekStart(_clock.Today)
             ? Visibility.Visible
             : Visibility.Collapsed;
 
@@ -400,7 +403,7 @@ public sealed class PlannerStateStore : ObservableObject
 
     public void RefreshCurrentTimeIndicator()
     {
-        double top = (TimeOnly.FromDateTime(DateTime.Now).ToTimeSpan().TotalMinutes / 60d) * PlannerWeekTimelineLayout.HourHeight;
+        double top = (_clock.TimeOfDay.ToTimeSpan().TotalMinutes / 60d) * PlannerWeekTimelineLayout.HourHeight;
         CurrentTimeIndicatorTop = Math.Clamp(top, 0d, Math.Max(0d, WeekTimelineTimedHeight - 2d));
         OnPropertyChanged(nameof(CurrentWeekTimeIndicatorVisibility));
     }
@@ -451,7 +454,7 @@ public sealed class PlannerStateStore : ObservableObject
 
     public Task GoToTodayAsync()
     {
-        return SelectDateAsync(DateOnly.FromDateTime(DateTime.Today));
+        return SelectDateAsync(_clock.Today);
     }
 
     public async Task SelectDateAsync(DateOnly date)
@@ -506,7 +509,7 @@ public sealed class PlannerStateStore : ObservableObject
 
     public async Task<bool> AutoCompleteElapsedTimedTasksAsync()
     {
-        bool didCompleteTasks = await _autoCompleteElapsedTimedTasksUseCase.ExecuteAsync(DateTime.Now);
+        bool didCompleteTasks = await _autoCompleteElapsedTimedTasksUseCase.ExecuteAsync(_clock.Now);
         if (!didCompleteTasks)
             return false;
 
@@ -599,7 +602,7 @@ public sealed class PlannerStateStore : ObservableObject
 
     private async Task ReloadAsync()
     {
-        DateOnly today = DateOnly.FromDateTime(DateTime.Today);
+        DateOnly today = _clock.Today;
         DateOnly monthGridStart = GetMonthGridStart(_displayMonth);
         DateOnly monthGridEnd = monthGridStart.AddDays(MonthGridCellCount - 1);
         DateOnly selectedWeekStart = GetWeekStart(_selectedDate);
@@ -618,10 +621,10 @@ public sealed class PlannerStateStore : ObservableObject
                 group => group.Key,
                 group => group.Select(task => new PlannerTaskViewModel(task)).ToList());
 
-        BuildMonth(taskLookup);
+        BuildMonth(taskLookup, today);
         BuildSelectedDay(taskLookup);
         BuildToday(taskLookup, today);
-        BuildWeekAgenda(taskLookup, today, todayWeekEnd);
+        BuildWeekAgenda(taskLookup, today, today, todayWeekEnd);
         BuildWeekTimeline(taskLookup, selectedWeekStart, selectedWeekEnd, today);
         RefreshCurrentTimeIndicator();
         OnPropertyChanged(nameof(CurrentWeekTimeIndicatorVisibility));
@@ -629,7 +632,7 @@ public sealed class PlannerStateStore : ObservableObject
         ReselectTask();
     }
 
-    private void BuildMonth(IReadOnlyDictionary<DateOnly, List<PlannerTaskViewModel>> taskLookup)
+    private void BuildMonth(IReadOnlyDictionary<DateOnly, List<PlannerTaskViewModel>> taskLookup, DateOnly today)
     {
         MonthDays.Clear();
         DateOnly gridStart = GetMonthGridStart(_displayMonth);
@@ -644,7 +647,7 @@ public sealed class PlannerStateStore : ObservableObject
             MonthDays.Add(new PlannerMonthDayViewModel(
                 date,
                 date.Month == _displayMonth.Month,
-                date == DateOnly.FromDateTime(DateTime.Today),
+                date == today,
                 date == _selectedDate,
                 hasTasks,
                 allCompleted));
@@ -675,6 +678,7 @@ public sealed class PlannerStateStore : ObservableObject
 
     private void BuildWeekAgenda(
         IReadOnlyDictionary<DateOnly, List<PlannerTaskViewModel>> taskLookup,
+        DateOnly today,
         DateOnly startDate,
         DateOnly endDate)
     {
@@ -690,6 +694,7 @@ public sealed class PlannerStateStore : ObservableObject
             WeekAgendaDays.Add(new PlannerAgendaDayViewModel(
                 date,
                 tasksForDay,
+                today,
                 isExpanded));
         }
 

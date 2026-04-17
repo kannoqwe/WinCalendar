@@ -3,16 +3,19 @@ using Planner.App.Modules.Tasks.Entities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using WinCalendar.Core.Time;
 
 namespace Planner.App.Modules.Tasks.UseCases;
 
 public sealed class AutoCompleteElapsedTimedTasksUseCase
 {
     private readonly ITaskRepository _taskRepository;
+    private readonly IClock _clock;
 
-    public AutoCompleteElapsedTimedTasksUseCase(ITaskRepository taskRepository)
+    public AutoCompleteElapsedTimedTasksUseCase(ITaskRepository taskRepository, IClock clock)
     {
         _taskRepository = taskRepository;
+        _clock = clock;
     }
 
     public async Task<bool> ExecuteAsync(DateTime now)
@@ -26,7 +29,7 @@ public sealed class AutoCompleteElapsedTimedTasksUseCase
 
         foreach (TaskItem task in dueTasks)
         {
-            task.Complete();
+            task.Complete(_clock.UtcNow);
             await _taskRepository.UpdateAsync(task);
         }
 

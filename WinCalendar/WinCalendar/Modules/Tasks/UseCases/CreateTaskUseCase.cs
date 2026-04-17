@@ -2,16 +2,19 @@
 using Planner.App.Modules.Tasks.Entities;
 using System;
 using System.Threading.Tasks;
+using WinCalendar.Core.Time;
 
 namespace Planner.App.Modules.Tasks.UseCases;
 
 public sealed class CreateTaskUseCase
 {
     private readonly ITaskRepository _taskRepository;
+    private readonly IClock _clock;
 
-    public CreateTaskUseCase(ITaskRepository taskRepository)
+    public CreateTaskUseCase(ITaskRepository taskRepository, IClock clock)
     {
         _taskRepository = taskRepository;
+        _clock = clock;
     }
 
     public async Task<TaskItem> ExecuteAsync(
@@ -21,7 +24,7 @@ public sealed class CreateTaskUseCase
         int? durationMinutes = null,
         string? description = null)
     {
-        TaskItem task = new TaskItem(title, date, time, durationMinutes, description);
+        TaskItem task = new(title, date, _clock.UtcNow, time, durationMinutes, description);
 
         await _taskRepository.AddAsync(task);
 

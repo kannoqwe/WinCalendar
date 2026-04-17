@@ -2,16 +2,19 @@ using Planner.App.Modules.Tasks.Contracts;
 using Planner.App.Modules.Tasks.Entities;
 using System;
 using System.Threading.Tasks;
+using WinCalendar.Core.Time;
 
 namespace Planner.App.Modules.Tasks.UseCases;
 
 public sealed class SetTaskCompletionStatusUseCase
 {
     private readonly ITaskRepository _taskRepository;
+    private readonly IClock _clock;
 
-    public SetTaskCompletionStatusUseCase(ITaskRepository taskRepository)
+    public SetTaskCompletionStatusUseCase(ITaskRepository taskRepository, IClock clock)
     {
         _taskRepository = taskRepository;
+        _clock = clock;
     }
 
     public async Task ExecuteAsync(Guid id, bool isCompleted)
@@ -23,9 +26,9 @@ public sealed class SetTaskCompletionStatusUseCase
             return;
 
         if (isCompleted)
-            task.Complete();
+            task.Complete(_clock.UtcNow);
         else
-            task.Uncomplete();
+            task.Uncomplete(_clock.UtcNow);
 
         await _taskRepository.UpdateAsync(task);
     }

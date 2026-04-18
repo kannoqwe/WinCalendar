@@ -36,7 +36,7 @@
             <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Foreground" Value="{ThemeResource AppAccentBrush}" />
+            <Setter Property="Foreground" Value="{StaticResource CompactTextBrush}" />
         </Style>
 
         <Style x:Key="CompactDayButtonStyle" TargetType="Button">

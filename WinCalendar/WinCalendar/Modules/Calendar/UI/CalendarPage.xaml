@@ -35,7 +35,7 @@
             <Setter Property="BorderBrush" Value="{ThemeResource AppBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="14" />
-            <Setter Property="Foreground" Value="{ThemeResource AppAccentBrush}" />
+            <Setter Property="Foreground" Value="Black" />
         </Style>
 
         <Style x:Key="TaskIconButtonStyle" TargetType="Button">

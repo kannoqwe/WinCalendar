@@ -179,6 +179,15 @@ public sealed class PlannerStateStore : ObservableObject
     public Visibility EmptyWeekAgendaVisibility =>
         WeekAgendaDays.Any(day => day.Tasks.Count > 0) ? Visibility.Collapsed : Visibility.Visible;
 
+    public Visibility SelectedDayTasksVisibility =>
+        SelectedDayTasks.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+
+    public Visibility EmptySelectedDayTasksVisibility =>
+        SelectedDayTasks.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+
+    public string EmptySelectedDayTasksText =>
+        _selectedDate == _clock.Today ? "No tasks for today" : "No tasks for this day";
+
     public PlannerTaskViewModel? SelectedTask
     {
         get => _selectedTask;
@@ -617,6 +626,9 @@ public sealed class PlannerStateStore : ObservableObject
         SelectedDateSummary = SelectedDayTasks.Count == 0
             ? "No tasks"
             : $"{SelectedDayTasks.Count} task{(SelectedDayTasks.Count == 1 ? string.Empty : "s")}";
+        OnPropertyChanged(nameof(SelectedDayTasksVisibility));
+        OnPropertyChanged(nameof(EmptySelectedDayTasksVisibility));
+        OnPropertyChanged(nameof(EmptySelectedDayTasksText));
 
         MonthLabel = PlannerDateTimeFormatter.FormatMonthTitle(_displayMonth);
         WeekLabel = PlannerDateTimeFormatter.FormatWeekRange(weekStart, weekEnd);

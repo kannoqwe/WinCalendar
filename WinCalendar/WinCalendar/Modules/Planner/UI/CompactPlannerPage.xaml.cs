@@ -30,10 +30,15 @@ public sealed partial class CompactPlannerPage : Page
 
     private async void AddTaskButton_Click(object sender, RoutedEventArgs e)
     {
-        await TaskComposerDialogService.ShowAddTaskAsync(XamlRoot, _plannerStateStore, _plannerStateStore.Today);
+        await TaskComposerDialogService.ShowAddTaskAsync(XamlRoot, _plannerStateStore, _plannerStateStore.SelectedDate);
+    }
 
-        if (_plannerStateStore.SelectedDate != _plannerStateStore.Today)
-            await _plannerStateStore.GoToTodayAsync();
+    private async void MonthDayButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { DataContext: PlannerMonthDayViewModel day })
+            return;
+
+        await _plannerStateStore.SelectDateAsync(day.Date);
     }
 
     private async void PreviousMonthButton_Click(object sender, RoutedEventArgs e)

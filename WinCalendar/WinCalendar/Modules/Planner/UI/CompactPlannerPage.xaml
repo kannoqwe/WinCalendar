@@ -11,7 +11,6 @@
     mc:Ignorable="d">
 
     <Page.Resources>
-        <SolidColorBrush x:Key="CompactAccentBrush" Color="#FFFF00FF" />
         <SolidColorBrush x:Key="CompactDividerBrush" Color="#0D000000" />
         <SolidColorBrush x:Key="CompactMutedBrush" Color="#8A000000" />
         <SolidColorBrush x:Key="CompactPanelBrush" Color="#F2FFFFFF" />
@@ -23,10 +22,34 @@
             <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Foreground" Value="{StaticResource CompactAccentBrush}" />
+            <Setter Property="Foreground" Value="{ThemeResource AppAccentBrush}" />
             <Setter Property="FontSize" Value="12" />
             <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Padding" Value="8,4" />
+        </Style>
+
+        <Style x:Key="CompactMonthNavButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Foreground" Value="{ThemeResource AppAccentBrush}" />
+        </Style>
+
+        <Style x:Key="CompactDayButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="44" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Margin" Value="1" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="VerticalContentAlignment" Value="Stretch" />
         </Style>
 
         <Style x:Key="CompactTaskItemContainerStyle" TargetType="ListViewItem">
@@ -42,8 +65,7 @@
 
     <Grid
         x:Name="Root"
-        Loaded="Root_Loaded"
-        Unloaded="Root_Unloaded">
+        Loaded="Root_Loaded">
         <Border
             Width="360"
             HorizontalAlignment="Stretch"
@@ -55,33 +77,130 @@
             <Grid RowSpacing="12">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="1" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="132" />
                 </Grid.RowDefinitions>
 
-                <CalendarView
-                    x:Name="CompactCalendarView"
-                    Width="332"
-                    Height="306"
+                <Grid ColumnSpacing="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        VerticalAlignment="Center"
+                        FontFamily="Segoe UI Variable Display"
+                        FontSize="20"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource CompactTextBrush}"
+                        Text="{Binding MonthLabel}" />
+
+                    <StackPanel
+                        Grid.Column="1"
+                        Orientation="Horizontal"
+                        Spacing="2">
+                        <Button
+                            Click="PreviousMonthButton_Click"
+                            Style="{StaticResource CompactMonthNavButtonStyle}"
+                            ToolTipService.ToolTip="Previous month">
+                            <FontIcon
+                                FontFamily="Segoe Fluent Icons"
+                                FontSize="12"
+                                Glyph="&#xE76B;" />
+                        </Button>
+                        <Button
+                            Click="NextMonthButton_Click"
+                            Style="{StaticResource CompactMonthNavButtonStyle}"
+                            ToolTipService.ToolTip="Next month">
+                            <FontIcon
+                                FontFamily="Segoe Fluent Icons"
+                                FontSize="12"
+                                Glyph="&#xE76C;" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <Grid
+                    Grid.Row="1"
+                    Width="322"
+                    HorizontalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="46" />
+                        <ColumnDefinition Width="46" />
+                        <ColumnDefinition Width="46" />
+                        <ColumnDefinition Width="46" />
+                        <ColumnDefinition Width="46" />
+                        <ColumnDefinition Width="46" />
+                        <ColumnDefinition Width="46" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock HorizontalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource CompactMutedBrush}" Text="Mo" />
+                    <TextBlock Grid.Column="1" HorizontalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource CompactMutedBrush}" Text="Tu" />
+                    <TextBlock Grid.Column="2" HorizontalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource CompactMutedBrush}" Text="We" />
+                    <TextBlock Grid.Column="3" HorizontalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource CompactMutedBrush}" Text="Th" />
+                    <TextBlock Grid.Column="4" HorizontalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource CompactMutedBrush}" Text="Fr" />
+                    <TextBlock Grid.Column="5" HorizontalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource CompactMutedBrush}" Text="Sa" />
+                    <TextBlock Grid.Column="6" HorizontalAlignment="Center" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource CompactMutedBrush}" Text="Su" />
+                </Grid>
+
+                <ItemsControl
+                    Grid.Row="2"
+                    Width="322"
                     HorizontalAlignment="Center"
-                    CalendarViewDayItemChanging="CompactCalendarView_CalendarViewDayItemChanging"
-                    DisplayMode="Month"
-                    FirstDayOfWeek="Monday"
-                    IsOutOfScopeEnabled="True"
-                    IsTodayHighlighted="True"
-                    MaxWidth="332"
-                    MinWidth="332"
-                    SelectedDatesChanged="CompactCalendarView_SelectedDatesChanged"
-                    SelectionMode="Single" />
+                    IsTabStop="False"
+                    ItemsSource="{Binding MonthDays}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <ItemsWrapGrid MaximumRowsOrColumns="7" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Style="{StaticResource CompactDayButtonStyle}">
+                                <Grid Opacity="{Binding DayOpacity}">
+                                    <Border
+                                        Width="30"
+                                        Height="30"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        Background="{ThemeResource AppAccentBrush}"
+                                        CornerRadius="6"
+                                        Visibility="{Binding TodayVisibility}" />
+
+                                    <TextBlock
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                        FontSize="13"
+                                        FontWeight="SemiBold"
+                                        Foreground="{Binding DayTextBrush}"
+                                        Text="{Binding DayButtonText}" />
+
+                                    <Border
+                                        Width="12"
+                                        Height="3"
+                                        Margin="0,0,0,3"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Bottom"
+                                        Background="{Binding CompactIndicatorBrush}"
+                                        CornerRadius="0"
+                                        Visibility="{Binding TaskIndicatorVisibility}" />
+                                </Grid>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
                 <Border
-                    Grid.Row="1"
+                    Grid.Row="3"
                     Height="1"
                     Background="{StaticResource CompactDividerBrush}" />
 
                 <Grid
-                    Grid.Row="2"
+                    Grid.Row="4"
                     ColumnSpacing="8">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -92,7 +211,7 @@
                         VerticalAlignment="Center"
                         FontSize="11"
                         FontWeight="Bold"
-                        Foreground="{StaticResource CompactAccentBrush}"
+                        Foreground="{ThemeResource AppAccentBrush}"
                         Text="TODAY TASKS" />
 
                     <Button
@@ -103,7 +222,7 @@
                 </Grid>
 
                 <ListView
-                    Grid.Row="3"
+                    Grid.Row="5"
                     Height="132"
                     IsItemClickEnabled="False"
                     ItemContainerStyle="{StaticResource CompactTaskItemContainerStyle}"
@@ -116,7 +235,7 @@
                                 Margin="0,0,0,8"
                                 Padding="10,7"
                                 Background="{StaticResource CompactTaskCardBrush}"
-                                BorderBrush="{StaticResource CompactAccentBrush}"
+                                BorderBrush="{ThemeResource AppAccentBrush}"
                                 BorderThickness="2,0,0,0"
                                 CornerRadius="6"
                                 Opacity="{Binding ContentOpacity}">

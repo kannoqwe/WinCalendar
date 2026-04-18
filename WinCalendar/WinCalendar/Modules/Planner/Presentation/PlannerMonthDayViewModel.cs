@@ -9,6 +9,9 @@ namespace WinCalendar.Modules.Planner.Presentation;
 
 public sealed class PlannerMonthDayViewModel : ObservableObject
 {
+    private static readonly Color AppAccentColor = ColorHelper.FromArgb(255, 255, 0, 136);
+    private static readonly Color CompactTextColor = ColorHelper.FromArgb(255, 28, 28, 28);
+
     private readonly bool _hasTasks;
     private readonly bool _allCompleted;
     private bool _isSelected;
@@ -27,10 +30,10 @@ public sealed class PlannerMonthDayViewModel : ObservableObject
         _isSelected = isSelected;
         _hasTasks = hasTasks;
         _allCompleted = allCompleted;
-        IndicatorBrush = new SolidColorBrush(
-            allCompleted
-                ? Colors.SeaGreen
-                : ColorHelper.FromArgb(255, 255, 0, 136));
+        Color indicatorColor = allCompleted ? Colors.SeaGreen : AppAccentColor;
+        IndicatorBrush = new SolidColorBrush(indicatorColor);
+        CompactIndicatorBrush = new SolidColorBrush(isToday && !allCompleted ? Colors.White : indicatorColor);
+        DayTextBrush = new SolidColorBrush(isToday ? Colors.White : CompactTextColor);
     }
 
     public DateOnly Date { get; }
@@ -48,6 +51,10 @@ public sealed class PlannerMonthDayViewModel : ObservableObject
     public double DayOpacity => IsCurrentMonth ? 1.0 : 0.42;
 
     public SolidColorBrush IndicatorBrush { get; }
+
+    public SolidColorBrush CompactIndicatorBrush { get; }
+
+    public SolidColorBrush DayTextBrush { get; }
 
     public Visibility TaskIndicatorVisibility => _hasTasks ? Visibility.Visible : Visibility.Collapsed;
 

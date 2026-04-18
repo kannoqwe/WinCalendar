@@ -503,7 +503,8 @@ public sealed class PlannerStateStore : ObservableObject
 
         IReadOnlyList<TaskItem> tasks = await _getTasksForRangeUseCase.ExecuteAsync(rangeStart, rangeEnd);
         Dictionary<DateOnly, List<PlannerTaskViewModel>> taskLookup = tasks
-            .OrderBy(task => task.Time ?? TimeOnly.MaxValue)
+            .OrderBy(task => task.IsCompleted)
+            .ThenBy(task => task.Time ?? TimeOnly.MaxValue)
             .ThenBy(task => task.CreatedAt)
             .GroupBy(task => task.Date)
             .ToDictionary(

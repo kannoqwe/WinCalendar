@@ -41,6 +41,23 @@ public sealed partial class CompactPlannerPage : Page
         await _plannerStateStore.SelectDateAsync(day.Date);
     }
 
+    private async void TaskCompletionButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { DataContext: PlannerTaskViewModel task } button)
+            return;
+
+        button.IsEnabled = false;
+
+        try
+        {
+            await _plannerStateStore.ToggleTaskCompletionAsync(task.Id, !task.IsCompleted);
+        }
+        finally
+        {
+            button.IsEnabled = true;
+        }
+    }
+
     private async void PreviousMonthButton_Click(object sender, RoutedEventArgs e)
     {
         await _plannerStateStore.BrowsePreviousMonthAsync();

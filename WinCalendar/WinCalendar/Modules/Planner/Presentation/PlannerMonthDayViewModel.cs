@@ -62,6 +62,8 @@ public sealed class PlannerMonthDayViewModel : ObservableObject
 
     public Visibility SelectionVisibility => _isSelected ? Visibility.Visible : Visibility.Collapsed;
 
+    public Visibility CompactSelectionVisibility => _isSelected && !IsToday ? Visibility.Visible : Visibility.Collapsed;
+
     public string StateText => !_hasTasks ? "No tasks" : _allCompleted ? "Done" : "Planned";
 
     public bool IsSelected
@@ -73,6 +75,7 @@ public sealed class PlannerMonthDayViewModel : ObservableObject
                 return;
 
             OnPropertyChanged(nameof(SelectionVisibility));
+            OnPropertyChanged(nameof(CompactSelectionVisibility));
         }
     }
 }

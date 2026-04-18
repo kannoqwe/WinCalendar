@@ -61,6 +61,17 @@
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
         </Style>
+
+        <Style x:Key="CompactTaskCompletionButtonStyle" TargetType="Button">
+            <Setter Property="Width" Value="28" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="{ThemeResource AppAccentBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Foreground" Value="{ThemeResource AppAccentBrush}" />
+        </Style>
     </Page.Resources>
 
     <Grid
@@ -171,7 +182,7 @@
                                         VerticalAlignment="Center"
                                         Background="{ThemeResource AppAccentMutedBrush}"
                                         CornerRadius="6"
-                                        Visibility="{Binding SelectionVisibility}" />
+                                        Visibility="{Binding CompactSelectionVisibility}" />
 
                                     <Border
                                         Width="30"
@@ -251,26 +262,44 @@
                                 BorderThickness="2,0,0,0"
                                 CornerRadius="6"
                                 Opacity="{Binding ContentOpacity}">
-                                <Grid RowSpacing="2">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
+                                <Grid ColumnSpacing="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
 
-                                    <TextBlock
-                                        VerticalAlignment="Center"
-                                        FontSize="13"
-                                        FontWeight="SemiBold"
-                                        Foreground="{StaticResource CompactTextBrush}"
-                                        Text="{Binding Title}"
-                                        TextTrimming="CharacterEllipsis" />
+                                    <Grid RowSpacing="2">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
 
-                                    <TextBlock
-                                        Grid.Row="1"
-                                        FontSize="11"
-                                        Foreground="{StaticResource CompactMutedBrush}"
-                                        Text="{Binding CompactTimeText}"
-                                        TextTrimming="CharacterEllipsis" />
+                                        <TextBlock
+                                            VerticalAlignment="Center"
+                                            FontSize="13"
+                                            FontWeight="SemiBold"
+                                            Foreground="{StaticResource CompactTextBrush}"
+                                            Text="{Binding Title}"
+                                            TextTrimming="CharacterEllipsis" />
+
+                                        <TextBlock
+                                            Grid.Row="1"
+                                            FontSize="11"
+                                            Foreground="{StaticResource CompactMutedBrush}"
+                                            Text="{Binding CompactTimeText}"
+                                            TextTrimming="CharacterEllipsis" />
+                                    </Grid>
+
+                                    <Button
+                                        Grid.Column="1"
+                                        Click="TaskCompletionButton_Click"
+                                        Style="{StaticResource CompactTaskCompletionButtonStyle}"
+                                        ToolTipService.ToolTip="Toggle done state">
+                                        <FontIcon
+                                            FontFamily="Segoe Fluent Icons"
+                                            FontSize="11"
+                                            Glyph="&#xE73E;" />
+                                    </Button>
                                 </Grid>
                             </Border>
                         </DataTemplate>

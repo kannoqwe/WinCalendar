@@ -41,6 +41,7 @@ internal static class TrayNative
     public const uint WM_NCHITTEST = 0x0084;
     public const uint WM_COMMAND = 0x0111;
     public const uint WM_CONTEXTMENU = 0x007B;
+    public const uint WM_LBUTTONDOWN = 0x0201;
     public const uint WM_LBUTTONUP = 0x0202;
     public const uint WM_LBUTTONDBLCLK = 0x0203;
     public const uint WM_RBUTTONUP = 0x0205;

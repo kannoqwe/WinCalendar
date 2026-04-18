@@ -42,7 +42,7 @@ public sealed class AppBootstrapper
             updateTaskUseCase);
 
         _plannerWindowCoordinator = new(_plannerStateStore, CreateMainWindow);
-        _shellExperienceCoordinator = new(_plannerWindowCoordinator, clock, requestExit);
+        _shellExperienceCoordinator = new(_plannerWindowCoordinator, requestExit);
     }
 
     public MainWindow CreateMainWindow()

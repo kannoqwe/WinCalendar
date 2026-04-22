@@ -70,10 +70,16 @@ public sealed class PlannerWindowCoordinator
             return;
         }
 
-        _compactWindow = new CompactPlannerWindow(_plannerStateStore);
+        _compactWindow = new CompactPlannerWindow(_plannerStateStore, OpenMainAppFromCompact);
         _compactWindow.Closed += CompactWindow_Closed;
         ConfigureCompactWindow(_compactWindow);
         _compactWindow.Activate();
+    }
+
+    private void OpenMainAppFromCompact()
+    {
+        ShowFullApp();
+        _compactWindow?.Close();
     }
 
     private static void ConfigureMainWindow(Window window)

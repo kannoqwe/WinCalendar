@@ -1,3 +1,4 @@
+using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using WinCalendar.Modules.Planner.Presentation;
@@ -7,11 +8,13 @@ namespace WinCalendar.Modules.Planner.UI;
 public sealed partial class CompactPlannerPage : Page
 {
     private readonly PlannerStateStore _plannerStateStore;
+    private readonly Action _openMainApp;
     private bool _initialized;
 
-    public CompactPlannerPage(PlannerStateStore plannerStateStore)
+    public CompactPlannerPage(PlannerStateStore plannerStateStore, Action openMainApp)
     {
         _plannerStateStore = plannerStateStore;
+        _openMainApp = openMainApp;
         InitializeComponent();
         DataContext = _plannerStateStore;
     }
@@ -66,5 +69,10 @@ public sealed partial class CompactPlannerPage : Page
     private async void NextMonthButton_Click(object sender, RoutedEventArgs e)
     {
         await _plannerStateStore.BrowseNextMonthAsync();
+    }
+
+    private void OpenMainAppButton_Click(object sender, RoutedEventArgs e)
+    {
+        _openMainApp();
     }
 }

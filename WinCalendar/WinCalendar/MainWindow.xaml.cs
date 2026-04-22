@@ -37,16 +37,11 @@ namespace WinCalendar
 
             PageHost.Content = tag switch
             {
-                "calendar" => new CalendarPage(_plannerStateStore, _windowCoordinator),
+                "calendar" => new CalendarPage(_plannerStateStore),
                 "notes" => new NotesPage(),
                 "settings" => new SettingsPage(),
                 _ => new TodayPage(_plannerStateStore, _windowCoordinator)
             };
-        }
-
-        private void MediumViewButton_Click(object sender, RoutedEventArgs e)
-        {
-            _windowCoordinator.ShowMediumView();
         }
 
         private void ConfigureCustomTitleBar()

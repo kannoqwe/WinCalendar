@@ -73,27 +73,6 @@
                         </controls:NavigationViewItem.Icon>
                     </controls:NavigationViewItem>
                 </controls:NavigationView.MenuItems>
-
-                <controls:NavigationView.PaneFooter>
-                    <StackPanel
-                        HorizontalAlignment="Center"
-                        Spacing="8"
-                        Padding="0,12,0,12">
-                        <Button
-                            x:Name="MediumViewButton"
-                            Width="36"
-                            Height="36"
-                            Padding="0"
-                            Background="Transparent"
-                            BorderBrush="Transparent"
-                            BorderThickness="0"
-                            CornerRadius="10"
-                            Click="MediumViewButton_Click"
-                            ToolTipService.ToolTip="Open Medium View">
-                            <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE740;" />
-                        </Button>
-                    </StackPanel>
-                </controls:NavigationView.PaneFooter>
                 <ContentPresenter x:Name="PageHost" />
             </controls:NavigationView>
         </Grid>

@@ -314,17 +314,6 @@
                                                 VerticalAlignment="Center">
                                                 <Button
                                                     Style="{StaticResource TaskIconButtonStyle}"
-                                                    Click="TaskOpenButton_Click"
-                                                    ToolTipService.ToolTip="Open task">
-                                                    <FontIcon
-                                                        FontFamily="Segoe Fluent Icons"
-                                                        FontSize="12"
-                                                        Glyph="&#xE8A7;" />
-                                                </Button>
-
-                                                <Button
-                                                    Margin="0,8,0,0"
-                                                    Style="{StaticResource TaskIconButtonStyle}"
                                                     Click="TaskCompletionButton_Click"
                                                     ToolTipService.ToolTip="Toggle done state">
                                                     <FontIcon

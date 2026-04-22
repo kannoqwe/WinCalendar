@@ -27,7 +27,7 @@
                     Text="Current UI defaults:" />
                 <TextBlock Text="Date format: DD.MM.YYYY" />
                 <TextBlock Text="Time format: 24h" />
-                <TextBlock Text="Compact panel stays connected to Medium and Full App through shared state." />
+                <TextBlock Text="Compact panel stays connected to the full app through shared state." />
             </StackPanel>
         </Border>
     </Grid>

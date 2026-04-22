@@ -1,14 +1,17 @@
 using System;
+using System.Runtime.InteropServices;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Windows.Graphics;
 using WinCalendar.Modules.Planner.Presentation;
 using WinCalendar.Modules.Planner.UI;
+using WinRT.Interop;
 
 namespace WinCalendar.Shared.Windowing;
 
 public sealed class PlannerWindowCoordinator
 {
+    private const int DipsPerInch = 96;
     private const int MainWindowWidth = 1360;
     private const int MainWindowHeight = 860;
     private const int MediumWindowWidth = 980;
@@ -95,6 +98,11 @@ public sealed class PlannerWindowCoordinator
     private static void ConfigureCompactWindow(Window window)
     {
         AppWindow appWindow = window.GetAppWindow();
+        int width = ScaleDipToPixel(window, CompactWindowWidth);
+        int height = ScaleDipToPixel(window, CompactWindowHeight);
+        int margin = ScaleDipToPixel(window, CompactWindowMargin);
+        int cornerRadius = ScaleDipToPixel(window, 12);
+
         OverlappedPresenter presenter = OverlappedPresenter.CreateForToolWindow();
         presenter.IsAlwaysOnTop = true;
         presenter.IsMaximizable = false;
@@ -103,13 +111,13 @@ public sealed class PlannerWindowCoordinator
         presenter.SetBorderAndTitleBar(false, false);
 
         appWindow.SetPresenter(presenter);
-        appWindow.Resize(new SizeInt32(CompactWindowWidth, CompactWindowHeight));
-        PositionCompactWindow(appWindow);
+        appWindow.Resize(new SizeInt32(width, height));
+        PositionCompactWindow(appWindow, width, height, margin);
         TransparentWindowHost.Apply(
             window,
-            CompactWindowWidth,
-            CompactWindowHeight,
-            12,
+            width,
+            height,
+            cornerRadius,
             TransparentWindowHost.WindowOutlineShape.AllRounded);
     }
 
@@ -133,14 +141,30 @@ public sealed class PlannerWindowCoordinator
             workArea.Y + Math.Max(0, (workArea.Height - MediumWindowHeight) / 2)));
     }
 
-    private static void PositionCompactWindow(AppWindow appWindow)
+    private static void PositionCompactWindow(AppWindow appWindow, int width, int height, int margin)
     {
         DisplayArea displayArea = DisplayArea.GetFromWindowId(appWindow.Id, DisplayAreaFallback.Primary);
         RectInt32 workArea = displayArea.WorkArea;
 
         appWindow.Move(new PointInt32(
-            workArea.X + Math.Max(0, workArea.Width - CompactWindowWidth - CompactWindowMargin),
-            workArea.Y + Math.Max(0, workArea.Height - CompactWindowHeight - CompactWindowMargin)));
+            workArea.X + Math.Max(0, workArea.Width - width - margin),
+            workArea.Y + Math.Max(0, workArea.Height - height - margin)));
+    }
+
+    private static int ScaleDipToPixel(Window window, int value)
+    {
+        uint dpi = GetWindowDpi(window);
+        return Math.Max(1, (int)Math.Round(value * dpi / (double)DipsPerInch));
+    }
+
+    private static uint GetWindowDpi(Window window)
+    {
+        nint windowHandle = WindowNative.GetWindowHandle(window);
+        if (windowHandle == nint.Zero)
+            return DipsPerInch;
+
+        uint dpi = GetDpiForWindow(windowHandle);
+        return dpi == 0 ? DipsPerInch : dpi;
     }
 
     private void MainWindow_Closed(object sender, WindowEventArgs args)
@@ -160,4 +184,7 @@ public sealed class PlannerWindowCoordinator
         _compactWindow.Closed -= CompactWindow_Closed;
         _compactWindow = null;
     }
+
+    [DllImport("user32.dll")]
+    private static extern uint GetDpiForWindow(nint hwnd);
 }

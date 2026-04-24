@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Planner.App.Modules.Tasks.Contracts;
 using Planner.App.Modules.Tasks.Entities;
+using Planner.App.Modules.Tasks.Infrastructure.Sqlite;
 using Planner.App.Modules.Tasks.UseCases;
 using WinCalendar.Core.Time;
 
@@ -11,6 +13,7 @@ try
 {
     TaskItemTests.Run();
     await TaskUseCaseTests.RunAsync();
+    await SqliteTaskRepositoryTests.RunAsync();
     Console.WriteLine("All tests passed.");
     return 0;
 }
@@ -109,6 +112,107 @@ internal static class TaskUseCaseTests
     }
 }
 
+internal static class SqliteTaskRepositoryTests
+{
+    public static async Task RunAsync()
+    {
+        await PersistAndQueryTaskAsync();
+        await UpdateAndDeleteTaskAsync();
+    }
+
+    private static async Task PersistAndQueryTaskAsync()
+    {
+        string databasePath = CreateDatabasePath();
+
+        try
+        {
+            TaskDatabaseInitializer initializer = new(databasePath);
+            initializer.Initialize();
+            SqliteTaskRepository repository = new(databasePath);
+            TaskItem task = new(
+                "Repository task",
+                new DateOnly(2026, 4, 24),
+                new DateTime(2026, 4, 24, 8, 0, 0, DateTimeKind.Utc),
+                new TimeOnly(14, 30),
+                45,
+                "Stored note");
+
+            await repository.AddAsync(task);
+
+            IReadOnlyList<TaskItem> tasks = await repository.GetByDateRangeAsync(
+                new DateOnly(2026, 4, 24),
+                new DateOnly(2026, 4, 24));
+
+            TaskItem restored = Assert.Single(tasks, "Repository should return the persisted task.");
+            Assert.Equal(task.Id, restored.Id, "Task id should round-trip.");
+            Assert.Equal("Repository task", restored.Title, "Task title should round-trip.");
+            Assert.Equal("Stored note", restored.Description, "Task description should round-trip.");
+            Assert.Equal(new TimeOnly(14, 30), restored.Time, "Task time should round-trip.");
+            Assert.Equal(45, restored.DurationMinutes, "Task duration should round-trip.");
+        }
+        finally
+        {
+            DeleteDatabase(databasePath);
+        }
+    }
+
+    private static async Task UpdateAndDeleteTaskAsync()
+    {
+        string databasePath = CreateDatabasePath();
+
+        try
+        {
+            TaskDatabaseInitializer initializer = new(databasePath);
+            initializer.Initialize();
+            SqliteTaskRepository repository = new(databasePath);
+            TaskItem task = new(
+                "Draft",
+                new DateOnly(2026, 4, 24),
+                new DateTime(2026, 4, 24, 8, 0, 0, DateTimeKind.Utc));
+
+            await repository.AddAsync(task);
+            task.Update(
+                "Final",
+                new DateOnly(2026, 4, 25),
+                new TimeOnly(9, 15),
+                30,
+                new DateTime(2026, 4, 24, 9, 0, 0, DateTimeKind.Utc),
+                "Updated");
+            await repository.UpdateAsync(task);
+
+            TaskItem? restored = await repository.GetByIdAsync(task.Id);
+            Assert.NotNull(restored, "Updated task should still exist.");
+            Assert.Equal("Final", restored!.Title, "Updated title should be stored.");
+            Assert.Equal(new DateOnly(2026, 4, 25), restored.Date, "Updated date should be stored.");
+            Assert.Equal(new TimeOnly(9, 15), restored.Time, "Updated time should be stored.");
+            Assert.Equal(30, restored.DurationMinutes, "Updated duration should be stored.");
+
+            await repository.DeleteAsync(task.Id);
+
+            TaskItem? deleted = await repository.GetByIdAsync(task.Id);
+            Assert.Null(deleted, "Deleted task should not be returned.");
+        }
+        finally
+        {
+            DeleteDatabase(databasePath);
+        }
+    }
+
+    private static string CreateDatabasePath()
+    {
+        return Path.Combine(Path.GetTempPath(), $"WinCalendar.Tests.{Guid.NewGuid():N}.db");
+    }
+
+    private static void DeleteDatabase(string databasePath)
+    {
+        foreach (string path in new[] { databasePath, $"{databasePath}-wal", $"{databasePath}-shm" })
+        {
+            if (File.Exists(path))
+                File.Delete(path);
+        }
+    }
+}
+
 internal sealed class FakeClock : IClock
 {
     public FakeClock(DateTime now)
@@ -199,6 +303,26 @@ internal static class Assert
     {
         if (!condition)
             throw new InvalidOperationException(message);
+    }
+
+    public static void Null<T>(T? actual, string message)
+    {
+        if (actual is not null)
+            throw new InvalidOperationException(message);
+    }
+
+    public static void NotNull<T>(T? actual, string message)
+    {
+        if (actual is null)
+            throw new InvalidOperationException(message);
+    }
+
+    public static T Single<T>(IReadOnlyList<T> values, string message)
+    {
+        if (values.Count != 1)
+            throw new InvalidOperationException(message);
+
+        return values[0];
     }
 
     public static void Throws<TException>(Action action, string message)

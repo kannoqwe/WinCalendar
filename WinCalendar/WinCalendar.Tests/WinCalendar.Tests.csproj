@@ -10,6 +10,12 @@
     <Compile Include="..\WinCalendar\Core\Time\IClock.cs" Link="Production\Core\Time\IClock.cs" />
     <Compile Include="..\WinCalendar\Modules\Tasks\Contracts\ITaskRepository.cs" Link="Production\Modules\Tasks\Contracts\ITaskRepository.cs" />
     <Compile Include="..\WinCalendar\Modules\Tasks\Entites\TaskItem.cs" Link="Production\Modules\Tasks\Entites\TaskItem.cs" />
+    <Compile Include="..\WinCalendar\Modules\Tasks\Infrastructure\Sqlite\SqliteConnection.cs" Link="Production\Modules\Tasks\Infrastructure\Sqlite\SqliteConnection.cs" />
+    <Compile Include="..\WinCalendar\Modules\Tasks\Infrastructure\Sqlite\SqliteException.cs" Link="Production\Modules\Tasks\Infrastructure\Sqlite\SqliteException.cs" />
+    <Compile Include="..\WinCalendar\Modules\Tasks\Infrastructure\Sqlite\SqliteNative.cs" Link="Production\Modules\Tasks\Infrastructure\Sqlite\SqliteNative.cs" />
+    <Compile Include="..\WinCalendar\Modules\Tasks\Infrastructure\Sqlite\SqliteStatement.cs" Link="Production\Modules\Tasks\Infrastructure\Sqlite\SqliteStatement.cs" />
+    <Compile Include="..\WinCalendar\Modules\Tasks\Infrastructure\Sqlite\SqliteTaskRepository.cs" Link="Production\Modules\Tasks\Infrastructure\Sqlite\SqliteTaskRepository.cs" />
+    <Compile Include="..\WinCalendar\Modules\Tasks\Infrastructure\Sqlite\TaskDatabaseInitializer.cs" Link="Production\Modules\Tasks\Infrastructure\Sqlite\TaskDatabaseInitializer.cs" />
     <Compile Include="..\WinCalendar\Modules\Tasks\UseCases\CreateTaskUseCase.cs" Link="Production\Modules\Tasks\UseCases\CreateTaskUseCase.cs" />
     <Compile Include="..\WinCalendar\Modules\Tasks\UseCases\SetTaskCompletionStatusUseCase.cs" Link="Production\Modules\Tasks\UseCases\SetTaskCompletionStatusUseCase.cs" />
   </ItemGroup>

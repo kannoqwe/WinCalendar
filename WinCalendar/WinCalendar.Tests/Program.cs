@@ -8,10 +8,12 @@ using Planner.App.Modules.Tasks.Entities;
 using Planner.App.Modules.Tasks.Infrastructure.Sqlite;
 using Planner.App.Modules.Tasks.UseCases;
 using WinCalendar.Core.Time;
+using WinCalendar.Modules.Planner.Presentation;
 
 try
 {
     TaskItemTests.Run();
+    PlannerQuickTaskParserTests.Run();
     await TaskUseCaseTests.RunAsync();
     await SqliteTaskRepositoryTests.RunAsync();
     Console.WriteLine("All tests passed.");
@@ -23,6 +25,42 @@ catch (Exception exception)
     return 1;
 }
 
+internal static class PlannerQuickTaskParserTests
+{
+    public static void Run()
+    {
+        ParsesEnglishQuickTask();
+        ParsesRussianQuickTask();
+    }
+
+    private static void ParsesEnglishQuickTask()
+    {
+        PlannerQuickTaskParseResult result = PlannerQuickTaskParser.Parse(
+            "meeting tomorrow 14:30 45m weekly",
+            new DateOnly(2026, 4, 24),
+            new DateOnly(2026, 4, 24))!;
+
+        Assert.Equal("meeting", result.Title, "Quick parser should remove recognized English tokens.");
+        Assert.Equal(new DateOnly(2026, 4, 25), result.Date, "Quick parser should understand tomorrow.");
+        Assert.Equal(new TimeOnly(14, 30), result.Time, "Quick parser should understand time.");
+        Assert.Equal(45, result.DurationMinutes, "Quick parser should understand minute duration.");
+        Assert.Equal(TaskRecurrencePattern.Weekly, result.RecurrencePattern, "Quick parser should understand recurrence.");
+    }
+
+    private static void ParsesRussianQuickTask()
+    {
+        PlannerQuickTaskParseResult result = PlannerQuickTaskParser.Parse(
+            "созвон завтра 9:15 1ч еженедельно",
+            new DateOnly(2026, 4, 24),
+            new DateOnly(2026, 4, 24))!;
+
+        Assert.Equal("созвон", result.Title, "Quick parser should remove recognized Russian tokens.");
+        Assert.Equal(new DateOnly(2026, 4, 25), result.Date, "Quick parser should understand Russian tomorrow.");
+        Assert.Equal(new TimeOnly(9, 15), result.Time, "Quick parser should understand Russian time.");
+        Assert.Equal(60, result.DurationMinutes, "Quick parser should understand Russian hour duration.");
+        Assert.Equal(TaskRecurrencePattern.Weekly, result.RecurrencePattern, "Quick parser should understand Russian recurrence.");
+    }
+}
 internal static class TaskItemTests
 {
     public static void Run()

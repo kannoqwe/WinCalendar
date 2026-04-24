@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Media;
 using Windows.Foundation;
 using WinCalendar.Modules.Planner.Presentation;
 using WinCalendar.Shared.Windowing;
+using VirtualKey = Windows.System.VirtualKey;
 
 namespace WinCalendar.Modules.Planner.UI;
 
@@ -113,6 +114,37 @@ public sealed partial class TodayPage : Page
         SuspendInlineEditor();
         _plannerStateStore.BeginNewTaskDraft(_plannerStateStore.SelectedDate);
         ResumeInlineEditor(focusTitleEditor: true);
+    }
+
+    private async void QuickAddTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != VirtualKey.Enter)
+            return;
+
+        e.Handled = true;
+        PlannerQuickTaskParseResult? result = PlannerQuickTaskParser.Parse(
+            QuickAddTextBox.Text,
+            _plannerStateStore.SelectedDate,
+            _plannerStateStore.Today);
+        if (result is null)
+            return;
+
+        QuickAddTextBox.IsEnabled = false;
+
+        try
+        {
+            await _plannerStateStore.AddTaskAsync(
+                result.Title,
+                result.Date,
+                result.Time,
+                result.DurationMinutes,
+                result.RecurrencePattern);
+            QuickAddTextBox.Text = string.Empty;
+        }
+        finally
+        {
+            QuickAddTextBox.IsEnabled = true;
+        }
     }
 
     private async Task OpenTaskAsync(PlannerTaskViewModel task)

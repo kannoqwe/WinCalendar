@@ -253,12 +253,16 @@
                                 Text="{Binding WeekViewSummary}" />
                         </StackPanel>
 
-                        <TextBlock
+                        <TextBox
+                            x:Name="QuickAddTextBox"
                             Grid.Column="1"
+                            Width="300"
                             VerticalAlignment="Center"
+                            MinHeight="32"
+                            Padding="10,4"
+                            PlaceholderText="Quick add..."
                             FontSize="12"
-                            Foreground="{ThemeResource AppTextMutedBrush}"
-                            Text="Click empty space to add a task" />
+                            KeyDown="QuickAddTextBox_KeyDown" />
                     </Grid>
 
                     <Border

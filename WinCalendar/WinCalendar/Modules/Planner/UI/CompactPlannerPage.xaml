@@ -409,13 +409,21 @@
                             </ListView.ItemTemplate>
                         </ListView>
 
-                        <TextBlock
+                        <StackPanel
                             HorizontalAlignment="Center"
                             VerticalAlignment="Center"
-                            FontSize="13"
-                            Foreground="{StaticResource CompactMutedBrush}"
-                            Text="{Binding EmptySelectedDayTasksText}"
-                            Visibility="{Binding EmptySelectedDayTasksVisibility}" />
+                            Spacing="8"
+                            Visibility="{Binding EmptySelectedDayTasksVisibility}">
+                            <TextBlock
+                                HorizontalAlignment="Center"
+                                FontSize="13"
+                                Foreground="{StaticResource CompactMutedBrush}"
+                                Text="{Binding EmptySelectedDayTasksText}" />
+                            <Button
+                                Click="AddTaskButton_Click"
+                                Content="+ NEW"
+                                Style="{StaticResource CompactNewTaskButtonStyle}" />
+                        </StackPanel>
                     </Grid>
                 </Grid>
 

@@ -22,12 +22,47 @@ public sealed class CreateTaskUseCase
         DateOnly date,
         TimeOnly? time = null,
         int? durationMinutes = null,
-        string? description = null)
+        string? description = null,
+        TaskRecurrencePattern recurrencePattern = TaskRecurrencePattern.None)
     {
-        TaskItem task = new(title, date, _clock.UtcNow, time, durationMinutes, description);
+        TaskItem task = new(title, date, _clock.UtcNow, time, durationMinutes, description, recurrencePattern);
 
         await _taskRepository.AddAsync(task);
+        await CreateFutureOccurrencesAsync(task);
 
         return task;
+    }
+
+    private async Task CreateFutureOccurrencesAsync(TaskItem sourceTask)
+    {
+        int occurrenceCount = sourceTask.RecurrencePattern switch
+        {
+            TaskRecurrencePattern.Daily => 30,
+            TaskRecurrencePattern.Weekly => 12,
+            TaskRecurrencePattern.Monthly => 6,
+            _ => 0
+        };
+
+        for (int index = 1; index <= occurrenceCount; index++)
+        {
+            DateOnly occurrenceDate = sourceTask.RecurrencePattern switch
+            {
+                TaskRecurrencePattern.Daily => sourceTask.Date.AddDays(index),
+                TaskRecurrencePattern.Weekly => sourceTask.Date.AddDays(index * 7),
+                TaskRecurrencePattern.Monthly => sourceTask.Date.AddMonths(index),
+                _ => sourceTask.Date
+            };
+
+            TaskItem occurrence = new(
+                sourceTask.Title,
+                occurrenceDate,
+                _clock.UtcNow,
+                sourceTask.Time,
+                sourceTask.DurationMinutes,
+                sourceTask.Description,
+                sourceTask.RecurrencePattern);
+
+            await _taskRepository.AddAsync(occurrence);
+        }
     }
 }

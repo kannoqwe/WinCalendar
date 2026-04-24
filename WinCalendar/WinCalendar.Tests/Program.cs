@@ -81,6 +81,7 @@ internal static class TaskUseCaseTests
     {
         await CreateTaskUsesClockTimestampAsync();
         await SetCompletionUsesClockTimestampAsync();
+        await CreateTaskMaterializesRecurringTasksAsync();
     }
 
     private static async Task CreateTaskUsesClockTimestampAsync()
@@ -109,6 +110,24 @@ internal static class TaskUseCaseTests
         Assert.True(task.IsCompleted, "Task should be completed.");
         Assert.Equal(clock.UtcNow, task.UpdatedAt, "Completion should use clock UTC time.");
         Assert.True(repository.UpdatedTasks.Contains(task), "Completed task should be persisted.");
+    }
+
+    private static async Task CreateTaskMaterializesRecurringTasksAsync()
+    {
+        FakeTaskRepository repository = new();
+        FakeClock clock = new(new DateTime(2026, 4, 17, 10, 0, 0, DateTimeKind.Utc));
+        CreateTaskUseCase useCase = new(repository, clock);
+
+        TaskItem task = await useCase.ExecuteAsync(
+            "Standup",
+            new DateOnly(2026, 4, 17),
+            recurrencePattern: TaskRecurrencePattern.Weekly);
+
+        Assert.Equal(TaskRecurrencePattern.Weekly, task.RecurrencePattern, "Source task should store recurrence.");
+        Assert.Equal(13, repository.AddedTasks.Count, "Weekly recurrence should create the source plus 12 future tasks.");
+        Assert.True(
+            repository.AddedTasks.Any(current => current.Date == new DateOnly(2026, 4, 24)),
+            "Weekly recurrence should create the next week occurrence.");
     }
 }
 
@@ -149,6 +168,7 @@ internal static class SqliteTaskRepositoryTests
             Assert.Equal("Stored note", restored.Description, "Task description should round-trip.");
             Assert.Equal(new TimeOnly(14, 30), restored.Time, "Task time should round-trip.");
             Assert.Equal(45, restored.DurationMinutes, "Task duration should round-trip.");
+            Assert.Equal(TaskRecurrencePattern.None, restored.RecurrencePattern, "Default recurrence should round-trip.");
         }
         finally
         {
@@ -177,7 +197,8 @@ internal static class SqliteTaskRepositoryTests
                 new TimeOnly(9, 15),
                 30,
                 new DateTime(2026, 4, 24, 9, 0, 0, DateTimeKind.Utc),
-                "Updated");
+                "Updated",
+                TaskRecurrencePattern.Daily);
             await repository.UpdateAsync(task);
 
             TaskItem? restored = await repository.GetByIdAsync(task.Id);
@@ -186,6 +207,7 @@ internal static class SqliteTaskRepositoryTests
             Assert.Equal(new DateOnly(2026, 4, 25), restored.Date, "Updated date should be stored.");
             Assert.Equal(new TimeOnly(9, 15), restored.Time, "Updated time should be stored.");
             Assert.Equal(30, restored.DurationMinutes, "Updated duration should be stored.");
+            Assert.Equal(TaskRecurrencePattern.Daily, restored.RecurrencePattern, "Updated recurrence should be stored.");
 
             await repository.DeleteAsync(task.Id);
 

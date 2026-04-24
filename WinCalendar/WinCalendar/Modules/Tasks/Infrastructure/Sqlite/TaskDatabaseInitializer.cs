@@ -32,6 +32,7 @@ public sealed class TaskDatabaseInitializer
                 task_date TEXT NOT NULL,
                 task_time TEXT NULL,
                 duration_minutes INTEGER NULL,
+                recurrence_pattern TEXT NOT NULL DEFAULT 'None',
                 is_completed INTEGER NOT NULL,
                 created_at_utc TEXT NOT NULL,
                 updated_at_utc TEXT NOT NULL
@@ -47,6 +48,11 @@ public sealed class TaskDatabaseInitializer
             connection,
             "description",
             "ALTER TABLE tasks ADD COLUMN description TEXT NULL;");
+
+        EnsureColumn(
+            connection,
+            "recurrence_pattern",
+            "ALTER TABLE tasks ADD COLUMN recurrence_pattern TEXT NOT NULL DEFAULT 'None';");
 
         connection.ExecuteNonQuery(
             """

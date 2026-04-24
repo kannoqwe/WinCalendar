@@ -32,6 +32,7 @@ public sealed class SqliteTaskRepository : ITaskRepository
                 task_date,
                 task_time,
                 duration_minutes,
+                recurrence_pattern,
                 is_completed,
                 created_at_utc,
                 updated_at_utc
@@ -65,6 +66,7 @@ public sealed class SqliteTaskRepository : ITaskRepository
                 task_date,
                 task_time,
                 duration_minutes,
+                recurrence_pattern,
                 is_completed,
                 created_at_utc,
                 updated_at_utc
@@ -100,6 +102,7 @@ public sealed class SqliteTaskRepository : ITaskRepository
                 task_date,
                 task_time,
                 duration_minutes,
+                recurrence_pattern,
                 is_completed,
                 created_at_utc,
                 updated_at_utc
@@ -148,6 +151,7 @@ public sealed class SqliteTaskRepository : ITaskRepository
                 task_date,
                 task_time,
                 duration_minutes,
+                recurrence_pattern,
                 is_completed,
                 created_at_utc,
                 updated_at_utc
@@ -174,11 +178,12 @@ public sealed class SqliteTaskRepository : ITaskRepository
                 task_date,
                 task_time,
                 duration_minutes,
+                recurrence_pattern,
                 is_completed,
                 created_at_utc,
                 updated_at_utc
             )
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
             """);
 
         BindTask(statement, task);
@@ -199,6 +204,7 @@ public sealed class SqliteTaskRepository : ITaskRepository
                 task_date = ?,
                 task_time = ?,
                 duration_minutes = ?,
+                recurrence_pattern = ?,
                 is_completed = ?,
                 created_at_utc = ?,
                 updated_at_utc = ?
@@ -210,10 +216,11 @@ public sealed class SqliteTaskRepository : ITaskRepository
         statement.BindText(3, FormatDate(task.Date));
         statement.BindNullableText(4, FormatTime(task.Time));
         statement.BindNullableInt(5, task.DurationMinutes);
-        statement.BindBoolean(6, task.IsCompleted);
-        statement.BindText(7, FormatTimestamp(task.CreatedAt));
-        statement.BindText(8, FormatTimestamp(task.UpdatedAt));
-        statement.BindText(9, task.Id.ToString());
+        statement.BindText(6, task.RecurrencePattern.ToString());
+        statement.BindBoolean(7, task.IsCompleted);
+        statement.BindText(8, FormatTimestamp(task.CreatedAt));
+        statement.BindText(9, FormatTimestamp(task.UpdatedAt));
+        statement.BindText(10, task.Id.ToString());
         statement.ExecuteNonQuery();
 
         return Task.CompletedTask;
@@ -243,9 +250,10 @@ public sealed class SqliteTaskRepository : ITaskRepository
         statement.BindText(4, FormatDate(task.Date));
         statement.BindNullableText(5, FormatTime(task.Time));
         statement.BindNullableInt(6, task.DurationMinutes);
-        statement.BindBoolean(7, task.IsCompleted);
-        statement.BindText(8, FormatTimestamp(task.CreatedAt));
-        statement.BindText(9, FormatTimestamp(task.UpdatedAt));
+        statement.BindText(7, task.RecurrencePattern.ToString());
+        statement.BindBoolean(8, task.IsCompleted);
+        statement.BindText(9, FormatTimestamp(task.CreatedAt));
+        statement.BindText(10, FormatTimestamp(task.UpdatedAt));
     }
 
     private static TaskItem Map(SqliteStatement statement)
@@ -256,11 +264,22 @@ public sealed class SqliteTaskRepository : ITaskRepository
         DateOnly date = ParseDate(statement.GetText(3)!);
         TimeOnly? time = ParseTime(statement.GetText(4));
         int? durationMinutes = statement.GetNullableInt(5);
-        bool isCompleted = statement.GetInt(6) == 1;
-        DateTime createdAt = ParseTimestamp(statement.GetText(7)!);
-        DateTime updatedAt = ParseTimestamp(statement.GetText(8)!);
+        TaskRecurrencePattern recurrencePattern = ParseRecurrencePattern(statement.GetText(6));
+        bool isCompleted = statement.GetInt(7) == 1;
+        DateTime createdAt = ParseTimestamp(statement.GetText(8)!);
+        DateTime updatedAt = ParseTimestamp(statement.GetText(9)!);
 
-        return TaskItem.Restore(id, title, date, time, durationMinutes, description, isCompleted, createdAt, updatedAt);
+        return TaskItem.Restore(
+            id,
+            title,
+            date,
+            time,
+            durationMinutes,
+            description,
+            recurrencePattern,
+            isCompleted,
+            createdAt,
+            updatedAt);
     }
 
     private static string FormatDate(DateOnly value)
@@ -306,5 +325,12 @@ public sealed class SqliteTaskRepository : ITaskRepository
     private static DateTime ParseTimestamp(string value)
     {
         return DateTime.Parse(value, CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+    }
+
+    private static TaskRecurrencePattern ParseRecurrencePattern(string? value)
+    {
+        return Enum.TryParse(value, out TaskRecurrencePattern recurrencePattern)
+            ? recurrencePattern
+            : TaskRecurrencePattern.None;
     }
 }

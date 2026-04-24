@@ -62,11 +62,6 @@
                             <SymbolIcon Symbol="AllApps" />
                         </controls:NavigationViewItem.Icon>
                     </controls:NavigationViewItem>
-                    <controls:NavigationViewItem Content="Notes" Tag="notes">
-                        <controls:NavigationViewItem.Icon>
-                            <SymbolIcon Symbol="Edit" />
-                        </controls:NavigationViewItem.Icon>
-                    </controls:NavigationViewItem>
                     <controls:NavigationViewItem Content="Settings" Tag="settings">
                         <controls:NavigationViewItem.Icon>
                             <SymbolIcon Symbol="Setting" />

@@ -47,7 +47,6 @@ namespace WinCalendar
             PageHost.Content = tag switch
             {
                 "calendar" => new CalendarPage(_plannerStateStore),
-                "notes" => new NotesPage(),
                 "settings" => new SettingsPage(_appSettingsStore),
                 _ => new TodayPage(_plannerStateStore, _windowCoordinator)
             };

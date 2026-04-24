@@ -5,6 +5,7 @@ using Planner.App.Modules.Tasks.UseCases;
 using WinCalendar.Core.Time;
 using WinCalendar.Modules.Shell.UI;
 using WinCalendar.Modules.Planner.Presentation;
+using WinCalendar.Shared.Settings;
 using WinCalendar.Shared.Windowing;
 
 namespace WinCalendar.Bootstrap;
@@ -14,10 +15,12 @@ public sealed class AppBootstrapper
     private readonly PlannerStateStore _plannerStateStore;
     private readonly PlannerWindowCoordinator _plannerWindowCoordinator;
     private readonly ShellExperienceCoordinator _shellExperienceCoordinator;
+    private readonly AppSettingsStore _appSettingsStore;
 
     public AppBootstrapper(Action requestExit)
     {
         string databasePath = AppPaths.GetDatabasePath();
+        _appSettingsStore = new AppSettingsStore();
 
         TaskDatabaseInitializer databaseInitializer = new(databasePath);
         databaseInitializer.Initialize();
@@ -47,7 +50,7 @@ public sealed class AppBootstrapper
 
     public MainWindow CreateMainWindow()
     {
-        MainWindow mainWindow = new(_plannerStateStore, _plannerWindowCoordinator);
+        MainWindow mainWindow = new(_plannerStateStore, _plannerWindowCoordinator, _appSettingsStore);
         _plannerWindowCoordinator.AttachMainWindow(mainWindow);
 
         return mainWindow;

@@ -14,20 +14,64 @@
             Background="{ThemeResource AppCardBackgroundBrush}"
             BorderBrush="{ThemeResource AppBorderBrush}"
             BorderThickness="1"
-            CornerRadius="18"
+            CornerRadius="12"
             Padding="24">
-            <StackPanel Spacing="16">
+            <StackPanel Spacing="18">
                 <TextBlock
                     FontFamily="Segoe UI Variable Display"
                     FontSize="34"
                     FontWeight="SemiBold"
                     Text="Settings" />
-                <TextBlock
-                    Foreground="{ThemeResource AppTextMutedBrush}"
-                    Text="Current UI defaults:" />
-                <TextBlock Text="Date format: DD.MM.YYYY" />
-                <TextBlock Text="Time format: 24h" />
-                <TextBlock Text="Compact panel stays connected to the full app through shared state." />
+
+                <StackPanel Spacing="8">
+                    <TextBlock
+                        FontSize="12"
+                        FontWeight="SemiBold"
+                        Foreground="{ThemeResource AppTextMutedBrush}"
+                        Text="APPEARANCE" />
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="220" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Spacing="2">
+                            <TextBlock
+                                FontSize="16"
+                                FontWeight="SemiBold"
+                                Text="Theme" />
+                            <TextBlock
+                                FontSize="13"
+                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Text="Choose how the main app follows Windows." />
+                        </StackPanel>
+
+                        <ComboBox
+                            x:Name="ThemeComboBox"
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            SelectionChanged="ThemeComboBox_SelectionChanged">
+                            <ComboBoxItem Content="System" Tag="System" />
+                            <ComboBoxItem Content="Light" Tag="Light" />
+                            <ComboBoxItem Content="Dark" Tag="Dark" />
+                        </ComboBox>
+                    </Grid>
+                </StackPanel>
+
+                <Border
+                    Height="1"
+                    Background="{ThemeResource AppBorderBrush}" />
+
+                <StackPanel Spacing="8">
+                    <TextBlock
+                        FontSize="12"
+                        FontWeight="SemiBold"
+                        Foreground="{ThemeResource AppTextMutedBrush}"
+                        Text="CURRENT DEFAULTS" />
+                    <TextBlock Text="Date format: DD.MM.YYYY" />
+                    <TextBlock Text="Time format: 24h" />
+                    <TextBlock Text="Compact panel stays connected to the full app through shared state." />
+                </StackPanel>
             </StackPanel>
         </Border>
     </Grid>

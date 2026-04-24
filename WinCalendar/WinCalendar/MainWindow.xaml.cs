@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using WinCalendar.Modules.Calendar.UI;
 using WinCalendar.Modules.Planner.Presentation;
 using WinCalendar.Modules.Planner.UI;
+using WinCalendar.Shared.Settings;
 using WinCalendar.Shared.Windowing;
 
 namespace WinCalendar
@@ -16,15 +17,23 @@ namespace WinCalendar
     {
         private readonly PlannerStateStore _plannerStateStore;
         private readonly PlannerWindowCoordinator _windowCoordinator;
+        private readonly AppSettingsStore _appSettingsStore;
         private AppWindow? _appWindow;
         private FrameworkElement? _titleBarDragRegion;
 
-        public MainWindow(PlannerStateStore plannerStateStore, PlannerWindowCoordinator windowCoordinator)
+        public MainWindow(
+            PlannerStateStore plannerStateStore,
+            PlannerWindowCoordinator windowCoordinator,
+            AppSettingsStore appSettingsStore)
         {
             _plannerStateStore = plannerStateStore;
             _windowCoordinator = windowCoordinator;
+            _appSettingsStore = appSettingsStore;
             InitializeComponent();
             _titleBarDragRegion = ContentRoot.FindName("TitleBarDragRegion") as FrameworkElement;
+            ApplyThemePreference();
+            _appSettingsStore.ThemePreferenceChanged += AppSettingsStore_ThemePreferenceChanged;
+            Closed += MainWindow_Closed;
             ConfigureCustomTitleBar();
             ShellNavigationView.SelectedItem = TodayNavigationItem;
             PageHost.Content = new TodayPage(_plannerStateStore, _windowCoordinator);
@@ -39,8 +48,29 @@ namespace WinCalendar
             {
                 "calendar" => new CalendarPage(_plannerStateStore),
                 "notes" => new NotesPage(),
-                "settings" => new SettingsPage(),
+                "settings" => new SettingsPage(_appSettingsStore),
                 _ => new TodayPage(_plannerStateStore, _windowCoordinator)
+            };
+        }
+
+        private void AppSettingsStore_ThemePreferenceChanged(object? sender, System.EventArgs e)
+        {
+            ApplyThemePreference();
+        }
+
+        private void MainWindow_Closed(object sender, WindowEventArgs args)
+        {
+            _appSettingsStore.ThemePreferenceChanged -= AppSettingsStore_ThemePreferenceChanged;
+            Closed -= MainWindow_Closed;
+        }
+
+        private void ApplyThemePreference()
+        {
+            ContentRoot.RequestedTheme = _appSettingsStore.ThemePreference switch
+            {
+                AppThemePreference.Light => ElementTheme.Light,
+                AppThemePreference.Dark => ElementTheme.Dark,
+                _ => ElementTheme.Default
             };
         }
 

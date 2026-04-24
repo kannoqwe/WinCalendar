@@ -127,6 +127,7 @@
 
     <Grid
         x:Name="Root"
+        KeyDown="Root_KeyDown"
         Loaded="Root_Loaded">
         <Border
             Width="360"
@@ -483,6 +484,7 @@
                                 Padding="8,4"
                                 PlaceholderText="Task title"
                                 Text="{Binding EditorTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                KeyDown="CompactEditorTitleTextBox_KeyDown"
                                 TextChanged="CompactEditorTitleTextBox_TextChanged" />
 
                             <Button

@@ -2,8 +2,10 @@ using System;
 using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
 using WinCalendar.Modules.Planner.Presentation;
+using Windows.System;
 
 namespace WinCalendar.Modules.Planner.UI;
 
@@ -99,6 +101,24 @@ public sealed partial class CompactPlannerPage : Page
         UpdateCompactEditorDoneButtonState();
     }
 
+    private async void CompactEditorTitleTextBox_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != VirtualKey.Enter)
+            return;
+
+        e.Handled = true;
+        await SaveCompactEditorAsync();
+    }
+
+    private void Root_KeyDown(object sender, KeyRoutedEventArgs e)
+    {
+        if (e.Key != VirtualKey.Escape || _plannerStateStore.SelectedTaskVisibility != Visibility.Visible)
+            return;
+
+        e.Handled = true;
+        CloseCompactEditor();
+    }
+
     private void CompactEditorDateFlyout_Opening(object sender, object e)
     {
         _syncingCompactEditorDateSelection = true;
@@ -173,11 +193,15 @@ public sealed partial class CompactPlannerPage : Page
 
     private void CancelCompactEditorButton_Click(object sender, RoutedEventArgs e)
     {
-        _plannerStateStore.SelectTask(null);
-        UpdateCompactEditorDoneButtonState();
+        CloseCompactEditor();
     }
 
     private async void DoneCompactEditorButton_Click(object sender, RoutedEventArgs e)
+    {
+        await SaveCompactEditorAsync();
+    }
+
+    private async System.Threading.Tasks.Task SaveCompactEditorAsync()
     {
         if (string.IsNullOrWhiteSpace(_plannerStateStore.EditorTitle))
             return;
@@ -187,7 +211,7 @@ public sealed partial class CompactPlannerPage : Page
         try
         {
             await _plannerStateStore.SaveSelectedTaskAsync();
-            _plannerStateStore.SelectTask(null);
+            CloseCompactEditor();
         }
         finally
         {
@@ -201,6 +225,12 @@ public sealed partial class CompactPlannerPage : Page
             return;
 
         CompactEditorDoneButton.IsEnabled = !string.IsNullOrWhiteSpace(_plannerStateStore.EditorTitle);
+    }
+
+    private void CloseCompactEditor()
+    {
+        _plannerStateStore.SelectTask(null);
+        UpdateCompactEditorDoneButtonState();
     }
 
     private void AnimateCompactEditorOpen()

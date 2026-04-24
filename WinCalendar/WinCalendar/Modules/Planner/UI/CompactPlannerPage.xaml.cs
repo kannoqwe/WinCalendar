@@ -16,6 +16,7 @@ public sealed partial class CompactPlannerPage : Page
     private readonly Action _openMainApp;
     private bool _syncingCompactEditorDateSelection;
     private bool _syncingCompactEditorTimeSelection;
+    private bool _syncingCompactEditorCategorySelection;
     private bool _syncingCompactEditorRecurrenceSelection;
     private bool _initialized;
 
@@ -48,6 +49,7 @@ public sealed partial class CompactPlannerPage : Page
     private void AddTaskButton_Click(object sender, RoutedEventArgs e)
     {
         _plannerStateStore.BeginNewTaskDraft(_plannerStateStore.SelectedDate);
+        SelectCompactEditorCategory();
         SelectCompactEditorRecurrence();
         UpdateCompactEditorDoneButtonState();
 
@@ -206,6 +208,18 @@ public sealed partial class CompactPlannerPage : Page
         _plannerStateStore.EditorRecurrencePattern = recurrencePattern;
     }
 
+    private void CompactEditorCategoryComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_syncingCompactEditorCategorySelection
+            || CompactEditorCategoryComboBox.SelectedItem is not ComboBoxItem { Tag: string tag }
+            || !Enum.TryParse(tag, out TaskCategory category))
+        {
+            return;
+        }
+
+        _plannerStateStore.EditorCategory = category;
+    }
+
     private void CancelCompactEditorButton_Click(object sender, RoutedEventArgs e)
     {
         CloseCompactEditor();
@@ -299,6 +313,30 @@ public sealed partial class CompactPlannerPage : Page
         finally
         {
             _syncingCompactEditorRecurrenceSelection = false;
+        }
+    }
+
+    private void SelectCompactEditorCategory()
+    {
+        _syncingCompactEditorCategorySelection = true;
+
+        try
+        {
+            string selectedTag = _plannerStateStore.EditorCategory.ToString();
+
+            foreach (object item in CompactEditorCategoryComboBox.Items)
+            {
+                if (item is ComboBoxItem { Tag: string tag } comboBoxItem
+                    && tag == selectedTag)
+                {
+                    CompactEditorCategoryComboBox.SelectedItem = comboBoxItem;
+                    return;
+                }
+            }
+        }
+        finally
+        {
+            _syncingCompactEditorCategorySelection = false;
         }
     }
 }

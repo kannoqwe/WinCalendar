@@ -10,7 +10,7 @@ public sealed class PlannerTaskViewModel
 {
     public PlannerTaskViewModel(TaskItem task)
     {
-        PlannerTaskPalette.PlannerTaskTone tone = PlannerTaskPalette.GetTone(task.Id);
+        PlannerTaskPalette.PlannerTaskTone tone = PlannerTaskPalette.GetTone(task.Category);
 
         Id = task.Id;
         Title = task.Title;
@@ -19,6 +19,7 @@ public sealed class PlannerTaskViewModel
         Time = task.Time;
         DurationMinutes = task.DurationMinutes;
         RecurrencePattern = task.RecurrencePattern;
+        Category = task.Category;
         IsCompleted = task.IsCompleted;
         TaskBackgroundBrush = tone.BackgroundBrush;
         TaskBorderBrush = tone.BorderBrush;
@@ -38,6 +39,8 @@ public sealed class PlannerTaskViewModel
     public int? DurationMinutes { get; }
 
     public TaskRecurrencePattern RecurrencePattern { get; }
+
+    public TaskCategory Category { get; }
 
     public bool IsCompleted { get; }
 
@@ -65,6 +68,14 @@ public sealed class PlannerTaskViewModel
         TaskRecurrencePattern.Weekly => "Weekly",
         TaskRecurrencePattern.Monthly => "Monthly",
         _ => "Does not repeat"
+    };
+
+    public string CategoryText => Category switch
+    {
+        TaskCategory.Personal => "Personal",
+        TaskCategory.Health => "Health",
+        TaskCategory.Important => "Important",
+        _ => "Work"
     };
 
     public bool HasTime => Time is not null;

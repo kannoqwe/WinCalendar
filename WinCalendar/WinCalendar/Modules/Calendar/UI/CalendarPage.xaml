@@ -283,8 +283,8 @@
                                     <Border
                                         Padding="12"
                                         Background="{Binding TaskBackgroundBrush}"
-                                        BorderBrush="{Binding TaskBorderBrush}"
-                                        BorderThickness="1"
+                                        BorderBrush="{Binding TaskAccentBrush}"
+                                        BorderThickness="4,1,1,1"
                                         CornerRadius="14"
                                         Opacity="{Binding ContentOpacity}">
                                         <Grid ColumnSpacing="10">

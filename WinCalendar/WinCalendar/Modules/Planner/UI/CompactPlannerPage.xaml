@@ -361,7 +361,7 @@
                                         Margin="0,0,0,8"
                                         Padding="10,7"
                                         Background="{StaticResource CompactTaskCardBrush}"
-                                        BorderBrush="{ThemeResource AppAccentBrush}"
+                                        BorderBrush="{Binding TaskAccentBrush}"
                                         BorderThickness="2,0,0,0"
                                         CornerRadius="6"
                                         Opacity="{Binding ContentOpacity}">
@@ -431,7 +431,7 @@
                     x:Name="CompactEditorHost"
                     Grid.Row="2"
                     Grid.RowSpan="4"
-                    Height="386"
+                    Height="428"
                     VerticalAlignment="Bottom"
                         Padding="10"
                         Background="{StaticResource CompactComposerPanelBrush}"
@@ -445,6 +445,7 @@
 
                         <Grid RowSpacing="8">
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
@@ -573,8 +574,39 @@
                             </Grid>
 
                             <ComboBox
-                                x:Name="CompactEditorRecurrenceComboBox"
+                                x:Name="CompactEditorCategoryComboBox"
                                 Grid.Row="4"
+                                HorizontalAlignment="Stretch"
+                                SelectionChanged="CompactEditorCategoryComboBox_SelectionChanged">
+                                <ComboBoxItem Tag="Work">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Border Width="8" Height="8" Background="#267EE0" CornerRadius="4" />
+                                        <TextBlock Text="Work" />
+                                    </StackPanel>
+                                </ComboBoxItem>
+                                <ComboBoxItem Tag="Personal">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Border Width="8" Height="8" Background="#7B61FF" CornerRadius="4" />
+                                        <TextBlock Text="Personal" />
+                                    </StackPanel>
+                                </ComboBoxItem>
+                                <ComboBoxItem Tag="Health">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Border Width="8" Height="8" Background="#249D57" CornerRadius="4" />
+                                        <TextBlock Text="Health" />
+                                    </StackPanel>
+                                </ComboBoxItem>
+                                <ComboBoxItem Tag="Important">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <Border Width="8" Height="8" Background="#EE8423" CornerRadius="4" />
+                                        <TextBlock Text="Important" />
+                                    </StackPanel>
+                                </ComboBoxItem>
+                            </ComboBox>
+
+                            <ComboBox
+                                x:Name="CompactEditorRecurrenceComboBox"
+                                Grid.Row="5"
                                 HorizontalAlignment="Stretch"
                                 SelectionChanged="CompactEditorRecurrenceComboBox_SelectionChanged">
                                 <ComboBoxItem Content="Does not repeat" Tag="None" />
@@ -584,7 +616,7 @@
                             </ComboBox>
 
                             <Grid
-                                Grid.Row="5"
+                                Grid.Row="6"
                                 ColumnSpacing="8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -760,7 +792,7 @@
                             </Grid>
 
                             <StackPanel
-                                Grid.Row="6"
+                                Grid.Row="7"
                                 HorizontalAlignment="Right"
                                 Orientation="Horizontal"
                                 Spacing="6">

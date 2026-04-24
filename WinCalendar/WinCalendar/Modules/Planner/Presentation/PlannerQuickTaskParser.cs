@@ -17,6 +17,7 @@ public static partial class PlannerQuickTaskParser
         TimeOnly? time = null;
         int? durationMinutes = null;
         TaskRecurrencePattern recurrencePattern = TaskRecurrencePattern.None;
+        TaskCategory category = TaskCategory.Work;
 
         foreach ((string token, DateOnly tokenDate) in GetDateTokens(today))
         {
@@ -26,6 +27,11 @@ public static partial class PlannerQuickTaskParser
         foreach ((string token, TaskRecurrencePattern pattern) in GetRecurrenceTokens())
         {
             title = RemoveToken(title, token, () => recurrencePattern = pattern);
+        }
+
+        foreach ((string token, TaskCategory tokenCategory) in GetCategoryTokens())
+        {
+            title = RemoveToken(title, token, () => category = tokenCategory);
         }
 
         title = TimeRegex().Replace(title, match =>
@@ -56,7 +62,7 @@ public static partial class PlannerQuickTaskParser
         if (string.IsNullOrWhiteSpace(title))
             return null;
 
-        return new PlannerQuickTaskParseResult(title, date, time, durationMinutes, recurrencePattern);
+        return new PlannerQuickTaskParseResult(title, date, time, durationMinutes, recurrencePattern, category);
     }
 
     private static IEnumerable<(string Token, DateOnly Date)> GetDateTokens(DateOnly today)
@@ -103,6 +109,18 @@ public static partial class PlannerQuickTaskParser
         return result;
     }
 
+    private static IEnumerable<(string Token, TaskCategory Category)> GetCategoryTokens()
+    {
+        yield return ("work", TaskCategory.Work);
+        yield return ("работа", TaskCategory.Work);
+        yield return ("personal", TaskCategory.Personal);
+        yield return ("личное", TaskCategory.Personal);
+        yield return ("health", TaskCategory.Health);
+        yield return ("здоровье", TaskCategory.Health);
+        yield return ("important", TaskCategory.Important);
+        yield return ("важно", TaskCategory.Important);
+    }
+
     private static string NormalizeTitle(string title)
     {
         return WhitespaceRegex().Replace(title, " ").Trim();
@@ -123,4 +141,5 @@ public sealed record PlannerQuickTaskParseResult(
     DateOnly Date,
     TimeOnly? Time,
     int? DurationMinutes,
-    TaskRecurrencePattern RecurrencePattern);
+    TaskRecurrencePattern RecurrencePattern,
+    TaskCategory Category);

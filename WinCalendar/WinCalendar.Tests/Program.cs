@@ -36,7 +36,7 @@ internal static class PlannerQuickTaskParserTests
     private static void ParsesEnglishQuickTask()
     {
         PlannerQuickTaskParseResult result = PlannerQuickTaskParser.Parse(
-            "meeting tomorrow 14:30 45m weekly",
+            "meeting important tomorrow 14:30 45m weekly",
             new DateOnly(2026, 4, 24),
             new DateOnly(2026, 4, 24))!;
 
@@ -45,6 +45,7 @@ internal static class PlannerQuickTaskParserTests
         Assert.Equal(new TimeOnly(14, 30), result.Time, "Quick parser should understand time.");
         Assert.Equal(45, result.DurationMinutes, "Quick parser should understand minute duration.");
         Assert.Equal(TaskRecurrencePattern.Weekly, result.RecurrencePattern, "Quick parser should understand recurrence.");
+        Assert.Equal(TaskCategory.Important, result.Category, "Quick parser should understand category.");
     }
 
     private static void ParsesRussianQuickTask()
@@ -59,6 +60,7 @@ internal static class PlannerQuickTaskParserTests
         Assert.Equal(new TimeOnly(9, 15), result.Time, "Quick parser should understand Russian time.");
         Assert.Equal(60, result.DurationMinutes, "Quick parser should understand Russian hour duration.");
         Assert.Equal(TaskRecurrencePattern.Weekly, result.RecurrencePattern, "Quick parser should understand Russian recurrence.");
+        Assert.Equal(TaskCategory.Work, result.Category, "Quick parser should default to work category.");
     }
 }
 internal static class TaskItemTests

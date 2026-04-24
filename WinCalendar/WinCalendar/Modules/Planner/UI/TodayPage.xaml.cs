@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Planner.App.Modules.Tasks.Entities;
 using Windows.Foundation;
 using WinCalendar.Modules.Planner.Presentation;
 using WinCalendar.Shared.Windowing;
@@ -29,6 +30,7 @@ public sealed partial class TodayPage : Page
     private bool _initialized;
     private bool _syncingWeekHorizontalScroll;
     private bool _syncingWeekVerticalScroll;
+    private bool _syncingEditorCategorySelection;
 
     public string[] EditorHourOptions { get; } = Enumerable.Range(0, 24)
         .Select(hour => hour.ToString("00"))
@@ -138,7 +140,8 @@ public sealed partial class TodayPage : Page
                 result.Date,
                 result.Time,
                 result.DurationMinutes,
-                result.RecurrencePattern);
+                result.RecurrencePattern,
+                result.Category);
             QuickAddTextBox.Text = string.Empty;
         }
         finally
@@ -210,6 +213,22 @@ public sealed partial class TodayPage : Page
 
     private void EditorAllDayToggleSwitch_Toggled(object sender, RoutedEventArgs e)
     {
+        ScheduleInlineSave();
+    }
+
+    private void EditorCategoryComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_syncingEditorCategorySelection
+            || EditorCategoryComboBox.SelectedItem is not ComboBoxItem { Tag: string tag }
+            || !Enum.TryParse(tag, out TaskCategory category))
+        {
+            return;
+        }
+
+        if (_plannerStateStore.EditorCategory == category)
+            return;
+
+        _plannerStateStore.EditorCategory = category;
         ScheduleInlineSave();
     }
 
@@ -605,6 +624,7 @@ public sealed partial class TodayPage : Page
         _focusTitleEditorAfterSelection = focusTitleEditor;
         DispatcherQueue.TryEnqueue(() =>
         {
+            SelectEditorCategory();
             _suppressInlineSave = false;
 
             if (!_focusTitleEditorAfterSelection)
@@ -614,5 +634,29 @@ public sealed partial class TodayPage : Page
             EditorTitleTextBox.Focus(FocusState.Programmatic);
             EditorTitleTextBox.SelectAll();
         });
+    }
+
+    private void SelectEditorCategory()
+    {
+        _syncingEditorCategorySelection = true;
+
+        try
+        {
+            string selectedTag = _plannerStateStore.EditorCategory.ToString();
+
+            foreach (object item in EditorCategoryComboBox.Items)
+            {
+                if (item is ComboBoxItem { Tag: string tag } comboBoxItem
+                    && tag == selectedTag)
+                {
+                    EditorCategoryComboBox.SelectedItem = comboBoxItem;
+                    return;
+                }
+            }
+        }
+        finally
+        {
+            _syncingEditorCategorySelection = false;
+        }
     }
 }

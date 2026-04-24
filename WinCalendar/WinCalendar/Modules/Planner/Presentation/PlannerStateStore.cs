@@ -269,6 +269,12 @@ public sealed class PlannerStateStore : ObservableObject
         set => _taskEditor.EditorRecurrencePattern = value;
     }
 
+    public TaskCategory EditorCategory
+    {
+        get => _taskEditor.EditorCategory;
+        set => _taskEditor.EditorCategory = value;
+    }
+
     public bool EditorIsAllDay
     {
         get => _taskEditor.EditorIsAllDay;
@@ -292,6 +298,8 @@ public sealed class PlannerStateStore : ObservableObject
     public string EditorDateText => _taskEditor.EditorDateText;
 
     public string EditorRecurrenceText => _taskEditor.EditorRecurrenceText;
+
+    public string EditorCategoryText => _taskEditor.EditorCategoryText;
 
     public double EditorMaxDurationMinutes => _taskEditor.EditorMaxDurationMinutes;
 
@@ -410,7 +418,8 @@ public sealed class PlannerStateStore : ObservableObject
         DateOnly? date = null,
         TimeOnly? time = null,
         int? durationMinutes = null,
-        TaskRecurrencePattern recurrencePattern = TaskRecurrencePattern.None)
+        TaskRecurrencePattern recurrencePattern = TaskRecurrencePattern.None,
+        TaskCategory category = TaskCategory.Work)
     {
         if (string.IsNullOrWhiteSpace(title))
             return;
@@ -421,7 +430,8 @@ public sealed class PlannerStateStore : ObservableObject
             targetDate,
             time,
             durationMinutes,
-            recurrencePattern: recurrencePattern);
+            recurrencePattern: recurrencePattern,
+            category: category);
         _selectedTaskId = task.Id;
         await SelectDateAsync(targetDate);
     }
@@ -499,7 +509,8 @@ public sealed class PlannerStateStore : ObservableObject
                 time,
                 durationMinutes,
                 description,
-                EditorRecurrencePattern),
+                EditorRecurrencePattern,
+                EditorCategory),
             TaskEditorMode.Edit when SelectedTask is not null => await _updateTaskUseCase.ExecuteAsync(
                 SelectedTask.Id,
                 EditorTitle,
@@ -507,7 +518,8 @@ public sealed class PlannerStateStore : ObservableObject
                 time,
                 durationMinutes,
                 description,
-                EditorRecurrencePattern),
+                EditorRecurrencePattern,
+                EditorCategory),
             _ => throw new InvalidOperationException("Task editor is not ready to save.")
         };
 

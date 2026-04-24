@@ -185,6 +185,9 @@ public sealed class PlannerStateStore : ObservableObject
     public Visibility EmptySelectedDayTasksVisibility =>
         SelectedDayTasks.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
 
+    public Visibility CompactSelectedDayContentVisibility =>
+        _taskEditorMode == TaskEditorMode.None ? Visibility.Visible : Visibility.Collapsed;
+
     public string EmptySelectedDayTasksText =>
         _selectedDate == _clock.Today ? "No tasks for today" : "No tasks for this day";
 
@@ -685,6 +688,7 @@ public sealed class PlannerStateStore : ObservableObject
         OnPropertyChanged(nameof(EditorDeleteVisibility));
         OnPropertyChanged(nameof(EditorCompleteVisibility));
         OnPropertyChanged(nameof(EditorCompletionButtonText));
+        OnPropertyChanged(nameof(CompactSelectedDayContentVisibility));
     }
 
     private void TaskEditor_PropertyChanged(object? sender, PropertyChangedEventArgs e)

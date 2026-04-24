@@ -13,6 +13,7 @@
     <Page.Resources>
         <SolidColorBrush x:Key="CompactDividerBrush" Color="#0D000000" />
         <SolidColorBrush x:Key="CompactMutedBrush" Color="#8A000000" />
+        <SolidColorBrush x:Key="CompactComposerPanelBrush" Color="#FFFFFFFF" />
         <SolidColorBrush x:Key="CompactPanelBrush" Color="#F2FFFFFF" />
         <SolidColorBrush x:Key="CompactTaskCardBrush" Color="#0D000000" />
         <SolidColorBrush x:Key="CompactTextBrush" Color="#FF1C1C1C" />
@@ -85,6 +86,43 @@
             <Setter Property="CornerRadius" Value="6" />
             <Setter Property="Foreground" Value="{ThemeResource AppAccentBrush}" />
         </Style>
+
+        <Style x:Key="CompactComposerFieldButtonStyle" TargetType="Button">
+            <Setter Property="MinHeight" Value="34" />
+            <Setter Property="Padding" Value="8,0" />
+            <Setter Property="Background" Value="{StaticResource CompactTaskCardBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource CompactDividerBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Foreground" Value="{StaticResource CompactTextBrush}" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        </Style>
+
+        <Style x:Key="CompactComposerSecondaryButtonStyle" TargetType="Button">
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Foreground" Value="{StaticResource CompactMutedBrush}" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
+
+        <Style x:Key="CompactComposerPrimaryButtonStyle" TargetType="Button">
+            <Setter Property="MinWidth" Value="0" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Padding" Value="14,0" />
+            <Setter Property="Background" Value="{ThemeResource AppAccentBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource AppAccentBrush}" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="6" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+        </Style>
     </Page.Resources>
 
     <Grid
@@ -105,7 +143,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="1" />
                     <RowDefinition Height="Auto" />
-                    <RowDefinition Height="132" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Grid ColumnSpacing="10">
@@ -303,77 +341,420 @@
                         Style="{StaticResource CompactNewTaskButtonStyle}" />
                 </Grid>
 
-                <ListView
+                <Grid
+                    x:Name="TaskAreaHost"
                     Grid.Row="5"
-                    Height="132"
-                    IsItemClickEnabled="False"
-                    ItemContainerStyle="{StaticResource CompactTaskItemContainerStyle}"
-                    ItemsSource="{Binding SelectedDayTasks}"
-                    SelectionMode="None"
-                    Visibility="{Binding SelectedDayTasksVisibility}">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <Border
-                                Height="58"
-                                Margin="0,0,0,8"
-                                Padding="10,7"
-                                Background="{StaticResource CompactTaskCardBrush}"
-                                BorderBrush="{ThemeResource AppAccentBrush}"
-                                BorderThickness="2,0,0,0"
-                                CornerRadius="6"
-                                Opacity="{Binding ContentOpacity}">
+                    Height="132">
+                    <Grid Visibility="{Binding CompactSelectedDayContentVisibility}">
+                        <ListView
+                            Height="132"
+                            IsItemClickEnabled="False"
+                            ItemContainerStyle="{StaticResource CompactTaskItemContainerStyle}"
+                            ItemsSource="{Binding SelectedDayTasks}"
+                            SelectionMode="None"
+                            Visibility="{Binding SelectedDayTasksVisibility}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <Border
+                                        Height="58"
+                                        Margin="0,0,0,8"
+                                        Padding="10,7"
+                                        Background="{StaticResource CompactTaskCardBrush}"
+                                        BorderBrush="{ThemeResource AppAccentBrush}"
+                                        BorderThickness="2,0,0,0"
+                                        CornerRadius="6"
+                                        Opacity="{Binding ContentOpacity}">
+                                        <Grid ColumnSpacing="8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <Grid RowSpacing="2">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="*" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+
+                                                <TextBlock
+                                                    VerticalAlignment="Center"
+                                                    FontSize="13"
+                                                    FontWeight="SemiBold"
+                                                    Foreground="{StaticResource CompactTextBrush}"
+                                                    Text="{Binding Title}"
+                                                    TextTrimming="CharacterEllipsis" />
+
+                                                <TextBlock
+                                                    Grid.Row="1"
+                                                    FontSize="11"
+                                                    Foreground="{StaticResource CompactMutedBrush}"
+                                                    Text="{Binding CompactTimeText}"
+                                                    TextTrimming="CharacterEllipsis" />
+                                            </Grid>
+
+                                            <Button
+                                                Grid.Column="1"
+                                                Click="TaskCompletionButton_Click"
+                                                Style="{StaticResource CompactTaskCompletionButtonStyle}"
+                                                ToolTipService.ToolTip="Toggle done state">
+                                                <FontIcon
+                                                    FontFamily="Segoe Fluent Icons"
+                                                    FontSize="11"
+                                                    Glyph="&#xE73E;" />
+                                            </Button>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+
+                        <TextBlock
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center"
+                            FontSize="13"
+                            Foreground="{StaticResource CompactMutedBrush}"
+                            Text="{Binding EmptySelectedDayTasksText}"
+                            Visibility="{Binding EmptySelectedDayTasksVisibility}" />
+                    </Grid>
+                </Grid>
+
+                <Border
+                    x:Name="CompactEditorHost"
+                    Grid.Row="2"
+                    Grid.RowSpan="4"
+                    Height="344"
+                    VerticalAlignment="Bottom"
+                        Padding="10"
+                        Background="{StaticResource CompactComposerPanelBrush}"
+                        BorderBrush="{StaticResource CompactDividerBrush}"
+                        BorderThickness="1"
+                        CornerRadius="8"
+                        Visibility="{Binding SelectedTaskVisibility}">
+                    <Border.RenderTransform>
+                        <TranslateTransform x:Name="CompactEditorHostTranslate" Y="12" />
+                    </Border.RenderTransform>
+
+                        <Grid RowSpacing="8">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <Grid ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Spacing="1">
+                                    <TextBlock
+                                        FontFamily="Segoe UI Variable Display"
+                                        FontSize="16"
+                                        FontWeight="SemiBold"
+                                        Foreground="{StaticResource CompactTextBrush}"
+                                        Text="New task" />
+                                    <TextBlock
+                                        FontSize="11"
+                                        Foreground="{StaticResource CompactMutedBrush}"
+                                        Text="{Binding EditorDateText}"
+                                        TextTrimming="CharacterEllipsis" />
+                                </StackPanel>
+
+                                <Button
+                                    Grid.Column="1"
+                                    Click="CancelCompactEditorButton_Click"
+                                    Style="{StaticResource CompactComposerSecondaryButtonStyle}"
+                                    ToolTipService.ToolTip="Cancel">
+                                    <FontIcon
+                                        FontFamily="Segoe Fluent Icons"
+                                        FontSize="10"
+                                        Glyph="&#xE711;" />
+                                </Button>
+                            </Grid>
+
+                            <TextBox
+                                x:Name="CompactEditorTitleTextBox"
+                                Grid.Row="1"
+                                MinHeight="32"
+                                Padding="8,4"
+                                PlaceholderText="Task title"
+                                Text="{Binding EditorTitle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                TextChanged="CompactEditorTitleTextBox_TextChanged" />
+
+                            <Button
+                                x:Name="CompactEditorDateButton"
+                                Grid.Row="2"
+                                Style="{StaticResource CompactComposerFieldButtonStyle}">
                                 <Grid ColumnSpacing="8">
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <Grid RowSpacing="2">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="*" />
-                                            <RowDefinition Height="Auto" />
-                                        </Grid.RowDefinitions>
-
-                                        <TextBlock
-                                            VerticalAlignment="Center"
-                                            FontSize="13"
-                                            FontWeight="SemiBold"
-                                            Foreground="{StaticResource CompactTextBrush}"
-                                            Text="{Binding Title}"
-                                            TextTrimming="CharacterEllipsis" />
-
-                                        <TextBlock
-                                            Grid.Row="1"
-                                            FontSize="11"
-                                            Foreground="{StaticResource CompactMutedBrush}"
-                                            Text="{Binding CompactTimeText}"
-                                            TextTrimming="CharacterEllipsis" />
-                                    </Grid>
-
-                                    <Button
+                                    <FontIcon
+                                        VerticalAlignment="Center"
+                                        FontFamily="Segoe Fluent Icons"
+                                        FontSize="11"
+                                        Foreground="{StaticResource CompactMutedBrush}"
+                                        Glyph="&#xE787;" />
+                                    <TextBlock
                                         Grid.Column="1"
-                                        Click="TaskCompletionButton_Click"
-                                        Style="{StaticResource CompactTaskCompletionButtonStyle}"
-                                        ToolTipService.ToolTip="Toggle done state">
-                                        <FontIcon
-                                            FontFamily="Segoe Fluent Icons"
-                                            FontSize="11"
-                                            Glyph="&#xE73E;" />
-                                    </Button>
+                                        VerticalAlignment="Center"
+                                        FontSize="12"
+                                        FontWeight="SemiBold"
+                                        Text="{Binding EditorDateText}"
+                                        TextTrimming="CharacterEllipsis" />
+                                    <FontIcon
+                                        Grid.Column="2"
+                                        VerticalAlignment="Center"
+                                        FontFamily="Segoe Fluent Icons"
+                                        FontSize="9"
+                                        Foreground="{StaticResource CompactMutedBrush}"
+                                        Glyph="&#xE70D;" />
                                 </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
 
-                <TextBlock
-                    Grid.Row="5"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    FontSize="13"
-                    Foreground="{StaticResource CompactMutedBrush}"
-                    Text="{Binding EmptySelectedDayTasksText}"
-                    Visibility="{Binding EmptySelectedDayTasksVisibility}" />
+                                <Button.Flyout>
+                                    <Flyout
+                                        x:Name="CompactEditorDateFlyout"
+                                        Opening="CompactEditorDateFlyout_Opening"
+                                        Placement="BottomEdgeAlignedLeft">
+                                        <Border
+                                            Padding="8"
+                                            Background="{ThemeResource AppShellBackgroundBrush}"
+                                            BorderBrush="{ThemeResource AppBorderBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="10">
+                                            <CalendarView
+                                                x:Name="CompactEditorDateCalendarView"
+                                                SelectedDatesChanged="CompactEditorDateCalendarView_SelectedDatesChanged"
+                                                SelectionMode="Single" />
+                                        </Border>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+
+                            <Grid
+                                Grid.Row="3"
+                                ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <ToggleSwitch
+                                    MinWidth="0"
+                                    IsOn="{Binding EditorIsAllDay, Mode=TwoWay}"
+                                    OffContent=""
+                                    OnContent="" />
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Margin="6,0,0,0"
+                                    VerticalAlignment="Center"
+                                    FontSize="12"
+                                    FontWeight="SemiBold"
+                                    Foreground="{StaticResource CompactTextBrush}"
+                                    Text="All Day" />
+                            </Grid>
+
+                            <Grid
+                                Grid.Row="4"
+                                ColumnSpacing="8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Spacing="4">
+                                    <TextBlock
+                                        FontSize="11"
+                                        Foreground="{StaticResource CompactMutedBrush}"
+                                        Text="Start" />
+                                    <Button
+                                        x:Name="CompactEditorTimeButton"
+                                        IsEnabled="{Binding EditorTimeInputEnabled}"
+                                        Style="{StaticResource CompactComposerFieldButtonStyle}">
+                                        <Grid ColumnSpacing="6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <FontIcon
+                                                VerticalAlignment="Center"
+                                                FontFamily="Segoe Fluent Icons"
+                                                FontSize="11"
+                                                Foreground="{StaticResource CompactMutedBrush}"
+                                                Glyph="&#xE823;" />
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                VerticalAlignment="Center"
+                                                FontSize="12"
+                                                FontWeight="SemiBold"
+                                                Text="{Binding EditorTimeText}" />
+                                            <FontIcon
+                                                Grid.Column="2"
+                                                VerticalAlignment="Center"
+                                                FontFamily="Segoe Fluent Icons"
+                                                FontSize="9"
+                                                Foreground="{StaticResource CompactMutedBrush}"
+                                                Glyph="&#xE70D;" />
+                                        </Grid>
+
+                                        <Button.Flyout>
+                                            <Flyout
+                                                x:Name="CompactEditorTimeFlyout"
+                                                Opening="CompactEditorTimeFlyout_Opening"
+                                                Placement="BottomEdgeAlignedLeft">
+                                                <Border
+                                                    Width="136"
+                                                    Padding="4"
+                                                    Background="{ThemeResource AppShellBackgroundBrush}"
+                                                    BorderBrush="{ThemeResource AppBorderBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="10">
+                                                    <Grid ColumnSpacing="4">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="1" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+
+                                                        <ListView
+                                                            x:Name="CompactEditorHourListView"
+                                                            Height="128"
+                                                            ItemsSource="{x:Bind CompactEditorHourOptions}"
+                                                            SelectionChanged="CompactEditorTimeListView_SelectionChanged"
+                                                            SelectionMode="Single" />
+                                                        <Border
+                                                            Grid.Column="1"
+                                                            Margin="0,4"
+                                                            Background="{StaticResource CompactDividerBrush}" />
+                                                        <ListView
+                                                            x:Name="CompactEditorMinuteListView"
+                                                            Grid.Column="2"
+                                                            Height="128"
+                                                            ItemsSource="{x:Bind CompactEditorMinuteOptions}"
+                                                            SelectionChanged="CompactEditorTimeListView_SelectionChanged"
+                                                            SelectionMode="Single" />
+                                                    </Grid>
+                                                </Border>
+                                            </Flyout>
+                                        </Button.Flyout>
+                                    </Button>
+                                </StackPanel>
+
+                                <StackPanel
+                                    Grid.Column="1"
+                                    Spacing="4">
+                                    <TextBlock
+                                        FontSize="11"
+                                        Foreground="{StaticResource CompactMutedBrush}"
+                                        Text="Duration" />
+                                    <Button
+                                        x:Name="CompactEditorDurationButton"
+                                        IsEnabled="{Binding EditorDurationInputEnabled}"
+                                        Style="{StaticResource CompactComposerFieldButtonStyle}">
+                                        <Grid ColumnSpacing="6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+
+                                            <FontIcon
+                                                VerticalAlignment="Center"
+                                                FontFamily="Segoe Fluent Icons"
+                                                FontSize="11"
+                                                Foreground="{StaticResource CompactMutedBrush}"
+                                                Glyph="&#xE916;" />
+                                            <TextBlock
+                                                Grid.Column="1"
+                                                VerticalAlignment="Center"
+                                                FontSize="12"
+                                                FontWeight="SemiBold"
+                                                Text="{Binding EditorDurationText}"
+                                                TextTrimming="CharacterEllipsis" />
+                                            <FontIcon
+                                                Grid.Column="2"
+                                                VerticalAlignment="Center"
+                                                FontFamily="Segoe Fluent Icons"
+                                                FontSize="9"
+                                                Foreground="{StaticResource CompactMutedBrush}"
+                                                Glyph="&#xE70D;" />
+                                        </Grid>
+
+                                        <Button.Flyout>
+                                            <Flyout
+                                                x:Name="CompactEditorDurationFlyout"
+                                                Opening="CompactEditorDurationFlyout_Opening"
+                                                Placement="BottomEdgeAlignedLeft">
+                                                <Border
+                                                    Width="184"
+                                                    Padding="4"
+                                                    Background="{ThemeResource AppShellBackgroundBrush}"
+                                                    BorderBrush="{ThemeResource AppBorderBrush}"
+                                                    BorderThickness="1"
+                                                    CornerRadius="10">
+                                                    <ListView
+                                                        x:Name="CompactEditorDurationListView"
+                                                        Height="132"
+                                                        IsItemClickEnabled="True"
+                                                        ItemsSource="{Binding EditorDurationOptions}"
+                                                        ItemClick="CompactEditorDurationListView_ItemClick"
+                                                        SelectionMode="Single">
+                                                        <ListView.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <Grid ColumnSpacing="8">
+                                                                    <Grid.ColumnDefinitions>
+                                                                        <ColumnDefinition Width="54" />
+                                                                        <ColumnDefinition Width="*" />
+                                                                    </Grid.ColumnDefinitions>
+
+                                                                    <TextBlock
+                                                                        FontSize="12"
+                                                                        FontWeight="SemiBold"
+                                                                        Text="{Binding EndTimeText}" />
+                                                                    <TextBlock
+                                                                        Grid.Column="1"
+                                                                        FontSize="12"
+                                                                        Foreground="{StaticResource CompactMutedBrush}"
+                                                                        Text="{Binding DescriptionText}"
+                                                                        TextTrimming="CharacterEllipsis" />
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </ListView.ItemTemplate>
+                                                    </ListView>
+                                                </Border>
+                                            </Flyout>
+                                        </Button.Flyout>
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+
+                            <StackPanel
+                                Grid.Row="5"
+                                HorizontalAlignment="Right"
+                                Orientation="Horizontal"
+                                Spacing="6">
+                                <Button
+                                    Click="CancelCompactEditorButton_Click"
+                                    Content="Cancel"
+                                    Style="{StaticResource CompactComposerSecondaryButtonStyle}" />
+                                <Button
+                                    x:Name="CompactEditorDoneButton"
+                                    Click="DoneCompactEditorButton_Click"
+                                    Content="Done"
+                                    IsEnabled="False"
+                                    Style="{StaticResource CompactComposerPrimaryButtonStyle}" />
+                            </StackPanel>
+                        </Grid>
+                    </Border>
             </Grid>
         </Border>
     </Grid>

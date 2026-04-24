@@ -10,6 +10,7 @@
     <Compile Include="..\WinCalendar\Core\Time\IClock.cs" Link="Production\Core\Time\IClock.cs" />
     <Compile Include="..\WinCalendar\Modules\Planner\Presentation\PlannerQuickTaskParser.cs" Link="Production\Modules\Planner\Presentation\PlannerQuickTaskParser.cs" />
     <Compile Include="..\WinCalendar\Modules\Tasks\Contracts\ITaskRepository.cs" Link="Production\Modules\Tasks\Contracts\ITaskRepository.cs" />
+    <Compile Include="..\WinCalendar\Modules\Tasks\Entites\TaskCategory.cs" Link="Production\Modules\Tasks\Entites\TaskCategory.cs" />
     <Compile Include="..\WinCalendar\Modules\Tasks\Entites\TaskItem.cs" Link="Production\Modules\Tasks\Entites\TaskItem.cs" />
     <Compile Include="..\WinCalendar\Modules\Tasks\Entites\TaskRecurrencePattern.cs" Link="Production\Modules\Tasks\Entites\TaskRecurrencePattern.cs" />
     <Compile Include="..\WinCalendar\Modules\Tasks\Infrastructure\Sqlite\SqliteConnection.cs" Link="Production\Modules\Tasks\Infrastructure\Sqlite\SqliteConnection.cs" />

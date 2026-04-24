@@ -20,6 +20,8 @@ public class TaskItem
 
     public TaskRecurrencePattern RecurrencePattern { get; private set; }
 
+    public TaskCategory Category { get; private set; }
+
     public bool IsCompleted { get; private set; }
 
     public DateTime CreatedAt { get; private set; }
@@ -38,14 +40,15 @@ public class TaskItem
         TimeOnly? time = null,
         int? durationMinutes = null,
         string? description = null,
-        TaskRecurrencePattern recurrencePattern = TaskRecurrencePattern.None)
+        TaskRecurrencePattern recurrencePattern = TaskRecurrencePattern.None,
+        TaskCategory category = TaskCategory.Work)
     {
         Id = Guid.NewGuid();
         IsCompleted = false;
         CreatedAt = NormalizeUtc(createdAtUtc);
         UpdatedAt = CreatedAt;
 
-        ApplyDetails(title, date, time, durationMinutes, description, recurrencePattern);
+        ApplyDetails(title, date, time, durationMinutes, description, recurrencePattern, category);
     }
 
     private TaskItem(
@@ -56,6 +59,7 @@ public class TaskItem
         int? durationMinutes,
         string? description,
         TaskRecurrencePattern recurrencePattern,
+        TaskCategory category,
         bool isCompleted,
         DateTime createdAt,
         DateTime updatedAt)
@@ -65,7 +69,7 @@ public class TaskItem
         CreatedAt = NormalizeUtc(createdAt);
         UpdatedAt = NormalizeUtc(updatedAt);
 
-        ApplyDetails(title, date, time, durationMinutes, description, recurrencePattern);
+        ApplyDetails(title, date, time, durationMinutes, description, recurrencePattern, category);
     }
 
     public static TaskItem Restore(
@@ -76,6 +80,7 @@ public class TaskItem
         int? durationMinutes,
         string? description,
         TaskRecurrencePattern recurrencePattern,
+        TaskCategory category,
         bool isCompleted,
         DateTime createdAt,
         DateTime updatedAt)
@@ -88,6 +93,7 @@ public class TaskItem
             durationMinutes,
             description,
             recurrencePattern,
+            category,
             isCompleted,
             createdAt,
             updatedAt);
@@ -100,9 +106,10 @@ public class TaskItem
         int? durationMinutes,
         DateTime updatedAtUtc,
         string? description = null,
-        TaskRecurrencePattern recurrencePattern = TaskRecurrencePattern.None)
+        TaskRecurrencePattern recurrencePattern = TaskRecurrencePattern.None,
+        TaskCategory category = TaskCategory.Work)
     {
-        ApplyDetails(title, date, time, durationMinutes, description, recurrencePattern);
+        ApplyDetails(title, date, time, durationMinutes, description, recurrencePattern, category);
         UpdatedAt = NormalizeUtc(updatedAtUtc);
     }
 
@@ -124,7 +131,8 @@ public class TaskItem
         TimeOnly? time,
         int? durationMinutes,
         string? description,
-        TaskRecurrencePattern recurrencePattern)
+        TaskRecurrencePattern recurrencePattern,
+        TaskCategory category)
     {
         Title = NormalizeTitle(title);
         Description = NormalizeDescription(description);
@@ -132,6 +140,7 @@ public class TaskItem
         Time = time;
         DurationMinutes = NormalizeDurationMinutes(time, durationMinutes);
         RecurrencePattern = recurrencePattern;
+        Category = category;
     }
 
     private static string NormalizeTitle(string title)

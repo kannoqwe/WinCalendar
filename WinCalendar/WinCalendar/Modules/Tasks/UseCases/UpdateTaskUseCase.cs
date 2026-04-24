@@ -24,12 +24,13 @@ public sealed class UpdateTaskUseCase
         TimeOnly? time = null,
         int? durationMinutes = null,
         string? description = null,
-        TaskRecurrencePattern recurrencePattern = TaskRecurrencePattern.None)
+        TaskRecurrencePattern recurrencePattern = TaskRecurrencePattern.None,
+        TaskCategory category = TaskCategory.Work)
     {
         TaskItem task = await _taskRepository.GetByIdAsync(id)
             ?? throw new InvalidOperationException($"Task with id '{id}' was not found.");
 
-        task.Update(title, date, time, durationMinutes, _clock.UtcNow, description, recurrencePattern);
+        task.Update(title, date, time, durationMinutes, _clock.UtcNow, description, recurrencePattern, category);
 
         await _taskRepository.UpdateAsync(task);
 

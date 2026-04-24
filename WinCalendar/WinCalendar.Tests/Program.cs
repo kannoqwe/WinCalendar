@@ -81,6 +81,7 @@ internal static class TaskItemTests
 
         Assert.Equal("Write plan", task.Title, "Task title should be trimmed.");
         Assert.Equal("Notes", task.Description, "Task description should be trimmed.");
+        Assert.Equal(TaskCategory.Work, task.Category, "Task category should default to work.");
         Assert.Equal(createdAt, task.CreatedAt, "CreatedAt should use the provided timestamp.");
         Assert.Equal(createdAt, task.UpdatedAt, "UpdatedAt should initially match CreatedAt.");
     }
@@ -236,7 +237,8 @@ internal static class SqliteTaskRepositoryTests
                 30,
                 new DateTime(2026, 4, 24, 9, 0, 0, DateTimeKind.Utc),
                 "Updated",
-                TaskRecurrencePattern.Daily);
+                TaskRecurrencePattern.Daily,
+                TaskCategory.Important);
             await repository.UpdateAsync(task);
 
             TaskItem? restored = await repository.GetByIdAsync(task.Id);
@@ -246,6 +248,7 @@ internal static class SqliteTaskRepositoryTests
             Assert.Equal(new TimeOnly(9, 15), restored.Time, "Updated time should be stored.");
             Assert.Equal(30, restored.DurationMinutes, "Updated duration should be stored.");
             Assert.Equal(TaskRecurrencePattern.Daily, restored.RecurrencePattern, "Updated recurrence should be stored.");
+            Assert.Equal(TaskCategory.Important, restored.Category, "Updated category should be stored.");
 
             await repository.DeleteAsync(task.Id);
 

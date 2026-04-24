@@ -23,9 +23,10 @@ public sealed class CreateTaskUseCase
         TimeOnly? time = null,
         int? durationMinutes = null,
         string? description = null,
-        TaskRecurrencePattern recurrencePattern = TaskRecurrencePattern.None)
+        TaskRecurrencePattern recurrencePattern = TaskRecurrencePattern.None,
+        TaskCategory category = TaskCategory.Work)
     {
-        TaskItem task = new(title, date, _clock.UtcNow, time, durationMinutes, description, recurrencePattern);
+        TaskItem task = new(title, date, _clock.UtcNow, time, durationMinutes, description, recurrencePattern, category);
 
         await _taskRepository.AddAsync(task);
         await CreateFutureOccurrencesAsync(task);
@@ -60,7 +61,8 @@ public sealed class CreateTaskUseCase
                 sourceTask.Time,
                 sourceTask.DurationMinutes,
                 sourceTask.Description,
-                sourceTask.RecurrencePattern);
+                sourceTask.RecurrencePattern,
+                sourceTask.Category);
 
             await _taskRepository.AddAsync(occurrence);
         }

@@ -263,6 +263,12 @@ public sealed class PlannerStateStore : ObservableObject
         set => _taskEditor.EditorDate = value;
     }
 
+    public TaskRecurrencePattern EditorRecurrencePattern
+    {
+        get => _taskEditor.EditorRecurrencePattern;
+        set => _taskEditor.EditorRecurrencePattern = value;
+    }
+
     public bool EditorIsAllDay
     {
         get => _taskEditor.EditorIsAllDay;
@@ -284,6 +290,8 @@ public sealed class PlannerStateStore : ObservableObject
     public string EditorDurationText => _taskEditor.EditorDurationText;
 
     public string EditorDateText => _taskEditor.EditorDateText;
+
+    public string EditorRecurrenceText => _taskEditor.EditorRecurrenceText;
 
     public double EditorMaxDurationMinutes => _taskEditor.EditorMaxDurationMinutes;
 
@@ -397,13 +405,23 @@ public sealed class PlannerStateStore : ObservableObject
         }
     }
 
-    public async Task AddTaskAsync(string title, DateOnly? date = null, TimeOnly? time = null, int? durationMinutes = null)
+    public async Task AddTaskAsync(
+        string title,
+        DateOnly? date = null,
+        TimeOnly? time = null,
+        int? durationMinutes = null,
+        TaskRecurrencePattern recurrencePattern = TaskRecurrencePattern.None)
     {
         if (string.IsNullOrWhiteSpace(title))
             return;
 
         DateOnly targetDate = date ?? _selectedDate;
-        TaskItem task = await _createTaskUseCase.ExecuteAsync(title, targetDate, time, durationMinutes);
+        TaskItem task = await _createTaskUseCase.ExecuteAsync(
+            title,
+            targetDate,
+            time,
+            durationMinutes,
+            recurrencePattern: recurrencePattern);
         _selectedTaskId = task.Id;
         await SelectDateAsync(targetDate);
     }
@@ -475,14 +493,21 @@ public sealed class PlannerStateStore : ObservableObject
 
         TaskItem task = _taskEditorMode switch
         {
-            TaskEditorMode.New => await _createTaskUseCase.ExecuteAsync(EditorTitle, date, time, durationMinutes, description),
+            TaskEditorMode.New => await _createTaskUseCase.ExecuteAsync(
+                EditorTitle,
+                date,
+                time,
+                durationMinutes,
+                description,
+                EditorRecurrencePattern),
             TaskEditorMode.Edit when SelectedTask is not null => await _updateTaskUseCase.ExecuteAsync(
                 SelectedTask.Id,
                 EditorTitle,
                 date,
                 time,
                 durationMinutes,
-                description),
+                description,
+                EditorRecurrencePattern),
             _ => throw new InvalidOperationException("Task editor is not ready to save.")
         };
 

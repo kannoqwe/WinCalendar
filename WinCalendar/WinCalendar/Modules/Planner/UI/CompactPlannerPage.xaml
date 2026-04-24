@@ -431,7 +431,7 @@
                     x:Name="CompactEditorHost"
                     Grid.Row="2"
                     Grid.RowSpan="4"
-                    Height="344"
+                    Height="386"
                     VerticalAlignment="Bottom"
                         Padding="10"
                         Background="{StaticResource CompactComposerPanelBrush}"
@@ -445,6 +445,7 @@
 
                         <Grid RowSpacing="8">
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
@@ -571,8 +572,19 @@
                                     Text="All Day" />
                             </Grid>
 
-                            <Grid
+                            <ComboBox
+                                x:Name="CompactEditorRecurrenceComboBox"
                                 Grid.Row="4"
+                                HorizontalAlignment="Stretch"
+                                SelectionChanged="CompactEditorRecurrenceComboBox_SelectionChanged">
+                                <ComboBoxItem Content="Does not repeat" Tag="None" />
+                                <ComboBoxItem Content="Daily" Tag="Daily" />
+                                <ComboBoxItem Content="Weekly" Tag="Weekly" />
+                                <ComboBoxItem Content="Monthly" Tag="Monthly" />
+                            </ComboBox>
+
+                            <Grid
+                                Grid.Row="5"
                                 ColumnSpacing="8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
@@ -748,7 +760,7 @@
                             </Grid>
 
                             <StackPanel
-                                Grid.Row="5"
+                                Grid.Row="6"
                                 HorizontalAlignment="Right"
                                 Orientation="Horizontal"
                                 Spacing="6">

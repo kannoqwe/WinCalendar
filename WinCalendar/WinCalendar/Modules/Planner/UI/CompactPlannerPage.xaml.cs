@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media.Animation;
+using Planner.App.Modules.Tasks.Entities;
 using WinCalendar.Modules.Planner.Presentation;
 using Windows.System;
 
@@ -15,6 +16,7 @@ public sealed partial class CompactPlannerPage : Page
     private readonly Action _openMainApp;
     private bool _syncingCompactEditorDateSelection;
     private bool _syncingCompactEditorTimeSelection;
+    private bool _syncingCompactEditorRecurrenceSelection;
     private bool _initialized;
 
     public string[] CompactEditorHourOptions { get; } = Enumerable.Range(0, 24)
@@ -46,6 +48,7 @@ public sealed partial class CompactPlannerPage : Page
     private void AddTaskButton_Click(object sender, RoutedEventArgs e)
     {
         _plannerStateStore.BeginNewTaskDraft(_plannerStateStore.SelectedDate);
+        SelectCompactEditorRecurrence();
         UpdateCompactEditorDoneButtonState();
 
         DispatcherQueue.TryEnqueue(() =>
@@ -191,6 +194,18 @@ public sealed partial class CompactPlannerPage : Page
         CompactEditorDurationFlyout.Hide();
     }
 
+    private void CompactEditorRecurrenceComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_syncingCompactEditorRecurrenceSelection
+            || CompactEditorRecurrenceComboBox.SelectedItem is not ComboBoxItem { Tag: string tag }
+            || !Enum.TryParse(tag, out TaskRecurrencePattern recurrencePattern))
+        {
+            return;
+        }
+
+        _plannerStateStore.EditorRecurrencePattern = recurrencePattern;
+    }
+
     private void CancelCompactEditorButton_Click(object sender, RoutedEventArgs e)
     {
         CloseCompactEditor();
@@ -261,5 +276,29 @@ public sealed partial class CompactPlannerPage : Page
         storyboard.Children.Add(opacityAnimation);
         storyboard.Children.Add(translateAnimation);
         storyboard.Begin();
+    }
+
+    private void SelectCompactEditorRecurrence()
+    {
+        _syncingCompactEditorRecurrenceSelection = true;
+
+        try
+        {
+            string selectedTag = _plannerStateStore.EditorRecurrencePattern.ToString();
+
+            foreach (object item in CompactEditorRecurrenceComboBox.Items)
+            {
+                if (item is ComboBoxItem { Tag: string tag } comboBoxItem
+                    && tag == selectedTag)
+                {
+                    CompactEditorRecurrenceComboBox.SelectedItem = comboBoxItem;
+                    return;
+                }
+            }
+        }
+        finally
+        {
+            _syncingCompactEditorRecurrenceSelection = false;
+        }
     }
 }

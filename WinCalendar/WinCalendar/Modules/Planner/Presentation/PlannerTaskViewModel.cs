@@ -18,6 +18,7 @@ public sealed class PlannerTaskViewModel
         Date = task.Date;
         Time = task.Time;
         DurationMinutes = task.DurationMinutes;
+        RecurrencePattern = task.RecurrencePattern;
         IsCompleted = task.IsCompleted;
         TaskBackgroundBrush = tone.BackgroundBrush;
         TaskBorderBrush = tone.BorderBrush;
@@ -35,6 +36,8 @@ public sealed class PlannerTaskViewModel
     public TimeOnly? Time { get; }
 
     public int? DurationMinutes { get; }
+
+    public TaskRecurrencePattern RecurrencePattern { get; }
 
     public bool IsCompleted { get; }
 
@@ -55,6 +58,14 @@ public sealed class PlannerTaskViewModel
     public string CompactTimeText => PlannerDateTimeFormatter.FormatCompactTime(Time, DurationMinutes);
 
     public string DurationText => PlannerDateTimeFormatter.FormatDuration(DurationMinutes);
+
+    public string RecurrenceText => RecurrencePattern switch
+    {
+        TaskRecurrencePattern.Daily => "Daily",
+        TaskRecurrencePattern.Weekly => "Weekly",
+        TaskRecurrencePattern.Monthly => "Monthly",
+        _ => "Does not repeat"
+    };
 
     public bool HasTime => Time is not null;
 

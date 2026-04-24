@@ -1,6 +1,7 @@
 using System;
 using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
+using Planner.App.Modules.Tasks.Entities;
 using WinCalendar.Core.Abstractions;
 using WinCalendar.Core.Time;
 
@@ -17,6 +18,7 @@ internal sealed class PlannerTaskEditorState : ObservableObject
     private TimeSpan _editorTime = new(9, 0, 0);
     private double _editorDurationMinutes = PlannerWeekTimelineLayout.DefaultTaskDurationMinutes;
     private DateTimeOffset _editorDate;
+    private TaskRecurrencePattern _editorRecurrencePattern;
 
     public PlannerTaskEditorState(DateOnly initialDate)
     {
@@ -122,6 +124,18 @@ internal sealed class PlannerTaskEditorState : ObservableObject
         }
     }
 
+    public TaskRecurrencePattern EditorRecurrencePattern
+    {
+        get => _editorRecurrencePattern;
+        set
+        {
+            if (!SetProperty(ref _editorRecurrencePattern, value))
+                return;
+
+            OnPropertyChanged(nameof(EditorRecurrenceText));
+        }
+    }
+
     public bool EditorIsAllDay
     {
         get => !EditorHasTime;
@@ -146,6 +160,8 @@ internal sealed class PlannerTaskEditorState : ObservableObject
 
     public string EditorDateText => PlannerDateTimeFormatter.FormatDate(DateOnly.FromDateTime(EditorDate.Date));
 
+    public string EditorRecurrenceText => FormatRecurrence(EditorRecurrencePattern);
+
     public double EditorMaxDurationMinutes =>
         EditorHasTime
             ? GetMaxDurationMinutes(TimeOnly.FromTimeSpan(EditorTime))
@@ -159,6 +175,7 @@ internal sealed class PlannerTaskEditorState : ObservableObject
         EditorTime = (time ?? new TimeOnly(9, 0)).ToTimeSpan();
         EditorDurationMinutes = EditorDefaultDurationMinutes;
         EditorHasTime = time is not null;
+        EditorRecurrencePattern = TaskRecurrencePattern.None;
     }
 
     public void Reset(DateOnly selectedDate)
@@ -169,6 +186,7 @@ internal sealed class PlannerTaskEditorState : ObservableObject
         EditorDurationMinutes = EditorDefaultDurationMinutes;
         EditorHasTime = false;
         EditorDate = new DateTimeOffset(selectedDate.ToDateTime(TimeOnly.MinValue));
+        EditorRecurrencePattern = TaskRecurrencePattern.None;
     }
 
     public void LoadTask(PlannerTaskViewModel task)
@@ -179,6 +197,7 @@ internal sealed class PlannerTaskEditorState : ObservableObject
         EditorDurationMinutes = task.DurationMinutes ?? EditorDefaultDurationMinutes;
         EditorHasTime = task.HasTime;
         EditorDate = new DateTimeOffset(task.Date.ToDateTime(TimeOnly.MinValue));
+        EditorRecurrencePattern = task.RecurrencePattern;
     }
 
     private void ClampEditorDuration()
@@ -241,5 +260,16 @@ internal sealed class PlannerTaskEditorState : ObservableObject
     private static double GetMaxDurationMinutes(TimeOnly time)
     {
         return (24 * 60) - time.ToTimeSpan().TotalMinutes;
+    }
+
+    private static string FormatRecurrence(TaskRecurrencePattern recurrencePattern)
+    {
+        return recurrencePattern switch
+        {
+            TaskRecurrencePattern.Daily => "Daily",
+            TaskRecurrencePattern.Weekly => "Weekly",
+            TaskRecurrencePattern.Monthly => "Monthly",
+            _ => "Does not repeat"
+        };
     }
 }

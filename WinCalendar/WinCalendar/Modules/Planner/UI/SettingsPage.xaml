@@ -67,9 +67,73 @@
                         FontSize="12"
                         FontWeight="SemiBold"
                         Foreground="{ThemeResource AppTextMutedBrush}"
+                        Text="CALENDAR" />
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="220" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Spacing="2">
+                            <TextBlock
+                                FontSize="16"
+                                FontWeight="SemiBold"
+                                Text="Time format" />
+                            <TextBlock
+                                FontSize="13"
+                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Text="Choose how task times should be displayed." />
+                        </StackPanel>
+
+                        <ComboBox
+                            x:Name="TimeFormatComboBox"
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            SelectionChanged="TimeFormatComboBox_SelectionChanged">
+                            <ComboBoxItem Content="24-hour" Tag="TwentyFourHour" />
+                            <ComboBoxItem Content="12-hour" Tag="TwelveHour" />
+                        </ComboBox>
+                    </Grid>
+
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="220" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Spacing="2">
+                            <TextBlock
+                                FontSize="16"
+                                FontWeight="SemiBold"
+                                Text="First day of week" />
+                            <TextBlock
+                                FontSize="13"
+                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Text="Set the calendar grid preference." />
+                        </StackPanel>
+
+                        <ComboBox
+                            x:Name="WeekStartComboBox"
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            SelectionChanged="WeekStartComboBox_SelectionChanged">
+                            <ComboBoxItem Content="Monday" Tag="Monday" />
+                            <ComboBoxItem Content="Sunday" Tag="Sunday" />
+                        </ComboBox>
+                    </Grid>
+                </StackPanel>
+
+                <Border
+                    Height="1"
+                    Background="{ThemeResource AppBorderBrush}" />
+
+                <StackPanel Spacing="8">
+                    <TextBlock
+                        FontSize="12"
+                        FontWeight="SemiBold"
+                        Foreground="{ThemeResource AppTextMutedBrush}"
                         Text="CURRENT DEFAULTS" />
                     <TextBlock Text="Date format: DD.MM.YYYY" />
-                    <TextBlock Text="Time format: 24h" />
                     <TextBlock Text="Compact panel stays connected to the full app through shared state." />
                 </StackPanel>
             </StackPanel>

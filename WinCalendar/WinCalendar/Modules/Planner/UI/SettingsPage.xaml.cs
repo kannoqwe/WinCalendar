@@ -13,26 +13,18 @@ public sealed partial class SettingsPage : Page
     {
         _appSettingsStore = appSettingsStore;
         InitializeComponent();
-        SelectThemePreference();
+        SelectPreferences();
     }
 
-    private void SelectThemePreference()
+    private void SelectPreferences()
     {
         _isInitializing = true;
 
         try
         {
-            string selectedTag = _appSettingsStore.ThemePreference.ToString();
-
-            foreach (object item in ThemeComboBox.Items)
-            {
-                if (item is ComboBoxItem { Tag: string tag } comboBoxItem
-                    && tag == selectedTag)
-                {
-                    ThemeComboBox.SelectedItem = comboBoxItem;
-                    return;
-                }
-            }
+            SelectComboBoxItem(ThemeComboBox, _appSettingsStore.ThemePreference.ToString());
+            SelectComboBoxItem(TimeFormatComboBox, _appSettingsStore.TimeFormatPreference.ToString());
+            SelectComboBoxItem(WeekStartComboBox, _appSettingsStore.WeekStartPreference.ToString());
         }
         finally
         {
@@ -50,5 +42,42 @@ public sealed partial class SettingsPage : Page
         }
 
         _appSettingsStore.ThemePreference = themePreference;
+    }
+
+    private void TimeFormatComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isInitializing
+            || TimeFormatComboBox.SelectedItem is not ComboBoxItem { Tag: string tag }
+            || !Enum.TryParse(tag, out AppTimeFormatPreference timeFormatPreference))
+        {
+            return;
+        }
+
+        _appSettingsStore.TimeFormatPreference = timeFormatPreference;
+    }
+
+    private void WeekStartComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_isInitializing
+            || WeekStartComboBox.SelectedItem is not ComboBoxItem { Tag: string tag }
+            || !Enum.TryParse(tag, out AppWeekStartPreference weekStartPreference))
+        {
+            return;
+        }
+
+        _appSettingsStore.WeekStartPreference = weekStartPreference;
+    }
+
+    private static void SelectComboBoxItem(ComboBox comboBox, string selectedTag)
+    {
+        foreach (object item in comboBox.Items)
+        {
+            if (item is ComboBoxItem { Tag: string tag } comboBoxItem
+                && tag == selectedTag)
+            {
+                comboBox.SelectedItem = comboBoxItem;
+                return;
+            }
+        }
     }
 }

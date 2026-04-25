@@ -62,11 +62,6 @@
                             <SymbolIcon Symbol="AllApps" />
                         </controls:NavigationViewItem.Icon>
                     </controls:NavigationViewItem>
-                    <controls:NavigationViewItem Content="Settings" Tag="settings">
-                        <controls:NavigationViewItem.Icon>
-                            <SymbolIcon Symbol="Setting" />
-                        </controls:NavigationViewItem.Icon>
-                    </controls:NavigationViewItem>
                 </controls:NavigationView.MenuItems>
                 <ContentPresenter x:Name="PageHost" />
             </controls:NavigationView>

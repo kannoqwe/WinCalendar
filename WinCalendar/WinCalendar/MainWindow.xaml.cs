@@ -41,13 +41,18 @@ namespace WinCalendar
 
         private void ShellNavigationView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
+            if (args.IsSettingsSelected)
+            {
+                PageHost.Content = new SettingsPage(_appSettingsStore);
+                return;
+            }
+
             if (args.SelectedItemContainer is not NavigationViewItem item || item.Tag is not string tag)
                 return;
 
             PageHost.Content = tag switch
             {
                 "calendar" => new CalendarPage(_plannerStateStore),
-                "settings" => new SettingsPage(_appSettingsStore),
                 _ => new TodayPage(_plannerStateStore, _windowCoordinator)
             };
         }

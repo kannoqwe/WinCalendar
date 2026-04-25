@@ -41,6 +41,10 @@ public sealed class PlannerWeekTaskBlockViewModel
 
     public SolidColorBrush AccentBrush => Task.TaskAccentBrush;
 
+    public SolidColorBrush ForegroundBrush => Task.TaskForegroundBrush;
+
+    public SolidColorBrush SecondaryForegroundBrush => Task.TaskSecondaryForegroundBrush;
+
     public Thickness ContentPadding =>
         Height >= 72
             ? new Thickness(5, 4, 5, 4)

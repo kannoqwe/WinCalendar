@@ -1,3 +1,4 @@
+using System;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
@@ -41,11 +42,15 @@ internal static class PlannerTaskPalette
         Color accent = useDarkPalette
             ? ColorHelper.FromArgb(255, darkAccentRed, darkAccentGreen, darkAccentBlue)
             : ColorHelper.FromArgb(255, lightAccentRed, lightAccentGreen, lightAccentBlue);
+        Color foreground = GetReadableForeground(background, 255);
+        Color secondaryForeground = GetReadableForeground(background, 204);
 
         return new PlannerTaskTone(
             new SolidColorBrush(background),
             new SolidColorBrush(Blend(background, accent, useDarkPalette ? 0.34 : 0.24)),
-            new SolidColorBrush(accent));
+            new SolidColorBrush(accent),
+            new SolidColorBrush(foreground),
+            new SolidColorBrush(secondaryForeground));
     }
 
     private static Color Blend(Color start, Color end, double amount)
@@ -60,8 +65,30 @@ internal static class PlannerTaskPalette
     private static byte BlendChannel(byte start, byte end, double amount) =>
         (byte)(start + ((end - start) * amount));
 
+    private static Color GetReadableForeground(Color background, byte alpha)
+    {
+        double luminance =
+            (0.2126 * ToLinear(background.R)) +
+            (0.7152 * ToLinear(background.G)) +
+            (0.0722 * ToLinear(background.B));
+
+        return luminance > 0.46
+            ? ColorHelper.FromArgb(alpha, 0x1F, 0x1B, 0x20)
+            : ColorHelper.FromArgb(alpha, 0xFF, 0xFF, 0xFF);
+    }
+
+    private static double ToLinear(byte channel)
+    {
+        double value = channel / 255d;
+        return value <= 0.03928
+            ? value / 12.92
+            : Math.Pow((value + 0.055) / 1.055, 2.4);
+    }
+
     internal sealed record PlannerTaskTone(
         SolidColorBrush BackgroundBrush,
         SolidColorBrush BorderBrush,
-        SolidColorBrush AccentBrush);
+        SolidColorBrush AccentBrush,
+        SolidColorBrush ForegroundBrush,
+        SolidColorBrush SecondaryForegroundBrush);
 }

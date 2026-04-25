@@ -24,6 +24,8 @@ public sealed class PlannerTaskViewModel
         TaskBackgroundBrush = tone.BackgroundBrush;
         TaskBorderBrush = tone.BorderBrush;
         TaskAccentBrush = tone.AccentBrush;
+        TaskForegroundBrush = tone.ForegroundBrush;
+        TaskSecondaryForegroundBrush = tone.SecondaryForegroundBrush;
     }
 
     public Guid Id { get; }
@@ -49,6 +51,10 @@ public sealed class PlannerTaskViewModel
     public SolidColorBrush TaskBorderBrush { get; }
 
     public SolidColorBrush TaskAccentBrush { get; }
+
+    public SolidColorBrush TaskForegroundBrush { get; }
+
+    public SolidColorBrush TaskSecondaryForegroundBrush { get; }
 
     public string DateText => PlannerDateTimeFormatter.FormatDate(Date);
 

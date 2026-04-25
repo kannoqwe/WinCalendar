@@ -449,6 +449,7 @@
                                                                                 <TextBlock
                                                                                     FontSize="10"
                                                                                     FontWeight="SemiBold"
+                                                                                    Foreground="{Binding TaskForegroundBrush}"
                                                                                     Text="{Binding Title}"
                                                                                     TextTrimming="CharacterEllipsis" />
                                                                             </Border>
@@ -588,6 +589,7 @@
                                                                                     <TextBlock
                                                                                         FontSize="{Binding TitleFontSize}"
                                                                                         FontWeight="SemiBold"
+                                                                                        Foreground="{Binding ForegroundBrush}"
                                                                                         MaxLines="{Binding TitleMaxLines}"
                                                                                         Text="{Binding Title}"
                                                                                         TextTrimming="CharacterEllipsis"
@@ -596,7 +598,7 @@
                                                                                     <TextBlock
                                                                                         Grid.Row="1"
                                                                                         FontSize="{Binding TimeFontSize}"
-                                                                                        Foreground="{Binding AccentBrush}"
+                                                                                        Foreground="{Binding SecondaryForegroundBrush}"
                                                                                         Text="{Binding BottomTimeText}"
                                                                                         TextTrimming="CharacterEllipsis" />
                                                                                 </Grid>

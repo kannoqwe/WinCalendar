@@ -35,6 +35,8 @@ public sealed class PlannerStateStore : ObservableObject
     private DateOnly _displayMonth;
     private Guid? _selectedTaskId;
     private PlannerTaskViewModel? _selectedTask;
+    private AppTimeFormatPreference _appliedTimeFormatPreference;
+    private AppWeekStartPreference _appliedWeekStartPreference;
     private string _selectedDateText = string.Empty;
     private string _selectedDateSummary = string.Empty;
     private string _monthLabel = string.Empty;
@@ -65,6 +67,9 @@ public sealed class PlannerStateStore : ObservableObject
         _appSettingsStore.ThemePreferenceChanged += AppSettingsStore_PreferenceChanged;
         _appSettingsStore.TimeFormatPreferenceChanged += AppSettingsStore_PreferenceChanged;
         _appSettingsStore.WeekStartPreferenceChanged += AppSettingsStore_PreferenceChanged;
+        _appliedTimeFormatPreference = _appSettingsStore.TimeFormatPreference;
+        _appliedWeekStartPreference = _appSettingsStore.WeekStartPreference;
+        PlannerDateTimeFormatter.TimeFormatPreference = _appliedTimeFormatPreference;
 
         DateOnly today = _clock.Today;
         _selectedDate = today;
@@ -541,8 +546,6 @@ public sealed class PlannerStateStore : ObservableObject
     private async Task ReloadAsync()
     {
         DateOnly today = _clock.Today;
-        PlannerDateTimeFormatter.TimeFormatPreference = _appSettingsStore.TimeFormatPreference;
-        RefreshDisplayPreferences();
 
         DateOnly monthGridStart = GetMonthGridStart(_displayMonth);
         DateOnly monthGridEnd = monthGridStart.AddDays(MonthGridCellCount - 1);
@@ -554,14 +557,7 @@ public sealed class PlannerStateStore : ObservableObject
         DateOnly rangeEnd = Max(monthGridEnd, selectedWeekEnd, todayWeekEnd, today);
 
         IReadOnlyList<TaskItem> tasks = await _getTasksForRangeUseCase.ExecuteAsync(rangeStart, rangeEnd);
-        Dictionary<DateOnly, List<PlannerTaskViewModel>> taskLookup = tasks
-            .OrderBy(task => task.IsCompleted)
-            .ThenBy(task => task.Time ?? TimeOnly.MaxValue)
-            .ThenBy(task => task.CreatedAt)
-            .GroupBy(task => task.Date)
-            .ToDictionary(
-                group => group.Key,
-                group => group.Select(task => new PlannerTaskViewModel(task)).ToList());
+        Dictionary<DateOnly, List<PlannerTaskViewModel>> taskLookup = BuildTaskLookup(tasks);
 
         BuildMonth(taskLookup, today);
         BuildSelectedDay(taskLookup);
@@ -756,13 +752,75 @@ public sealed class PlannerStateStore : ObservableObject
             ? ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
             : ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 
+        if (WeekdayLabels.Count == labels.Length)
+        {
+            bool labelsMatch = true;
+            for (int index = 0; index < labels.Length; index++)
+            {
+                if (WeekdayLabels[index] == labels[index])
+                    continue;
+
+                labelsMatch = false;
+                break;
+            }
+
+            if (labelsMatch)
+                return;
+        }
+
         WeekdayLabels.Clear();
         foreach (string label in labels)
             WeekdayLabels.Add(label);
     }
 
-    private void RefreshWeekTimelineHours()
+    private static Dictionary<DateOnly, List<PlannerTaskViewModel>> BuildTaskLookup(IReadOnlyList<TaskItem> tasks)
     {
+        Dictionary<DateOnly, List<TaskItem>> rawLookup = [];
+
+        foreach (TaskItem task in tasks)
+        {
+            if (!rawLookup.TryGetValue(task.Date, out List<TaskItem>? tasksForDay))
+            {
+                tasksForDay = [];
+                rawLookup[task.Date] = tasksForDay;
+            }
+
+            tasksForDay.Add(task);
+        }
+
+        Dictionary<DateOnly, List<PlannerTaskViewModel>> taskLookup = new(rawLookup.Count);
+        foreach ((DateOnly date, List<TaskItem> tasksForDay) in rawLookup)
+        {
+            tasksForDay.Sort(CompareTasksForDisplay);
+
+            List<PlannerTaskViewModel> viewModels = new(tasksForDay.Count);
+            foreach (TaskItem task in tasksForDay)
+                viewModels.Add(new PlannerTaskViewModel(task));
+
+            taskLookup[date] = viewModels;
+        }
+
+        return taskLookup;
+    }
+
+    private static int CompareTasksForDisplay(TaskItem left, TaskItem right)
+    {
+        int completedComparison = left.IsCompleted.CompareTo(right.IsCompleted);
+        if (completedComparison != 0)
+            return completedComparison;
+
+        int timeComparison = (left.Time ?? TimeOnly.MaxValue).CompareTo(right.Time ?? TimeOnly.MaxValue);
+        if (timeComparison != 0)
+            return timeComparison;
+
+        return left.CreatedAt.CompareTo(right.CreatedAt);
+    }
+
+    private void RefreshWeekTimelineHours(bool force)
+    {
+        if (!force && WeekTimelineHours.Count == 24)
+            return;
+
         WeekTimelineHours.Clear();
 
         for (int hour = 0; hour < 24; hour++)
@@ -771,8 +829,12 @@ public sealed class PlannerStateStore : ObservableObject
 
     private void RefreshDisplayPreferences()
     {
+        bool timeFormatChanged = _appSettingsStore.TimeFormatPreference != _appliedTimeFormatPreference;
+        _appliedTimeFormatPreference = _appSettingsStore.TimeFormatPreference;
+        _appliedWeekStartPreference = _appSettingsStore.WeekStartPreference;
+        PlannerDateTimeFormatter.TimeFormatPreference = _appliedTimeFormatPreference;
         RefreshWeekdayLabels();
-        RefreshWeekTimelineHours();
+        RefreshWeekTimelineHours(timeFormatChanged);
         _taskEditor.UpdateEditorDurationOptions();
         OnPropertyChanged(nameof(EditorTimeText));
         OnPropertyChanged(nameof(EditorDurationText));
@@ -780,8 +842,14 @@ public sealed class PlannerStateStore : ObservableObject
 
     private void AppSettingsStore_PreferenceChanged(object? sender, EventArgs e)
     {
-        PlannerDateTimeFormatter.TimeFormatPreference = _appSettingsStore.TimeFormatPreference;
         PlannerTaskPalette.UseDarkPalette = _appSettingsStore.IsDarkThemeEffective;
+
+        if (_appSettingsStore.TimeFormatPreference != _appliedTimeFormatPreference
+            || _appSettingsStore.WeekStartPreference != _appliedWeekStartPreference)
+        {
+            RefreshDisplayPreferences();
+        }
+
         _ = ReloadAsync();
     }
 

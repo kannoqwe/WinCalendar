@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace WinCalendar.Modules.Planner.Presentation;
 
@@ -17,12 +16,16 @@ internal static class PlannerWeekTimelineLayout
 
     public static List<PlannerWeekTaskBlockViewModel> BuildTimedTaskBlocks(IEnumerable<PlannerTaskViewModel> tasks)
     {
-        List<WeekTaskLayoutItem> items = tasks
-            .Where(task => task.HasTime)
-            .OrderBy(task => task.Time)
-            .ThenBy(task => task.Title)
-            .Select(task => new WeekTaskLayoutItem(task, GetTaskStartMinutes(task), GetTaskEndMinutes(task)))
-            .ToList();
+        List<WeekTaskLayoutItem> items = [];
+        foreach (PlannerTaskViewModel task in tasks)
+        {
+            if (!task.HasTime)
+                continue;
+
+            items.Add(new WeekTaskLayoutItem(task, GetTaskStartMinutes(task), GetTaskEndMinutes(task)));
+        }
+
+        items.Sort(CompareLayoutItems);
 
         if (items.Count == 0)
             return [];
@@ -30,9 +33,20 @@ internal static class PlannerWeekTimelineLayout
         foreach (List<WeekTaskLayoutItem> group in BuildTaskGroups(items))
             AssignColumns(group);
 
-        return items
-            .Select(CreateTaskBlock)
-            .ToList();
+        List<PlannerWeekTaskBlockViewModel> taskBlocks = new(items.Count);
+        foreach (WeekTaskLayoutItem item in items)
+            taskBlocks.Add(CreateTaskBlock(item));
+
+        return taskBlocks;
+    }
+
+    private static int CompareLayoutItems(WeekTaskLayoutItem left, WeekTaskLayoutItem right)
+    {
+        int timeComparison = left.StartMinutes.CompareTo(right.StartMinutes);
+        if (timeComparison != 0)
+            return timeComparison;
+
+        return string.Compare(left.Task.Title, right.Task.Title, StringComparison.Ordinal);
     }
 
     private static int GetTaskStartMinutes(PlannerTaskViewModel task)
@@ -60,7 +74,7 @@ internal static class PlannerWeekTimelineLayout
             }
 
             List<WeekTaskLayoutItem> currentGroup = groups[^1];
-            int currentGroupEnd = currentGroup.Max(current => current.EndMinutes);
+            int currentGroupEnd = GetGroupEnd(currentGroup);
 
             if (item.StartMinutes < currentGroupEnd)
             {
@@ -74,26 +88,57 @@ internal static class PlannerWeekTimelineLayout
         return groups;
     }
 
+    private static int GetGroupEnd(List<WeekTaskLayoutItem> group)
+    {
+        int end = 0;
+        foreach (WeekTaskLayoutItem item in group)
+            end = Math.Max(end, item.EndMinutes);
+
+        return end;
+    }
+
     private static void AssignColumns(List<WeekTaskLayoutItem> group)
     {
         List<WeekTaskLayoutItem> activeItems = [];
         int totalColumns = 1;
 
-        foreach (WeekTaskLayoutItem item in group.OrderBy(current => current.StartMinutes))
+        group.Sort(static (left, right) => left.StartMinutes.CompareTo(right.StartMinutes));
+
+        foreach (WeekTaskLayoutItem item in group)
         {
             activeItems.RemoveAll(current => current.EndMinutes <= item.StartMinutes);
 
             int column = 0;
-            while (activeItems.Any(current => current.Column == column))
+            while (HasColumn(activeItems, column))
                 column++;
 
             item.Column = column;
             activeItems.Add(item);
-            totalColumns = Math.Max(totalColumns, activeItems.Max(current => current.Column) + 1);
+            totalColumns = Math.Max(totalColumns, GetMaxColumn(activeItems) + 1);
         }
 
         foreach (WeekTaskLayoutItem item in group)
             item.TotalColumns = totalColumns;
+    }
+
+    private static bool HasColumn(List<WeekTaskLayoutItem> items, int column)
+    {
+        foreach (WeekTaskLayoutItem item in items)
+        {
+            if (item.Column == column)
+                return true;
+        }
+
+        return false;
+    }
+
+    private static int GetMaxColumn(List<WeekTaskLayoutItem> items)
+    {
+        int maxColumn = 0;
+        foreach (WeekTaskLayoutItem item in items)
+            maxColumn = Math.Max(maxColumn, item.Column);
+
+        return maxColumn;
     }
 
     private static PlannerWeekTaskBlockViewModel CreateTaskBlock(WeekTaskLayoutItem item)

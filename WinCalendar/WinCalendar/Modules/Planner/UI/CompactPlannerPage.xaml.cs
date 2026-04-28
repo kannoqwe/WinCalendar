@@ -50,13 +50,14 @@ public sealed partial class CompactPlannerPage : Page
 
         try
         {
+            bool isFirstPrepare = !_initialized;
             if (!_initialized)
             {
                 _initialized = true;
                 await _plannerStateStore.EnsureInitializedAsync();
             }
 
-            if (_plannerStateStore.SelectedDate != _plannerStateStore.Today)
+            if (isFirstPrepare && _plannerStateStore.SelectedDate != _plannerStateStore.Today)
                 await _plannerStateStore.GoToTodayAsync();
         }
         finally

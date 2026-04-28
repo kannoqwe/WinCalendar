@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -19,6 +20,7 @@ public sealed partial class CompactPlannerPage : Page
     private bool _syncingCompactEditorCategorySelection;
     private bool _syncingCompactEditorRecurrenceSelection;
     private bool _initialized;
+    private bool _isPreparing;
 
     public string[] CompactEditorHourOptions { get; } = Enumerable.Range(0, 24)
         .Select(hour => hour.ToString("00"))
@@ -36,14 +38,62 @@ public sealed partial class CompactPlannerPage : Page
 
     private async void Root_Loaded(object sender, RoutedEventArgs e)
     {
-        if (_initialized)
+        await PrepareForShowAsync();
+    }
+
+    public async Task PrepareForShowAsync()
+    {
+        if (_isPreparing)
             return;
 
-        _initialized = true;
-        await _plannerStateStore.EnsureInitializedAsync();
+        _isPreparing = true;
 
-        if (_plannerStateStore.SelectedDate != _plannerStateStore.Today)
-            await _plannerStateStore.GoToTodayAsync();
+        try
+        {
+            if (!_initialized)
+            {
+                _initialized = true;
+                await _plannerStateStore.EnsureInitializedAsync();
+            }
+
+            if (_plannerStateStore.SelectedDate != _plannerStateStore.Today)
+                await _plannerStateStore.GoToTodayAsync();
+        }
+        finally
+        {
+            _isPreparing = false;
+        }
+    }
+
+    public void PlayOpenAnimation()
+    {
+        PanelHost.Opacity = 0;
+        PanelHostTransform.ScaleX = 0.98;
+        PanelHostTransform.ScaleY = 0.98;
+        PanelHostTransform.TranslateY = 10;
+
+        Storyboard storyboard = new();
+        CubicEase easing = new() { EasingMode = EasingMode.EaseOut };
+
+        DoubleAnimation opacityAnimation = CreateAnimation(0, 1, 140, easing);
+        DoubleAnimation scaleXAnimation = CreateAnimation(0.98, 1, 160, easing);
+        DoubleAnimation scaleYAnimation = CreateAnimation(0.98, 1, 160, easing);
+        DoubleAnimation translateAnimation = CreateAnimation(10, 0, 160, easing);
+
+        Storyboard.SetTarget(opacityAnimation, PanelHost);
+        Storyboard.SetTargetProperty(opacityAnimation, "Opacity");
+        Storyboard.SetTarget(scaleXAnimation, PanelHostTransform);
+        Storyboard.SetTargetProperty(scaleXAnimation, "ScaleX");
+        Storyboard.SetTarget(scaleYAnimation, PanelHostTransform);
+        Storyboard.SetTargetProperty(scaleYAnimation, "ScaleY");
+        Storyboard.SetTarget(translateAnimation, PanelHostTransform);
+        Storyboard.SetTargetProperty(translateAnimation, "TranslateY");
+
+        storyboard.Children.Add(opacityAnimation);
+        storyboard.Children.Add(scaleXAnimation);
+        storyboard.Children.Add(scaleYAnimation);
+        storyboard.Children.Add(translateAnimation);
+        storyboard.Begin();
     }
 
     private void AddTaskButton_Click(object sender, RoutedEventArgs e)
@@ -290,6 +340,17 @@ public sealed partial class CompactPlannerPage : Page
         storyboard.Children.Add(opacityAnimation);
         storyboard.Children.Add(translateAnimation);
         storyboard.Begin();
+    }
+
+    private static DoubleAnimation CreateAnimation(double from, double to, int milliseconds, EasingFunctionBase easing)
+    {
+        return new DoubleAnimation
+        {
+            From = from,
+            To = to,
+            Duration = TimeSpan.FromMilliseconds(milliseconds),
+            EasingFunction = easing
+        };
     }
 
     private void SelectCompactEditorRecurrence()

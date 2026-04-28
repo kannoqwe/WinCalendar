@@ -130,6 +130,7 @@
         KeyDown="Root_KeyDown"
         Loaded="Root_Loaded">
         <Border
+            x:Name="PanelHost"
             Width="360"
             HorizontalAlignment="Stretch"
             Background="{StaticResource CompactPanelBrush}"
@@ -137,6 +138,16 @@
             BorderThickness="1"
             CornerRadius="12"
             Padding="14">
+            <Border.RenderTransform>
+                <CompositeTransform
+                    x:Name="PanelHostTransform"
+                    CenterX="180"
+                    CenterY="536"
+                    ScaleX="0.98"
+                    ScaleY="0.98"
+                    TranslateY="10" />
+            </Border.RenderTransform>
+
             <Grid RowSpacing="12">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -419,10 +430,6 @@
                                 FontSize="13"
                                 Foreground="{StaticResource CompactMutedBrush}"
                                 Text="{Binding EmptySelectedDayTasksText}" />
-                            <Button
-                                Click="AddTaskButton_Click"
-                                Content="+ NEW"
-                                Style="{StaticResource CompactNewTaskButtonStyle}" />
                         </StackPanel>
                     </Grid>
                 </Grid>

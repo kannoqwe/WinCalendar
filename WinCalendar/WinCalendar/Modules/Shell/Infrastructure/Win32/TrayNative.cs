@@ -40,6 +40,7 @@ internal static class TrayNative
     public const uint WM_MOUSEACTIVATE = 0x0021;
     public const uint WM_NCHITTEST = 0x0084;
     public const uint WM_PAINT = 0x000F;
+    public const uint WM_HOTKEY = 0x0312;
     public const uint WM_COMMAND = 0x0111;
     public const uint WM_CONTEXTMENU = 0x007B;
     public const uint WM_LBUTTONDOWN = 0x0201;
@@ -55,6 +56,8 @@ internal static class TrayNative
     public const int HTBOTTOMRIGHT = 17;
     public const int MA_NOACTIVATE = 3;
     public const int IDI_APPLICATION = 32512;
+    public const int VK_RETURN = 0x0D;
+    public const int VK_ESCAPE = 0x1B;
 
     public static readonly nint HwndMessage = new(-3);
     public static readonly nint HwndTopMost = new(-1);

@@ -22,6 +22,8 @@ public sealed class PlannerWindowCoordinator
     private readonly Func<MainWindow> _mainWindowFactory;
     private MainWindow? _mainWindow;
     private CompactPlannerWindow? _compactWindow;
+    private bool _isCompactWindowVisible;
+    private bool _isTogglingCompactWindow;
 
     public PlannerWindowCoordinator(PlannerStateStore plannerStateStore, Func<MainWindow> mainWindowFactory)
     {
@@ -47,24 +49,52 @@ public sealed class PlannerWindowCoordinator
         _mainWindow.Activate();
     }
 
-    public void ToggleCompactPanel()
+    public async void ToggleCompactPanel()
     {
-        if (_compactWindow is not null)
-        {
-            _compactWindow.Close();
+        if (_isTogglingCompactWindow)
             return;
-        }
 
-        _compactWindow = new CompactPlannerWindow(_plannerStateStore, OpenMainAppFromCompact);
-        _compactWindow.Closed += CompactWindow_Closed;
-        ConfigureCompactWindow(_compactWindow);
-        _compactWindow.Activate();
+        _isTogglingCompactWindow = true;
+
+        try
+        {
+            if (_compactWindow is not null && _isCompactWindowVisible)
+            {
+                HideCompactWindow();
+                return;
+            }
+
+            if (_compactWindow is null)
+            {
+                _compactWindow = new CompactPlannerWindow(_plannerStateStore, OpenMainAppFromCompact);
+                _compactWindow.Closed += CompactWindow_Closed;
+                ConfigureCompactWindow(_compactWindow);
+            }
+
+            await _compactWindow.PrepareForShowAsync();
+            _compactWindow.Activate();
+            _isCompactWindowVisible = true;
+            _compactWindow.PlayOpenAnimation();
+        }
+        finally
+        {
+            _isTogglingCompactWindow = false;
+        }
     }
 
     private void OpenMainAppFromCompact()
     {
         ShowFullApp();
-        _compactWindow?.Close();
+        HideCompactWindow();
+    }
+
+    private void HideCompactWindow()
+    {
+        if (_compactWindow is null)
+            return;
+
+        _compactWindow.GetAppWindow().Hide();
+        _isCompactWindowVisible = false;
     }
 
     private static void ConfigureMainWindow(Window window)
@@ -152,6 +182,7 @@ public sealed class PlannerWindowCoordinator
 
         _compactWindow.Closed -= CompactWindow_Closed;
         _compactWindow = null;
+        _isCompactWindowVisible = false;
     }
 
     [DllImport("user32.dll")]

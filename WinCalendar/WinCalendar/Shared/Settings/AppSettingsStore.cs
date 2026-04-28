@@ -12,12 +12,18 @@ public sealed class AppSettingsStore
     private const string OverlayEnabledKey = "OverlayEnabled";
     private const string OverlayWidthKey = "OverlayWidth";
     private const string OverlayHeightKey = "OverlayHeight";
+    private const string OverlayRightOffsetKey = "OverlayRightOffset";
+    private const string OverlayBottomOffsetKey = "OverlayBottomOffset";
     public const int DefaultOverlayWidth = 140;
     public const int DefaultOverlayHeight = 52;
+    public const int DefaultOverlayRightOffset = 4;
+    public const int DefaultOverlayBottomOffset = 0;
     public const int MinimumOverlayWidth = 80;
     public const int MinimumOverlayHeight = 32;
     public const int MaximumOverlayWidth = 420;
     public const int MaximumOverlayHeight = 180;
+    public const int MinimumOverlayOffset = 0;
+    public const int MaximumOverlayOffset = 2000;
 
     private readonly ApplicationDataContainer _localSettings;
 
@@ -102,6 +108,12 @@ public sealed class AppSettingsStore
         set => SetOverlaySize(OverlayWidth, value);
     }
 
+    public int OverlayRightOffset =>
+        ReadInt(OverlayRightOffsetKey, DefaultOverlayRightOffset, MinimumOverlayOffset, MaximumOverlayOffset);
+
+    public int OverlayBottomOffset =>
+        ReadInt(OverlayBottomOffsetKey, DefaultOverlayBottomOffset, MinimumOverlayOffset, MaximumOverlayOffset);
+
     public bool IsDarkThemeEffective => ThemePreference switch
     {
         AppThemePreference.Dark => true,
@@ -129,14 +141,28 @@ public sealed class AppSettingsStore
 
     public void SetOverlaySize(int width, int height)
     {
+        SetOverlayBounds(width, height, OverlayRightOffset, OverlayBottomOffset);
+    }
+
+    public void SetOverlayBounds(int width, int height, int rightOffset, int bottomOffset)
+    {
         int clampedWidth = Math.Clamp(width, MinimumOverlayWidth, MaximumOverlayWidth);
         int clampedHeight = Math.Clamp(height, MinimumOverlayHeight, MaximumOverlayHeight);
+        int clampedRightOffset = Math.Clamp(rightOffset, MinimumOverlayOffset, MaximumOverlayOffset);
+        int clampedBottomOffset = Math.Clamp(bottomOffset, MinimumOverlayOffset, MaximumOverlayOffset);
 
-        if (OverlayWidth == clampedWidth && OverlayHeight == clampedHeight)
+        if (OverlayWidth == clampedWidth
+            && OverlayHeight == clampedHeight
+            && OverlayRightOffset == clampedRightOffset
+            && OverlayBottomOffset == clampedBottomOffset)
+        {
             return;
+        }
 
         _localSettings.Values[OverlayWidthKey] = clampedWidth;
         _localSettings.Values[OverlayHeightKey] = clampedHeight;
+        _localSettings.Values[OverlayRightOffsetKey] = clampedRightOffset;
+        _localSettings.Values[OverlayBottomOffsetKey] = clampedBottomOffset;
         OverlaySettingsChanged?.Invoke(this, EventArgs.Empty);
     }
 

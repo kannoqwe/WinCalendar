@@ -9,8 +9,6 @@ namespace WinCalendar.Modules.Shell.UI;
 
 internal sealed class TaskbarCalendarOverlayHost : IDisposable
 {
-    private const int OverlayRightMargin = 4;
-    private const int OverlayBottomMargin = 0;
     private const int SmCxScreen = 0;
     private const int SmCyScreen = 1;
     private const uint MonitorDefaultToNearest = 2;
@@ -23,6 +21,8 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
     private const uint EventObjectLocationChange = 0x800B;
     private const uint WinEventOutOfContext = 0x0000;
     private const uint WinEventSkipOwnProcess = 0x0002;
+    private const int EnterHotKeyId = 1;
+    private const int EscapeHotKeyId = 2;
 
     private readonly Action _onClick;
     private readonly AppSettingsStore _appSettingsStore;
@@ -40,6 +40,8 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
     private bool _isDisposed;
     private bool _isResizeMode;
     private bool _isSizing;
+    private OverlayBounds _previewBounds;
+    private DragOperation _dragOperation;
     private DragState _dragState;
 
     public TaskbarCalendarOverlayHost(
@@ -54,6 +56,7 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
         _winEventProcedure = WinEventProcedure;
         _windowClassName = $"WinCalendar.TaskbarCalendarOverlay.{Environment.ProcessId}";
         _moduleHandle = TrayNative.GetModuleHandle(lpModuleName: null);
+        _previewBounds = GetStoredOverlayBounds();
 
         RegisterWindowClass();
         CreateOverlayWindow();
@@ -95,8 +98,8 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
             dwStyle: TrayNative.WS_POPUP,
             x: overlayPosition.X,
             y: overlayPosition.Y,
-            nWidth: _appSettingsStore.OverlayWidth,
-            nHeight: _appSettingsStore.OverlayHeight,
+            nWidth: GetOverlayWidth(),
+            nHeight: GetOverlayHeight(),
             hWndParent: nint.Zero,
             hMenu: nint.Zero,
             hInstance: _moduleHandle,
@@ -131,6 +134,7 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
         }
 
         _isResizeMode = true;
+        RegisterResizeHotKeys();
         _ = TrayNative.SetLayeredWindowAttributes(
             _overlayWindowHandle,
             crKey: 0,
@@ -226,8 +230,8 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
             TrayNative.HwndTopMost,
             overlayPosition.X,
             overlayPosition.Y,
-            _appSettingsStore.OverlayWidth,
-            _appSettingsStore.OverlayHeight,
+            GetOverlayWidth(),
+            GetOverlayHeight(),
             TrayNative.SWP_NOACTIVATE | TrayNative.SWP_SHOWWINDOW);
 
         _ = TrayNative.ShowWindow(_overlayWindowHandle, TrayNative.SW_SHOWNOACTIVATE);
@@ -268,6 +272,22 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
             case TrayNative.WM_PAINT:
                 PaintOverlay(hWnd);
                 return nint.Zero;
+            case TrayNative.WM_HOTKEY:
+                if (_isResizeMode && (wParam == (nuint)EnterHotKeyId || wParam == (nuint)EscapeHotKeyId))
+                {
+                    if (_isSizing)
+                    {
+                        EndSizing();
+                    }
+                    else
+                    {
+                        EndResizeMode();
+                    }
+
+                    return nint.Zero;
+                }
+
+                return TrayNative.DefWindowProc(hWnd, msg, wParam, lParam);
             case TrayNative.WM_MOUSEACTIVATE:
                 return new nint(TrayNative.MA_NOACTIVATE);
             case TrayNative.WM_NCHITTEST:
@@ -309,32 +329,54 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
 
     private int GetHitTest()
     {
-        if (!_isResizeMode)
-            return TrayNative.HTCLIENT;
-
-        return TrayNative.HTBOTTOMRIGHT;
+        return TrayNative.HTCLIENT;
     }
 
     private void BeginSizing()
     {
         Point point = GetCursorPoint();
+        OverlayBounds bounds = GetCurrentOverlayBounds();
         _isSizing = true;
-        _dragState = new DragState(point.X, point.Y, _appSettingsStore.OverlayWidth, _appSettingsStore.OverlayHeight);
+        _previewBounds = bounds;
+        _dragOperation = GetDragOperation(point, bounds);
+        _dragState = new DragState(
+            point.X,
+            point.Y,
+            bounds);
         SetCapture(_overlayWindowHandle);
     }
 
     private void UpdateSizing()
     {
         Point point = GetCursorPoint();
-        int nextWidth = _dragState.Width;
-        int nextHeight = _dragState.Height;
+        int deltaX = point.X - _dragState.ScreenX;
+        int deltaY = point.Y - _dragState.ScreenY;
+        int left = _dragState.Bounds.X;
+        int top = _dragState.Bounds.Y;
+        int right = _dragState.Bounds.X + _dragState.Bounds.Width;
+        int bottom = _dragState.Bounds.Y + _dragState.Bounds.Height;
 
-        nextWidth += point.X - _dragState.ScreenX;
-        nextHeight += point.Y - _dragState.ScreenY;
+        if (_dragOperation == DragOperation.Move)
+        {
+            MovePreviewBounds(deltaX, deltaY);
+        }
+        else
+        {
+            if ((_dragOperation & DragOperation.Left) == DragOperation.Left)
+                left += deltaX;
 
-        nextWidth = Math.Clamp(nextWidth, AppSettingsStore.MinimumOverlayWidth, AppSettingsStore.MaximumOverlayWidth);
-        nextHeight = Math.Clamp(nextHeight, AppSettingsStore.MinimumOverlayHeight, AppSettingsStore.MaximumOverlayHeight);
-        _appSettingsStore.SetOverlaySize(nextWidth, nextHeight);
+            if ((_dragOperation & DragOperation.Right) == DragOperation.Right)
+                right += deltaX;
+
+            if ((_dragOperation & DragOperation.Top) == DragOperation.Top)
+                top += deltaY;
+
+            if ((_dragOperation & DragOperation.Bottom) == DragOperation.Bottom)
+                bottom += deltaY;
+
+            NormalizePreviewBounds(left, top, right, bottom);
+        }
+
         SyncOverlayWindow();
         InvalidateRect(_overlayWindowHandle, nint.Zero, true);
     }
@@ -342,13 +384,22 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
     private void EndSizing()
     {
         _isSizing = false;
+        _dragOperation = DragOperation.None;
         ReleaseCapture();
+        int screenWidth = GetSystemMetrics(SmCxScreen);
+        int screenHeight = GetSystemMetrics(SmCyScreen);
+        _appSettingsStore.SetOverlayBounds(
+            _previewBounds.Width,
+            _previewBounds.Height,
+            screenWidth - _previewBounds.X - _previewBounds.Width,
+            screenHeight - _previewBounds.Y - _previewBounds.Height);
         EndResizeMode();
     }
 
     private void EndResizeMode()
     {
         _isResizeMode = false;
+        UnregisterResizeHotKeys();
         _ = TrayNative.SetLayeredWindowAttributes(
             _overlayWindowHandle,
             crKey: 0,
@@ -372,8 +423,8 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
                 {
                     Left = 0,
                     Top = 0,
-                    Right = _appSettingsStore.OverlayWidth,
-                    Bottom = _appSettingsStore.OverlayHeight
+                    Right = GetOverlayBounds().Width,
+                    Bottom = GetOverlayBounds().Height
                 };
                 FrameRect(paintStruct.hdc, ref frameRect, borderBrush);
             }
@@ -388,17 +439,142 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
 
     private void AppSettingsStore_OverlaySettingsChanged(object? sender, EventArgs e)
     {
+        if (!_isSizing)
+            _previewBounds = GetStoredOverlayBounds();
+
         SyncOverlayWindow();
+    }
+
+    private void RegisterResizeHotKeys()
+    {
+        RegisterHotKey(_overlayWindowHandle, EnterHotKeyId, 0, TrayNative.VK_RETURN);
+        RegisterHotKey(_overlayWindowHandle, EscapeHotKeyId, 0, TrayNative.VK_ESCAPE);
+    }
+
+    private void UnregisterResizeHotKeys()
+    {
+        UnregisterHotKey(_overlayWindowHandle, EnterHotKeyId);
+        UnregisterHotKey(_overlayWindowHandle, EscapeHotKeyId);
     }
 
     private Position GetOverlayPosition()
     {
+        OverlayBounds bounds = GetOverlayBounds();
+        return new Position(bounds.X, bounds.Y);
+    }
+
+    private int GetOverlayWidth() => GetOverlayBounds().Width;
+
+    private int GetOverlayHeight() => GetOverlayBounds().Height;
+
+    private OverlayBounds GetOverlayBounds() => _isResizeMode ? _previewBounds : GetStoredOverlayBounds();
+
+    private OverlayBounds GetStoredOverlayBounds()
+    {
         int screenWidth = GetSystemMetrics(SmCxScreen);
         int screenHeight = GetSystemMetrics(SmCyScreen);
+        int width = _appSettingsStore.OverlayWidth;
+        int height = _appSettingsStore.OverlayHeight;
+        int x = Math.Clamp(
+            screenWidth - width - _appSettingsStore.OverlayRightOffset,
+            0,
+            Math.Max(0, screenWidth - width));
+        int y = Math.Clamp(
+            screenHeight - height - _appSettingsStore.OverlayBottomOffset,
+            0,
+            Math.Max(0, screenHeight - height));
 
-        return new Position(
-            Math.Max(0, screenWidth - _appSettingsStore.OverlayWidth - OverlayRightMargin),
-            Math.Max(0, screenHeight - _appSettingsStore.OverlayHeight - OverlayBottomMargin));
+        return new OverlayBounds(x, y, width, height);
+    }
+
+    private OverlayBounds GetCurrentOverlayBounds()
+    {
+        if (GetWindowRect(_overlayWindowHandle, out RECT rect))
+            return new OverlayBounds(rect.Left, rect.Top, rect.Right - rect.Left, rect.Bottom - rect.Top);
+
+        return GetOverlayBounds();
+    }
+
+    private void NormalizePreviewBounds(int left, int top, int right, int bottom)
+    {
+        int screenWidth = GetSystemMetrics(SmCxScreen);
+        int screenHeight = GetSystemMetrics(SmCyScreen);
+        left = Math.Clamp(left, 0, screenWidth - AppSettingsStore.MinimumOverlayWidth);
+        top = Math.Clamp(top, 0, screenHeight - AppSettingsStore.MinimumOverlayHeight);
+        right = Math.Clamp(right, AppSettingsStore.MinimumOverlayWidth, screenWidth);
+        bottom = Math.Clamp(bottom, AppSettingsStore.MinimumOverlayHeight, screenHeight);
+
+        if (right - left < AppSettingsStore.MinimumOverlayWidth)
+        {
+            if ((_dragOperation & DragOperation.Left) == DragOperation.Left)
+                left = right - AppSettingsStore.MinimumOverlayWidth;
+            else
+                right = left + AppSettingsStore.MinimumOverlayWidth;
+        }
+
+        if (bottom - top < AppSettingsStore.MinimumOverlayHeight)
+        {
+            if ((_dragOperation & DragOperation.Top) == DragOperation.Top)
+                top = bottom - AppSettingsStore.MinimumOverlayHeight;
+            else
+                bottom = top + AppSettingsStore.MinimumOverlayHeight;
+        }
+
+        if (right - left > AppSettingsStore.MaximumOverlayWidth)
+        {
+            if ((_dragOperation & DragOperation.Left) == DragOperation.Left)
+                left = right - AppSettingsStore.MaximumOverlayWidth;
+            else
+                right = left + AppSettingsStore.MaximumOverlayWidth;
+        }
+
+        if (bottom - top > AppSettingsStore.MaximumOverlayHeight)
+        {
+            if ((_dragOperation & DragOperation.Top) == DragOperation.Top)
+                top = bottom - AppSettingsStore.MaximumOverlayHeight;
+            else
+                bottom = top + AppSettingsStore.MaximumOverlayHeight;
+        }
+
+        left = Math.Max(0, left);
+        top = Math.Max(0, top);
+        right = Math.Min(screenWidth, right);
+        bottom = Math.Min(screenHeight, bottom);
+        _previewBounds = new OverlayBounds(left, top, right - left, bottom - top);
+    }
+
+    private void MovePreviewBounds(int deltaX, int deltaY)
+    {
+        int screenWidth = GetSystemMetrics(SmCxScreen);
+        int screenHeight = GetSystemMetrics(SmCyScreen);
+        int x = Math.Clamp(
+            _dragState.Bounds.X + deltaX,
+            0,
+            Math.Max(0, screenWidth - _dragState.Bounds.Width));
+        int y = Math.Clamp(
+            _dragState.Bounds.Y + deltaY,
+            0,
+            Math.Max(0, screenHeight - _dragState.Bounds.Height));
+
+        _previewBounds = new OverlayBounds(x, y, _dragState.Bounds.Width, _dragState.Bounds.Height);
+    }
+
+    private static DragOperation GetDragOperation(Point point, OverlayBounds bounds)
+    {
+        const int edgeSize = 14;
+        DragOperation operation = DragOperation.None;
+
+        if (point.X <= bounds.X + edgeSize)
+            operation |= DragOperation.Left;
+        else if (point.X >= bounds.X + bounds.Width - edgeSize)
+            operation |= DragOperation.Right;
+
+        if (point.Y <= bounds.Y + edgeSize)
+            operation |= DragOperation.Top;
+        else if (point.Y >= bounds.Y + bounds.Height - edgeSize)
+            operation |= DragOperation.Bottom;
+
+        return operation == DragOperation.None ? DragOperation.Move : operation;
     }
 
     public void Dispose()
@@ -506,11 +682,35 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool ReleaseCapture();
 
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool RegisterHotKey(nint hWnd, int id, uint fsModifiers, int vk);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool UnregisterHotKey(nint hWnd, int id);
+
     private readonly record struct Position(int X, int Y);
 
     private readonly record struct Point(int X, int Y);
 
-    private readonly record struct DragState(int ScreenX, int ScreenY, int Width, int Height);
+    private readonly record struct OverlayBounds(int X, int Y, int Width, int Height);
+
+    private readonly record struct DragState(
+        int ScreenX,
+        int ScreenY,
+        OverlayBounds Bounds);
+
+    [Flags]
+    private enum DragOperation
+    {
+        None = 0,
+        Move = 1,
+        Left = 2,
+        Right = 4,
+        Top = 8,
+        Bottom = 16
+    }
 
     private static Point GetCursorPoint()
     {

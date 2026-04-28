@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using WinCalendar.Core.Abstractions;
 using WinCalendar.Core.Time;
+using WinCalendar.Shared.Settings;
 
 namespace WinCalendar.Modules.Planner.Presentation;
 
@@ -22,6 +23,7 @@ public sealed class PlannerStateStore : ObservableObject
     private readonly AutoCompleteElapsedTimedTasksUseCase _autoCompleteElapsedTimedTasksUseCase;
     private readonly SetTaskCompletionStatusUseCase _setTaskCompletionStatusUseCase;
     private readonly UpdateTaskUseCase _updateTaskUseCase;
+    private readonly AppSettingsStore _appSettingsStore;
     private readonly IClock _clock;
     private readonly PlannerTaskEditorState _taskEditor;
     private readonly Dictionary<DateOnly, bool> _agendaState = [];
@@ -49,7 +51,8 @@ public sealed class PlannerStateStore : ObservableObject
         AutoCompleteElapsedTimedTasksUseCase autoCompleteElapsedTimedTasksUseCase,
         SetTaskCompletionStatusUseCase setTaskCompletionStatusUseCase,
         DeleteTaskUseCase deleteTaskUseCase,
-        UpdateTaskUseCase updateTaskUseCase)
+        UpdateTaskUseCase updateTaskUseCase,
+        AppSettingsStore appSettingsStore)
     {
         _clock = clock;
         _createTaskUseCase = createTaskUseCase;
@@ -58,6 +61,10 @@ public sealed class PlannerStateStore : ObservableObject
         _setTaskCompletionStatusUseCase = setTaskCompletionStatusUseCase;
         _deleteTaskUseCase = deleteTaskUseCase;
         _updateTaskUseCase = updateTaskUseCase;
+        _appSettingsStore = appSettingsStore;
+        _appSettingsStore.ThemePreferenceChanged += AppSettingsStore_PreferenceChanged;
+        _appSettingsStore.TimeFormatPreferenceChanged += AppSettingsStore_PreferenceChanged;
+        _appSettingsStore.WeekStartPreferenceChanged += AppSettingsStore_PreferenceChanged;
 
         DateOnly today = _clock.Today;
         _selectedDate = today;
@@ -72,8 +79,8 @@ public sealed class PlannerStateStore : ObservableObject
         WeekTimelineHours = [];
         WeekTimelineDays = [];
 
-        for (int hour = 0; hour < 24; hour++)
-            WeekTimelineHours.Add(new PlannerWeekHourViewModel(hour));
+        WeekdayLabels = [];
+        RefreshDisplayPreferences();
     }
 
     public ObservableCollection<PlannerMonthDayViewModel> MonthDays { get; }
@@ -87,6 +94,8 @@ public sealed class PlannerStateStore : ObservableObject
     public ObservableCollection<PlannerWeekHourViewModel> WeekTimelineHours { get; }
 
     public ObservableCollection<PlannerWeekDayTimelineViewModel> WeekTimelineDays { get; }
+
+    public ObservableCollection<string> WeekdayLabels { get; }
 
     public ObservableCollection<PlannerEditorDurationOptionViewModel> EditorDurationOptions => _taskEditor.EditorDurationOptions;
 
@@ -532,6 +541,9 @@ public sealed class PlannerStateStore : ObservableObject
     private async Task ReloadAsync()
     {
         DateOnly today = _clock.Today;
+        PlannerDateTimeFormatter.TimeFormatPreference = _appSettingsStore.TimeFormatPreference;
+        RefreshDisplayPreferences();
+
         DateOnly monthGridStart = GetMonthGridStart(_displayMonth);
         DateOnly monthGridEnd = monthGridStart.AddDays(MonthGridCellCount - 1);
         DateOnly selectedWeekStart = GetWeekStart(_selectedDate);
@@ -685,7 +697,7 @@ public sealed class PlannerStateStore : ObservableObject
         int weekViewTaskCount = WeekTimelineDays.Sum(day => day.AllDayTasks.Count + day.TimedTaskBlocks.Count);
         WeekViewSummary = weekViewTaskCount == 0
             ? "No tasks for this week"
-            : $"{weekViewTaskCount} task{(weekViewTaskCount == 1 ? string.Empty : "s")} from Monday to Sunday";
+            : $"{weekViewTaskCount} task{(weekViewTaskCount == 1 ? string.Empty : "s")} from {WeekdayLabels[0]} to {WeekdayLabels[6]}";
     }
 
     private void ReselectTask()
@@ -738,21 +750,63 @@ public sealed class PlannerStateStore : ObservableObject
         _agendaState[day.Date] = day.IsExpanded;
     }
 
-    private static DateOnly GetMonthGridStart(DateOnly monthStart)
+    private void RefreshWeekdayLabels()
     {
-        int mondayIndex = ((int)monthStart.DayOfWeek + 6) % 7;
-        return monthStart.AddDays(-mondayIndex);
+        string[] labels = _appSettingsStore.WeekStartPreference == AppWeekStartPreference.Sunday
+            ? ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
+            : ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+
+        WeekdayLabels.Clear();
+        foreach (string label in labels)
+            WeekdayLabels.Add(label);
     }
 
-    private static DateOnly GetWeekStart(DateOnly date)
+    private void RefreshWeekTimelineHours()
     {
-        int mondayIndex = ((int)date.DayOfWeek + 6) % 7;
-        return date.AddDays(-mondayIndex);
+        WeekTimelineHours.Clear();
+
+        for (int hour = 0; hour < 24; hour++)
+            WeekTimelineHours.Add(new PlannerWeekHourViewModel(hour));
     }
 
-    private static DateOnly GetWeekEnd(DateOnly date)
+    private void RefreshDisplayPreferences()
+    {
+        RefreshWeekdayLabels();
+        RefreshWeekTimelineHours();
+        _taskEditor.UpdateEditorDurationOptions();
+        OnPropertyChanged(nameof(EditorTimeText));
+        OnPropertyChanged(nameof(EditorDurationText));
+    }
+
+    private void AppSettingsStore_PreferenceChanged(object? sender, EventArgs e)
+    {
+        PlannerDateTimeFormatter.TimeFormatPreference = _appSettingsStore.TimeFormatPreference;
+        PlannerTaskPalette.UseDarkPalette = _appSettingsStore.IsDarkThemeEffective;
+        _ = ReloadAsync();
+    }
+
+    private DateOnly GetMonthGridStart(DateOnly monthStart)
+    {
+        int startIndex = GetDayOffset(monthStart.DayOfWeek);
+        return monthStart.AddDays(-startIndex);
+    }
+
+    private DateOnly GetWeekStart(DateOnly date)
+    {
+        int startIndex = GetDayOffset(date.DayOfWeek);
+        return date.AddDays(-startIndex);
+    }
+
+    private DateOnly GetWeekEnd(DateOnly date)
     {
         return GetWeekStart(date).AddDays(6);
+    }
+
+    private int GetDayOffset(DayOfWeek dayOfWeek)
+    {
+        return _appSettingsStore.WeekStartPreference == AppWeekStartPreference.Sunday
+            ? (int)dayOfWeek
+            : ((int)dayOfWeek + 6) % 7;
     }
 
     private static DateOnly ClampToMonth(DateOnly monthStart, int preferredDay)

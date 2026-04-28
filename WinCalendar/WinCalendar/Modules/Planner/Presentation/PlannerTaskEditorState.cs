@@ -167,7 +167,7 @@ internal sealed class PlannerTaskEditorState : ObservableObject
     public Visibility EditorDurationVisibility =>
         EditorHasTime && EditorHasDuration ? Visibility.Visible : Visibility.Collapsed;
 
-    public string EditorTimeText => $"{EditorTime.Hours:00}:{EditorTime.Minutes:00}";
+    public string EditorTimeText => PlannerDateTimeFormatter.FormatTime(TimeOnly.FromTimeSpan(EditorTime));
 
     public string EditorDurationText => FormatEditorDurationDescription((int)NormalizeDurationValue(EditorDurationMinutes, EditorMaxDurationMinutes));
 
@@ -239,7 +239,7 @@ internal sealed class PlannerTaskEditorState : ObservableObject
         return Math.Clamp(normalizedValue, 15d, maxDurationMinutes);
     }
 
-    private void UpdateEditorDurationOptions()
+    public void UpdateEditorDurationOptions()
     {
         EditorDurationOptions.Clear();
 
@@ -251,7 +251,7 @@ internal sealed class PlannerTaskEditorState : ObservableObject
             int endMinutes = Math.Min(24 * 60, (int)startTime.ToTimeSpan().TotalMinutes + duration);
             string endTimeText = endMinutes == 24 * 60
                 ? "24:00"
-                : TimeOnly.MinValue.Add(TimeSpan.FromMinutes(endMinutes)).ToString("HH:mm");
+                : PlannerDateTimeFormatter.FormatTime(TimeOnly.MinValue.Add(TimeSpan.FromMinutes(endMinutes)));
 
             EditorDurationOptions.Add(new PlannerEditorDurationOptionViewModel(
                 duration,

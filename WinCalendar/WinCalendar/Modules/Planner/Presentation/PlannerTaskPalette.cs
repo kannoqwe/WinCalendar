@@ -9,9 +9,11 @@ namespace WinCalendar.Modules.Planner.Presentation;
 
 internal static class PlannerTaskPalette
 {
+    public static bool UseDarkPalette { get; set; } = Application.Current.RequestedTheme == ApplicationTheme.Dark;
+
     public static PlannerTaskTone GetTone(TaskCategory category)
     {
-        bool useDarkPalette = Application.Current.RequestedTheme == ApplicationTheme.Dark;
+        bool useDarkPalette = UseDarkPalette;
         return category switch
         {
             TaskCategory.Personal => CreateTone(useDarkPalette, 245, 238, 255, 123, 97, 255, 53, 44, 88, 161, 137, 255),

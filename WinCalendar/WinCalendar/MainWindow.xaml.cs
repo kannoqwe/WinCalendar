@@ -1,3 +1,4 @@
+using System;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
@@ -18,21 +19,25 @@ namespace WinCalendar
         private readonly PlannerStateStore _plannerStateStore;
         private readonly PlannerWindowCoordinator _windowCoordinator;
         private readonly AppSettingsStore _appSettingsStore;
+        private readonly Action _beginOverlayResizeMode;
         private AppWindow? _appWindow;
         private FrameworkElement? _titleBarDragRegion;
 
         public MainWindow(
             PlannerStateStore plannerStateStore,
             PlannerWindowCoordinator windowCoordinator,
-            AppSettingsStore appSettingsStore)
+            AppSettingsStore appSettingsStore,
+            Action beginOverlayResizeMode)
         {
             _plannerStateStore = plannerStateStore;
             _windowCoordinator = windowCoordinator;
             _appSettingsStore = appSettingsStore;
+            _beginOverlayResizeMode = beginOverlayResizeMode;
             InitializeComponent();
             _titleBarDragRegion = ContentRoot.FindName("TitleBarDragRegion") as FrameworkElement;
             ApplyThemePreference();
             _appSettingsStore.ThemePreferenceChanged += AppSettingsStore_ThemePreferenceChanged;
+            _appSettingsStore.OverlaySettingsChanged += AppSettingsStore_OverlaySettingsChanged;
             Closed += MainWindow_Closed;
             ConfigureCustomTitleBar();
             ShellNavigationView.SelectedItem = TodayNavigationItem;
@@ -43,7 +48,7 @@ namespace WinCalendar
         {
             if (args.IsSettingsSelected)
             {
-                PageHost.Content = new SettingsPage(_appSettingsStore);
+                PageHost.Content = new SettingsPage(_appSettingsStore, _beginOverlayResizeMode);
                 return;
             }
 
@@ -62,20 +67,30 @@ namespace WinCalendar
             ApplyThemePreference();
         }
 
+        private void AppSettingsStore_OverlaySettingsChanged(object? sender, System.EventArgs e)
+        {
+            if (PageHost.Content is SettingsPage settingsPage)
+                settingsPage.RefreshOverlaySettings();
+        }
+
         private void MainWindow_Closed(object sender, WindowEventArgs args)
         {
             _appSettingsStore.ThemePreferenceChanged -= AppSettingsStore_ThemePreferenceChanged;
+            _appSettingsStore.OverlaySettingsChanged -= AppSettingsStore_OverlaySettingsChanged;
             Closed -= MainWindow_Closed;
         }
 
         private void ApplyThemePreference()
         {
-            ContentRoot.RequestedTheme = _appSettingsStore.ThemePreference switch
+            ElementTheme effectiveTheme = _appSettingsStore.ThemePreference switch
             {
                 AppThemePreference.Light => ElementTheme.Light,
                 AppThemePreference.Dark => ElementTheme.Dark,
-                _ => ElementTheme.Default
+                _ => _appSettingsStore.IsDarkThemeEffective ? ElementTheme.Dark : ElementTheme.Light
             };
+
+            ContentRoot.RequestedTheme = effectiveTheme;
+            PlannerTaskPalette.UseDarkPalette = effectiveTheme == ElementTheme.Dark;
         }
 
         private void ConfigureCustomTitleBar()

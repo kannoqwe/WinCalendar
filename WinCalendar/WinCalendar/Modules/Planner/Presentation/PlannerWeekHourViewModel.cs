@@ -1,3 +1,6 @@
+using System;
+using WinCalendar.Core.Time;
+
 namespace WinCalendar.Modules.Planner.Presentation;
 
 public sealed class PlannerWeekHourViewModel
@@ -9,5 +12,5 @@ public sealed class PlannerWeekHourViewModel
 
     public int Hour { get; }
 
-    public string LabelText => $"{Hour:00}:00";
+    public string LabelText => PlannerDateTimeFormatter.FormatTime(new TimeOnly(Hour, 0));
 }

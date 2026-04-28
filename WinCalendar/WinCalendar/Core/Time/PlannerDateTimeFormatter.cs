@@ -1,9 +1,12 @@
 using System;
+using WinCalendar.Shared.Settings;
 
 namespace WinCalendar.Core.Time;
 
 internal static class PlannerDateTimeFormatter
 {
+    public static AppTimeFormatPreference TimeFormatPreference { get; set; } = AppTimeFormatPreference.TwentyFourHour;
+
     public static string FormatDate(DateOnly date)
     {
         return date.ToString("dd.MM.yyyy");
@@ -37,7 +40,9 @@ internal static class PlannerDateTimeFormatter
 
     public static string FormatTime(TimeOnly? time)
     {
-        return time?.ToString("HH:mm") ?? "No time";
+        return time is null
+            ? "No time"
+            : FormatClockTime(time.Value);
     }
 
     public static string FormatDuration(int? durationMinutes)
@@ -80,7 +85,7 @@ internal static class PlannerDateTimeFormatter
         int endMinutes = Math.Min(24 * 60, startMinutes + durationMinutes.Value);
         string endText = endMinutes == 24 * 60
             ? "24:00"
-            : TimeOnly.MinValue.Add(TimeSpan.FromMinutes(endMinutes)).ToString("HH:mm");
+            : FormatClockTime(TimeOnly.MinValue.Add(TimeSpan.FromMinutes(endMinutes)));
 
         return $"{FormatTime(time)} - {endText}";
     }
@@ -90,5 +95,12 @@ internal static class PlannerDateTimeFormatter
         return time is null
             ? FormatDate(date)
             : $"{FormatDate(date)} {FormatTimeRange(time, durationMinutes)}";
+    }
+
+    private static string FormatClockTime(TimeOnly time)
+    {
+        return TimeFormatPreference == AppTimeFormatPreference.TwelveHour
+            ? time.ToString("h:mm tt")
+            : time.ToString("HH:mm");
     }
 }

@@ -39,14 +39,20 @@ internal static class TrayNative
     public const uint WM_NULL = 0x0000;
     public const uint WM_MOUSEACTIVATE = 0x0021;
     public const uint WM_NCHITTEST = 0x0084;
+    public const uint WM_PAINT = 0x000F;
     public const uint WM_COMMAND = 0x0111;
     public const uint WM_CONTEXTMENU = 0x007B;
     public const uint WM_LBUTTONDOWN = 0x0201;
     public const uint WM_LBUTTONUP = 0x0202;
     public const uint WM_LBUTTONDBLCLK = 0x0203;
+    public const uint WM_MOUSEMOVE = 0x0200;
+    public const uint WM_RBUTTONDOWN = 0x0204;
     public const uint WM_RBUTTONUP = 0x0205;
 
     public const int HTCLIENT = 1;
+    public const int HTRIGHT = 11;
+    public const int HTBOTTOM = 15;
+    public const int HTBOTTOMRIGHT = 17;
     public const int MA_NOACTIVATE = 3;
     public const int IDI_APPLICATION = 32512;
 

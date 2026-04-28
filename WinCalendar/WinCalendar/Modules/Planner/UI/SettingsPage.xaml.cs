@@ -7,13 +7,35 @@ namespace WinCalendar.Modules.Planner.UI;
 public sealed partial class SettingsPage : Page
 {
     private readonly AppSettingsStore _appSettingsStore;
+    private readonly Action _beginOverlayResizeMode;
     private bool _isInitializing;
 
-    public SettingsPage(AppSettingsStore appSettingsStore)
+    public SettingsPage(AppSettingsStore appSettingsStore, Action beginOverlayResizeMode)
     {
         _appSettingsStore = appSettingsStore;
+        _beginOverlayResizeMode = beginOverlayResizeMode;
+        _isInitializing = true;
         InitializeComponent();
         SelectPreferences();
+    }
+
+    public void RefreshOverlaySettings()
+    {
+        if (_isInitializing)
+            return;
+
+        _isInitializing = true;
+
+        try
+        {
+            OverlayEnabledToggleSwitch.IsOn = _appSettingsStore.OverlayEnabled;
+            ResizeOverlayButton.IsEnabled = _appSettingsStore.OverlayEnabled;
+            OverlaySizeTextBlock.Text = $"{_appSettingsStore.OverlayWidth} x {_appSettingsStore.OverlayHeight}";
+        }
+        finally
+        {
+            _isInitializing = false;
+        }
     }
 
     private void SelectPreferences()
@@ -25,6 +47,9 @@ public sealed partial class SettingsPage : Page
             SelectComboBoxItem(ThemeComboBox, _appSettingsStore.ThemePreference.ToString());
             SelectComboBoxItem(TimeFormatComboBox, _appSettingsStore.TimeFormatPreference.ToString());
             SelectComboBoxItem(WeekStartComboBox, _appSettingsStore.WeekStartPreference.ToString());
+            OverlayEnabledToggleSwitch.IsOn = _appSettingsStore.OverlayEnabled;
+            ResizeOverlayButton.IsEnabled = _appSettingsStore.OverlayEnabled;
+            OverlaySizeTextBlock.Text = $"{_appSettingsStore.OverlayWidth} x {_appSettingsStore.OverlayHeight}";
         }
         finally
         {
@@ -66,6 +91,23 @@ public sealed partial class SettingsPage : Page
         }
 
         _appSettingsStore.WeekStartPreference = weekStartPreference;
+    }
+
+    private void OverlayEnabledToggleSwitch_Toggled(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        if (_isInitializing)
+            return;
+
+        _appSettingsStore.OverlayEnabled = OverlayEnabledToggleSwitch.IsOn;
+        RefreshOverlaySettings();
+    }
+
+    private void ResizeOverlayButton_Click(object sender, Microsoft.UI.Xaml.RoutedEventArgs e)
+    {
+        if (!_appSettingsStore.OverlayEnabled)
+            return;
+
+        _beginOverlayResizeMode();
     }
 
     private static void SelectComboBoxItem(ComboBox comboBox, string selectedTag)

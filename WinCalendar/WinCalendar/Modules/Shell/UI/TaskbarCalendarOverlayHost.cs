@@ -3,13 +3,12 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using Microsoft.UI.Dispatching;
 using WinCalendar.Modules.Shell.Infrastructure.Win32;
+using WinCalendar.Shared.Settings;
 
 namespace WinCalendar.Modules.Shell.UI;
 
 internal sealed class TaskbarCalendarOverlayHost : IDisposable
 {
-    private const int OverlayWidth = 140;
-    private const int OverlayHeight = 52;
     private const int OverlayRightMargin = 4;
     private const int OverlayBottomMargin = 0;
     private const int SmCxScreen = 0;
@@ -26,6 +25,7 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
     private const uint WinEventSkipOwnProcess = 0x0002;
 
     private readonly Action _onClick;
+    private readonly AppSettingsStore _appSettingsStore;
     private readonly DispatcherQueue _dispatcherQueue;
     private readonly DispatcherQueueTimer _syncTimer;
     private readonly TrayNative.WndProc _windowProcedure;
@@ -38,10 +38,17 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
     private nint _windowLocationHookHandle;
     private int _syncQueued;
     private bool _isDisposed;
+    private bool _isResizeMode;
+    private bool _isSizing;
+    private DragState _dragState;
 
-    public TaskbarCalendarOverlayHost(DispatcherQueue dispatcherQueue, Action onClick)
+    public TaskbarCalendarOverlayHost(
+        DispatcherQueue dispatcherQueue,
+        AppSettingsStore appSettingsStore,
+        Action onClick)
     {
         _onClick = onClick;
+        _appSettingsStore = appSettingsStore;
         _dispatcherQueue = dispatcherQueue;
         _windowProcedure = WindowProcedure;
         _winEventProcedure = WinEventProcedure;
@@ -51,6 +58,7 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
         RegisterWindowClass();
         CreateOverlayWindow();
         RegisterWinEventHooks();
+        _appSettingsStore.OverlaySettingsChanged += AppSettingsStore_OverlaySettingsChanged;
 
         _syncTimer = dispatcherQueue.CreateTimer();
         _syncTimer.Interval = TimeSpan.FromSeconds(10);
@@ -87,8 +95,8 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
             dwStyle: TrayNative.WS_POPUP,
             x: overlayPosition.X,
             y: overlayPosition.Y,
-            nWidth: OverlayWidth,
-            nHeight: OverlayHeight,
+            nWidth: _appSettingsStore.OverlayWidth,
+            nHeight: _appSettingsStore.OverlayHeight,
             hWndParent: nint.Zero,
             hMenu: nint.Zero,
             hInstance: _moduleHandle,
@@ -109,6 +117,28 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
     private void SyncTimer_Tick(DispatcherQueueTimer sender, object args)
     {
         SyncOverlayWindow();
+    }
+
+    public void ToggleResizeMode()
+    {
+        if (_isDisposed || _overlayWindowHandle == nint.Zero)
+            return;
+
+        if (_isResizeMode)
+        {
+            EndResizeMode();
+            return;
+        }
+
+        _isResizeMode = true;
+        _ = TrayNative.SetLayeredWindowAttributes(
+            _overlayWindowHandle,
+            crKey: 0,
+            bAlpha: 180,
+            dwFlags: TrayNative.LWA_ALPHA);
+
+        SyncOverlayWindow();
+        InvalidateRect(_overlayWindowHandle, nint.Zero, true);
     }
 
     private void RegisterWinEventHooks()
@@ -184,7 +214,7 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
         if (_isDisposed || _overlayWindowHandle == nint.Zero)
             return;
 
-        if (IsForegroundWindowFullscreen())
+        if (!_isResizeMode && IsForegroundWindowFullscreen())
         {
             _ = TrayNative.ShowWindow(_overlayWindowHandle, TrayNative.SW_HIDE);
             return;
@@ -196,8 +226,8 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
             TrayNative.HwndTopMost,
             overlayPosition.X,
             overlayPosition.Y,
-            OverlayWidth,
-            OverlayHeight,
+            _appSettingsStore.OverlayWidth,
+            _appSettingsStore.OverlayHeight,
             TrayNative.SWP_NOACTIVATE | TrayNative.SWP_SHOWWINDOW);
 
         _ = TrayNative.ShowWindow(_overlayWindowHandle, TrayNative.SW_SHOWNOACTIVATE);
@@ -235,26 +265,140 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
     {
         switch (msg)
         {
+            case TrayNative.WM_PAINT:
+                PaintOverlay(hWnd);
+                return nint.Zero;
             case TrayNative.WM_MOUSEACTIVATE:
                 return new nint(TrayNative.MA_NOACTIVATE);
             case TrayNative.WM_NCHITTEST:
-                return new nint(TrayNative.HTCLIENT);
+                return new nint(GetHitTest());
             case TrayNative.WM_LBUTTONDOWN:
+                if (_isResizeMode)
+                {
+                    BeginSizing();
+                    return nint.Zero;
+                }
+
                 _onClick();
+                return nint.Zero;
+            case TrayNative.WM_RBUTTONDOWN:
+                if (_isResizeMode)
+                {
+                    EndResizeMode();
+                    return nint.Zero;
+                }
+
+                return TrayNative.DefWindowProc(hWnd, msg, wParam, lParam);
+            case TrayNative.WM_MOUSEMOVE:
+                if (_isSizing)
+                    UpdateSizing();
+
+                return nint.Zero;
+            case TrayNative.WM_LBUTTONUP:
+                if (_isSizing)
+                {
+                    EndSizing();
+                    return nint.Zero;
+                }
+
                 return nint.Zero;
             default:
                 return TrayNative.DefWindowProc(hWnd, msg, wParam, lParam);
         }
     }
 
-    private static Position GetOverlayPosition()
+    private int GetHitTest()
+    {
+        if (!_isResizeMode)
+            return TrayNative.HTCLIENT;
+
+        return TrayNative.HTBOTTOMRIGHT;
+    }
+
+    private void BeginSizing()
+    {
+        Point point = GetCursorPoint();
+        _isSizing = true;
+        _dragState = new DragState(point.X, point.Y, _appSettingsStore.OverlayWidth, _appSettingsStore.OverlayHeight);
+        SetCapture(_overlayWindowHandle);
+    }
+
+    private void UpdateSizing()
+    {
+        Point point = GetCursorPoint();
+        int nextWidth = _dragState.Width;
+        int nextHeight = _dragState.Height;
+
+        nextWidth += point.X - _dragState.ScreenX;
+        nextHeight += point.Y - _dragState.ScreenY;
+
+        nextWidth = Math.Clamp(nextWidth, AppSettingsStore.MinimumOverlayWidth, AppSettingsStore.MaximumOverlayWidth);
+        nextHeight = Math.Clamp(nextHeight, AppSettingsStore.MinimumOverlayHeight, AppSettingsStore.MaximumOverlayHeight);
+        _appSettingsStore.SetOverlaySize(nextWidth, nextHeight);
+        SyncOverlayWindow();
+        InvalidateRect(_overlayWindowHandle, nint.Zero, true);
+    }
+
+    private void EndSizing()
+    {
+        _isSizing = false;
+        ReleaseCapture();
+        EndResizeMode();
+    }
+
+    private void EndResizeMode()
+    {
+        _isResizeMode = false;
+        _ = TrayNative.SetLayeredWindowAttributes(
+            _overlayWindowHandle,
+            crKey: 0,
+            bAlpha: 1,
+            dwFlags: TrayNative.LWA_ALPHA);
+        SyncOverlayWindow();
+    }
+
+    private void PaintOverlay(nint windowHandle)
+    {
+        nint paintHandle = BeginPaint(windowHandle, out PAINTSTRUCT paintStruct);
+        if (paintHandle != nint.Zero)
+        {
+            nint fillBrush = CreateSolidBrush(0x00E6B04F);
+            nint borderBrush = CreateSolidBrush(0x000088FF);
+
+            try
+            {
+                FillRect(paintStruct.hdc, ref paintStruct.rcPaint, fillBrush);
+                RECT frameRect = new()
+                {
+                    Left = 0,
+                    Top = 0,
+                    Right = _appSettingsStore.OverlayWidth,
+                    Bottom = _appSettingsStore.OverlayHeight
+                };
+                FrameRect(paintStruct.hdc, ref frameRect, borderBrush);
+            }
+            finally
+            {
+                DeleteObject(fillBrush);
+                DeleteObject(borderBrush);
+                EndPaint(windowHandle, ref paintStruct);
+            }
+        }
+    }
+
+    private void AppSettingsStore_OverlaySettingsChanged(object? sender, EventArgs e)
+    {
+        SyncOverlayWindow();
+    }
+
+    private Position GetOverlayPosition()
     {
         int screenWidth = GetSystemMetrics(SmCxScreen);
         int screenHeight = GetSystemMetrics(SmCyScreen);
 
         return new Position(
-            Math.Max(0, screenWidth - OverlayWidth - OverlayRightMargin),
-            Math.Max(0, screenHeight - OverlayHeight - OverlayBottomMargin));
+            Math.Max(0, screenWidth - _appSettingsStore.OverlayWidth - OverlayRightMargin),
+            Math.Max(0, screenHeight - _appSettingsStore.OverlayHeight - OverlayBottomMargin));
     }
 
     public void Dispose()
@@ -263,6 +407,7 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
             return;
 
         _isDisposed = true;
+        _appSettingsStore.OverlaySettingsChanged -= AppSettingsStore_OverlaySettingsChanged;
         UnregisterWinEventHooks();
         _syncTimer.Stop();
         _syncTimer.Tick -= SyncTimer_Tick;
@@ -328,7 +473,51 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool UnhookWinEvent(nint hWinEventHook);
 
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern nint BeginPaint(nint hWnd, out PAINTSTRUCT lpPaint);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool EndPaint(nint hWnd, ref PAINTSTRUCT lpPaint);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool FillRect(nint hDC, ref RECT lprc, nint hbr);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool FrameRect(nint hDC, ref RECT lprc, nint hbr);
+
+    [DllImport("gdi32.dll", SetLastError = true)]
+    private static extern nint CreateSolidBrush(uint color);
+
+    [DllImport("gdi32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool DeleteObject(nint hObject);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool InvalidateRect(nint hWnd, nint lpRect, bool bErase);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern nint SetCapture(nint hWnd);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool ReleaseCapture();
+
     private readonly record struct Position(int X, int Y);
+
+    private readonly record struct Point(int X, int Y);
+
+    private readonly record struct DragState(int ScreenX, int ScreenY, int Width, int Height);
+
+    private static Point GetCursorPoint()
+    {
+        return TrayNative.GetCursorPos(out TrayNative.POINT point)
+            ? new Point(point.X, point.Y)
+            : new Point(0, 0);
+    }
 
     [UnmanagedFunctionPointer(CallingConvention.Winapi)]
     private delegate void WinEventProc(
@@ -347,6 +536,48 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
         public int Top;
         public int Right;
         public int Bottom;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct PAINTSTRUCT
+    {
+        public nint hdc;
+        public bool fErase;
+        public RECT rcPaint;
+        public bool fRestore;
+        public bool fIncUpdate;
+        public byte rgbReserved0;
+        public byte rgbReserved1;
+        public byte rgbReserved2;
+        public byte rgbReserved3;
+        public byte rgbReserved4;
+        public byte rgbReserved5;
+        public byte rgbReserved6;
+        public byte rgbReserved7;
+        public byte rgbReserved8;
+        public byte rgbReserved9;
+        public byte rgbReserved10;
+        public byte rgbReserved11;
+        public byte rgbReserved12;
+        public byte rgbReserved13;
+        public byte rgbReserved14;
+        public byte rgbReserved15;
+        public byte rgbReserved16;
+        public byte rgbReserved17;
+        public byte rgbReserved18;
+        public byte rgbReserved19;
+        public byte rgbReserved20;
+        public byte rgbReserved21;
+        public byte rgbReserved22;
+        public byte rgbReserved23;
+        public byte rgbReserved24;
+        public byte rgbReserved25;
+        public byte rgbReserved26;
+        public byte rgbReserved27;
+        public byte rgbReserved28;
+        public byte rgbReserved29;
+        public byte rgbReserved30;
+        public byte rgbReserved31;
     }
 
     [StructLayout(LayoutKind.Sequential)]

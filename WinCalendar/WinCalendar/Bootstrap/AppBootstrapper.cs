@@ -21,6 +21,7 @@ public sealed class AppBootstrapper
     {
         string databasePath = AppPaths.GetDatabasePath();
         _appSettingsStore = new AppSettingsStore();
+        PlannerDateTimeFormatter.TimeFormatPreference = _appSettingsStore.TimeFormatPreference;
 
         TaskDatabaseInitializer databaseInitializer = new(databasePath);
         databaseInitializer.Initialize();
@@ -42,15 +43,20 @@ public sealed class AppBootstrapper
             autoCompleteElapsedTimedTasksUseCase,
             setTaskCompletionStatusUseCase,
             deleteTaskUseCase,
-            updateTaskUseCase);
+            updateTaskUseCase,
+            _appSettingsStore);
 
         _plannerWindowCoordinator = new(_plannerStateStore, CreateMainWindow);
-        _shellExperienceCoordinator = new(_plannerWindowCoordinator, requestExit);
+        _shellExperienceCoordinator = new(_plannerWindowCoordinator, _appSettingsStore, requestExit);
     }
 
     public MainWindow CreateMainWindow()
     {
-        MainWindow mainWindow = new(_plannerStateStore, _plannerWindowCoordinator, _appSettingsStore);
+        MainWindow mainWindow = new(
+            _plannerStateStore,
+            _plannerWindowCoordinator,
+            _appSettingsStore,
+            _shellExperienceCoordinator.BeginOverlayResizeMode);
         _plannerWindowCoordinator.AttachMainWindow(mainWindow);
 
         return mainWindow;

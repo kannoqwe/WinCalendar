@@ -132,9 +132,59 @@
                         FontSize="12"
                         FontWeight="SemiBold"
                         Foreground="{ThemeResource AppTextMutedBrush}"
-                        Text="CURRENT DEFAULTS" />
-                    <TextBlock Text="Date format: DD.MM.YYYY" />
-                    <TextBlock Text="Compact panel stays connected to the full app through shared state." />
+                        Text="OVERLAY" />
+
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="220" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Spacing="2">
+                            <TextBlock
+                                FontSize="16"
+                                FontWeight="SemiBold"
+                                Text="Taskbar overlay" />
+                            <TextBlock
+                                FontSize="13"
+                                Foreground="{ThemeResource AppTextMutedBrush}"
+                                Text="Show the click target near the Windows clock." />
+                        </StackPanel>
+
+                        <ToggleSwitch
+                            x:Name="OverlayEnabledToggleSwitch"
+                            Grid.Column="1"
+                            HorizontalAlignment="Left"
+                            IsOn="True"
+                            OffContent="Off"
+                            OnContent="On"
+                            Toggled="OverlayEnabledToggleSwitch_Toggled" />
+                    </Grid>
+
+                    <Grid ColumnSpacing="16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="220" />
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Spacing="2">
+                            <TextBlock
+                                FontSize="16"
+                                FontWeight="SemiBold"
+                                Text="Overlay size" />
+                            <TextBlock
+                                x:Name="OverlaySizeTextBlock"
+                                FontSize="13"
+                                Foreground="{ThemeResource AppTextMutedBrush}" />
+                        </StackPanel>
+
+                        <Button
+                            x:Name="ResizeOverlayButton"
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            Click="ResizeOverlayButton_Click"
+                            Content="Change size" />
+                    </Grid>
                 </StackPanel>
             </StackPanel>
         </Border>

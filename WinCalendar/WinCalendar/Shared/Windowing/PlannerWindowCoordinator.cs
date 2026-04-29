@@ -67,6 +67,7 @@ public sealed class PlannerWindowCoordinator
             if (_compactWindow is null)
             {
                 _compactWindow = new CompactPlannerWindow(_plannerStateStore, OpenMainAppFromCompact);
+                _compactWindow.Activated += CompactWindow_Activated;
                 _compactWindow.Closed += CompactWindow_Closed;
                 ConfigureCompactWindow(_compactWindow);
             }
@@ -180,9 +181,23 @@ public sealed class PlannerWindowCoordinator
         if (sender is not CompactPlannerWindow compactWindow || !ReferenceEquals(_compactWindow, compactWindow))
             return;
 
+        _compactWindow.Activated -= CompactWindow_Activated;
         _compactWindow.Closed -= CompactWindow_Closed;
         _compactWindow = null;
         _isCompactWindowVisible = false;
+    }
+
+    private void CompactWindow_Activated(object sender, WindowActivatedEventArgs args)
+    {
+        if (!_isCompactWindowVisible
+            || sender is not CompactPlannerWindow compactWindow
+            || !ReferenceEquals(_compactWindow, compactWindow)
+            || args.WindowActivationState != WindowActivationState.Deactivated)
+        {
+            return;
+        }
+
+        HideCompactWindow();
     }
 
     [DllImport("user32.dll")]

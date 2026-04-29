@@ -11,8 +11,6 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
 {
     private const int SmCxScreen = 0;
     private const int SmCyScreen = 1;
-    private const uint MonitorDefaultToNearest = 2;
-    private const int FullscreenTolerance = 2;
     private const int ObjidWindow = 0;
     private const int ChildIdSelf = 0;
     private const uint EventSystemForeground = 0x0003;
@@ -218,12 +216,6 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
         if (_isDisposed || _overlayWindowHandle == nint.Zero)
             return;
 
-        if (!_isResizeMode && IsForegroundWindowFullscreen())
-        {
-            _ = TrayNative.ShowWindow(_overlayWindowHandle, TrayNative.SW_HIDE);
-            return;
-        }
-
         Position overlayPosition = GetOverlayPosition();
         _ = TrayNative.SetWindowPos(
             _overlayWindowHandle,
@@ -235,34 +227,6 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
             TrayNative.SWP_NOACTIVATE | TrayNative.SWP_SHOWWINDOW);
 
         _ = TrayNative.ShowWindow(_overlayWindowHandle, TrayNative.SW_SHOWNOACTIVATE);
-    }
-
-    private bool IsForegroundWindowFullscreen()
-    {
-        nint foregroundWindowHandle = GetForegroundWindow();
-        if (foregroundWindowHandle == nint.Zero || foregroundWindowHandle == _overlayWindowHandle)
-            return false;
-
-        if (!GetWindowRect(foregroundWindowHandle, out RECT windowRect))
-            return false;
-
-        nint monitorHandle = MonitorFromWindow(foregroundWindowHandle, MonitorDefaultToNearest);
-        if (monitorHandle == nint.Zero)
-            return false;
-
-        MONITORINFO monitorInfo = new()
-        {
-            cbSize = Marshal.SizeOf<MONITORINFO>()
-        };
-
-        if (!GetMonitorInfo(monitorHandle, ref monitorInfo))
-            return false;
-
-        RECT monitorRect = monitorInfo.rcMonitor;
-        return windowRect.Left <= monitorRect.Left + FullscreenTolerance
-            && windowRect.Top <= monitorRect.Top + FullscreenTolerance
-            && windowRect.Right >= monitorRect.Right - FullscreenTolerance
-            && windowRect.Bottom >= monitorRect.Bottom - FullscreenTolerance;
     }
 
     private nint WindowProcedure(nint hWnd, uint msg, nuint wParam, nint lParam)
@@ -621,19 +585,9 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
     [DllImport("user32.dll")]
     private static extern int GetSystemMetrics(int nIndex);
 
-    [DllImport("user32.dll")]
-    private static extern nint GetForegroundWindow();
-
     [DllImport("user32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool GetWindowRect(nint hWnd, out RECT lpRect);
-
-    [DllImport("user32.dll")]
-    private static extern nint MonitorFromWindow(nint hwnd, uint dwFlags);
-
-    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool GetMonitorInfo(nint hMonitor, ref MONITORINFO lpmi);
 
     [DllImport("user32.dll", SetLastError = true)]
     private static extern nint SetWinEventHook(
@@ -780,12 +734,4 @@ internal sealed class TaskbarCalendarOverlayHost : IDisposable
         public byte rgbReserved31;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    private struct MONITORINFO
-    {
-        public int cbSize;
-        public RECT rcMonitor;
-        public RECT rcWork;
-        public uint dwFlags;
-    }
 }

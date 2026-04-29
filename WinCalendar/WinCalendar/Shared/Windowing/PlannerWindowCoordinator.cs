@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml;
 using Windows.Graphics;
 using WinCalendar.Modules.Planner.Presentation;
 using WinCalendar.Modules.Planner.UI;
+using WinCalendar.Shared.Settings;
 using WinRT.Interop;
 
 namespace WinCalendar.Shared.Windowing;
@@ -19,15 +20,20 @@ public sealed class PlannerWindowCoordinator
     private const int CompactWindowMargin = 12;
 
     private readonly PlannerStateStore _plannerStateStore;
+    private readonly AppSettingsStore _appSettingsStore;
     private readonly Func<MainWindow> _mainWindowFactory;
     private MainWindow? _mainWindow;
     private CompactPlannerWindow? _compactWindow;
     private bool _isCompactWindowVisible;
     private bool _isTogglingCompactWindow;
 
-    public PlannerWindowCoordinator(PlannerStateStore plannerStateStore, Func<MainWindow> mainWindowFactory)
+    public PlannerWindowCoordinator(
+        PlannerStateStore plannerStateStore,
+        AppSettingsStore appSettingsStore,
+        Func<MainWindow> mainWindowFactory)
     {
         _plannerStateStore = plannerStateStore;
+        _appSettingsStore = appSettingsStore;
         _mainWindowFactory = mainWindowFactory;
     }
 
@@ -66,7 +72,7 @@ public sealed class PlannerWindowCoordinator
 
             if (_compactWindow is null)
             {
-                _compactWindow = new CompactPlannerWindow(_plannerStateStore, OpenMainAppFromCompact);
+                _compactWindow = new CompactPlannerWindow(_plannerStateStore, _appSettingsStore, OpenMainAppFromCompact);
                 _compactWindow.Activated += CompactWindow_Activated;
                 _compactWindow.Closed += CompactWindow_Closed;
                 ConfigureCompactWindow(_compactWindow);

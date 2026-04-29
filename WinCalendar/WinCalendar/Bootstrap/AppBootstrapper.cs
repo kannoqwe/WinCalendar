@@ -46,7 +46,7 @@ public sealed class AppBootstrapper
             updateTaskUseCase,
             _appSettingsStore);
 
-        _plannerWindowCoordinator = new(_plannerStateStore, CreateMainWindow);
+        _plannerWindowCoordinator = new(_plannerStateStore, _appSettingsStore, CreateMainWindow);
         _shellExperienceCoordinator = new(_plannerWindowCoordinator, _appSettingsStore, requestExit);
     }
 

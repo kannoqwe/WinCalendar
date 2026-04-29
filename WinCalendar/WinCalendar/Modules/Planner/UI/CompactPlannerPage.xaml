@@ -7,17 +7,9 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Background="Transparent"
     FontFamily="Segoe UI Variable Text"
-    RequestedTheme="Light"
     mc:Ignorable="d">
 
     <Page.Resources>
-        <SolidColorBrush x:Key="CompactDividerBrush" Color="#0D000000" />
-        <SolidColorBrush x:Key="CompactMutedBrush" Color="#8A000000" />
-        <SolidColorBrush x:Key="CompactComposerPanelBrush" Color="#FFFFFFFF" />
-        <SolidColorBrush x:Key="CompactPanelBrush" Color="#F2FFFFFF" />
-        <SolidColorBrush x:Key="CompactTaskCardBrush" Color="#0D000000" />
-        <SolidColorBrush x:Key="CompactTextBrush" Color="#FF1C1C1C" />
-
         <Style x:Key="CompactNewTaskButtonStyle" TargetType="Button">
             <Setter Property="Background" Value="Transparent" />
             <Setter Property="BorderBrush" Value="Transparent" />
@@ -37,7 +29,7 @@
             <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Foreground" Value="{StaticResource CompactTextBrush}" />
+            <Setter Property="Foreground" Value="{ThemeResource CompactTextBrush}" />
         </Style>
 
         <Style x:Key="CompactOpenMainAppButtonStyle" TargetType="Button">
@@ -48,7 +40,7 @@
             <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Foreground" Value="{StaticResource CompactTextBrush}" />
+            <Setter Property="Foreground" Value="{ThemeResource CompactTextBrush}" />
             <Setter Property="FontSize" Value="12" />
             <Setter Property="FontWeight" Value="SemiBold" />
         </Style>
@@ -90,11 +82,11 @@
         <Style x:Key="CompactComposerFieldButtonStyle" TargetType="Button">
             <Setter Property="MinHeight" Value="34" />
             <Setter Property="Padding" Value="8,0" />
-            <Setter Property="Background" Value="{StaticResource CompactTaskCardBrush}" />
-            <Setter Property="BorderBrush" Value="{StaticResource CompactDividerBrush}" />
+            <Setter Property="Background" Value="{ThemeResource CompactTaskCardBrush}" />
+            <Setter Property="BorderBrush" Value="{ThemeResource CompactDividerBrush}" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Foreground" Value="{StaticResource CompactTextBrush}" />
+            <Setter Property="Foreground" Value="{ThemeResource CompactTextBrush}" />
             <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         </Style>
 
@@ -106,7 +98,7 @@
             <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="CornerRadius" Value="6" />
-            <Setter Property="Foreground" Value="{StaticResource CompactMutedBrush}" />
+            <Setter Property="Foreground" Value="{ThemeResource CompactMutedBrush}" />
             <Setter Property="FontSize" Value="12" />
             <Setter Property="FontWeight" Value="SemiBold" />
         </Style>
@@ -133,8 +125,8 @@
             x:Name="PanelHost"
             Width="360"
             HorizontalAlignment="Stretch"
-            Background="{StaticResource CompactPanelBrush}"
-            BorderBrush="{StaticResource CompactDividerBrush}"
+            Background="{ThemeResource CompactPanelBrush}"
+            BorderBrush="{ThemeResource CompactDividerBrush}"
             BorderThickness="1"
             CornerRadius="12"
             Padding="14">
@@ -169,7 +161,7 @@
                         FontFamily="Segoe UI Variable Display"
                         FontSize="20"
                         FontWeight="SemiBold"
-                        Foreground="{StaticResource CompactTextBrush}"
+                        Foreground="{ThemeResource CompactTextBrush}"
                         Text="{Binding MonthLabel}" />
 
                     <StackPanel
@@ -214,26 +206,26 @@
                                             Canvas.Top="4"
                                             RadiusX="2"
                                             RadiusY="2"
-                                            Stroke="{StaticResource CompactTextBrush}"
+                                            Stroke="{ThemeResource CompactTextBrush}"
                                             StrokeThickness="2" />
                                         <Ellipse
                                             Width="2"
                                             Height="2"
                                             Canvas.Left="5"
                                             Canvas.Top="7"
-                                            Fill="{StaticResource CompactTextBrush}" />
+                                            Fill="{ThemeResource CompactTextBrush}" />
                                         <Ellipse
                                             Width="2"
                                             Height="2"
                                             Canvas.Left="9"
                                             Canvas.Top="7"
-                                            Fill="{StaticResource CompactTextBrush}" />
+                                            Fill="{ThemeResource CompactTextBrush}" />
                                         <Ellipse
                                             Width="2"
                                             Height="2"
                                             Canvas.Left="13"
                                             Canvas.Top="7"
-                                            Fill="{StaticResource CompactTextBrush}" />
+                                            Fill="{ThemeResource CompactTextBrush}" />
                                     </Canvas>
                                 </Viewbox>
                                 <TextBlock
@@ -261,7 +253,7 @@
                                 HorizontalAlignment="Center"
                                 FontSize="11"
                                 FontWeight="SemiBold"
-                                Foreground="{StaticResource CompactMutedBrush}"
+                                Foreground="{ThemeResource CompactMutedBrush}"
                                 Text="{Binding}" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -329,7 +321,7 @@
                 <Border
                     Grid.Row="3"
                     Height="1"
-                    Background="{StaticResource CompactDividerBrush}" />
+                    Background="{ThemeResource CompactDividerBrush}" />
 
                 <Grid
                     Grid.Row="4"
@@ -343,7 +335,7 @@
                         VerticalAlignment="Center"
                         FontSize="11"
                         FontWeight="Normal"
-                        Foreground="{StaticResource CompactMutedBrush}"
+                        Foreground="{ThemeResource CompactMutedBrush}"
                         Text="TODAY TASKS" />
 
                     <Button
@@ -371,7 +363,7 @@
                                         Height="58"
                                         Margin="0,0,0,8"
                                         Padding="10,7"
-                                        Background="{StaticResource CompactTaskCardBrush}"
+                                        Background="{ThemeResource CompactTaskCardBrush}"
                                         BorderBrush="{Binding TaskAccentBrush}"
                                         BorderThickness="2,0,0,0"
                                         CornerRadius="6"
@@ -392,14 +384,14 @@
                                                     VerticalAlignment="Center"
                                                     FontSize="13"
                                                     FontWeight="SemiBold"
-                                                    Foreground="{StaticResource CompactTextBrush}"
+                                                    Foreground="{ThemeResource CompactTextBrush}"
                                                     Text="{Binding Title}"
                                                     TextTrimming="CharacterEllipsis" />
 
                                                 <TextBlock
                                                     Grid.Row="1"
                                                     FontSize="11"
-                                                    Foreground="{StaticResource CompactMutedBrush}"
+                                                    Foreground="{ThemeResource CompactMutedBrush}"
                                                     Text="{Binding CompactTimeText}"
                                                     TextTrimming="CharacterEllipsis" />
                                             </Grid>
@@ -428,7 +420,7 @@
                             <TextBlock
                                 HorizontalAlignment="Center"
                                 FontSize="13"
-                                Foreground="{StaticResource CompactMutedBrush}"
+                                Foreground="{ThemeResource CompactMutedBrush}"
                                 Text="{Binding EmptySelectedDayTasksText}" />
                         </StackPanel>
                     </Grid>
@@ -441,8 +433,8 @@
                     Height="428"
                     VerticalAlignment="Bottom"
                         Padding="10"
-                        Background="{StaticResource CompactComposerPanelBrush}"
-                        BorderBrush="{StaticResource CompactDividerBrush}"
+                        Background="{ThemeResource CompactComposerPanelBrush}"
+                        BorderBrush="{ThemeResource CompactDividerBrush}"
                         BorderThickness="1"
                         CornerRadius="8"
                         Visibility="{Binding SelectedTaskVisibility}">
@@ -473,11 +465,11 @@
                                         FontFamily="Segoe UI Variable Display"
                                         FontSize="16"
                                         FontWeight="SemiBold"
-                                        Foreground="{StaticResource CompactTextBrush}"
+                                        Foreground="{ThemeResource CompactTextBrush}"
                                         Text="New task" />
                                     <TextBlock
                                         FontSize="11"
-                                        Foreground="{StaticResource CompactMutedBrush}"
+                                        Foreground="{ThemeResource CompactMutedBrush}"
                                         Text="{Binding EditorDateText}"
                                         TextTrimming="CharacterEllipsis" />
                                 </StackPanel>
@@ -519,7 +511,7 @@
                                         VerticalAlignment="Center"
                                         FontFamily="Segoe Fluent Icons"
                                         FontSize="11"
-                                        Foreground="{StaticResource CompactMutedBrush}"
+                                        Foreground="{ThemeResource CompactMutedBrush}"
                                         Glyph="&#xE787;" />
                                     <TextBlock
                                         Grid.Column="1"
@@ -533,7 +525,7 @@
                                         VerticalAlignment="Center"
                                         FontFamily="Segoe Fluent Icons"
                                         FontSize="9"
-                                        Foreground="{StaticResource CompactMutedBrush}"
+                                        Foreground="{ThemeResource CompactMutedBrush}"
                                         Glyph="&#xE70D;" />
                                 </Grid>
 
@@ -576,7 +568,7 @@
                                     VerticalAlignment="Center"
                                     FontSize="12"
                                     FontWeight="SemiBold"
-                                    Foreground="{StaticResource CompactTextBrush}"
+                                    Foreground="{ThemeResource CompactTextBrush}"
                                     Text="All Day" />
                             </Grid>
 
@@ -633,7 +625,7 @@
                                 <StackPanel Spacing="4">
                                     <TextBlock
                                         FontSize="11"
-                                        Foreground="{StaticResource CompactMutedBrush}"
+                                        Foreground="{ThemeResource CompactMutedBrush}"
                                         Text="Start" />
                                     <Button
                                         x:Name="CompactEditorTimeButton"
@@ -650,7 +642,7 @@
                                                 VerticalAlignment="Center"
                                                 FontFamily="Segoe Fluent Icons"
                                                 FontSize="11"
-                                                Foreground="{StaticResource CompactMutedBrush}"
+                                                Foreground="{ThemeResource CompactMutedBrush}"
                                                 Glyph="&#xE823;" />
                                             <TextBlock
                                                 Grid.Column="1"
@@ -663,7 +655,7 @@
                                                 VerticalAlignment="Center"
                                                 FontFamily="Segoe Fluent Icons"
                                                 FontSize="9"
-                                                Foreground="{StaticResource CompactMutedBrush}"
+                                                Foreground="{ThemeResource CompactMutedBrush}"
                                                 Glyph="&#xE70D;" />
                                         </Grid>
 
@@ -695,7 +687,7 @@
                                                         <Border
                                                             Grid.Column="1"
                                                             Margin="0,4"
-                                                            Background="{StaticResource CompactDividerBrush}" />
+                                                            Background="{ThemeResource CompactDividerBrush}" />
                                                         <ListView
                                                             x:Name="CompactEditorMinuteListView"
                                                             Grid.Column="2"
@@ -715,7 +707,7 @@
                                     Spacing="4">
                                     <TextBlock
                                         FontSize="11"
-                                        Foreground="{StaticResource CompactMutedBrush}"
+                                        Foreground="{ThemeResource CompactMutedBrush}"
                                         Text="Duration" />
                                     <Button
                                         x:Name="CompactEditorDurationButton"
@@ -732,7 +724,7 @@
                                                 VerticalAlignment="Center"
                                                 FontFamily="Segoe Fluent Icons"
                                                 FontSize="11"
-                                                Foreground="{StaticResource CompactMutedBrush}"
+                                                Foreground="{ThemeResource CompactMutedBrush}"
                                                 Glyph="&#xE916;" />
                                             <TextBlock
                                                 Grid.Column="1"
@@ -746,7 +738,7 @@
                                                 VerticalAlignment="Center"
                                                 FontFamily="Segoe Fluent Icons"
                                                 FontSize="9"
-                                                Foreground="{StaticResource CompactMutedBrush}"
+                                                Foreground="{ThemeResource CompactMutedBrush}"
                                                 Glyph="&#xE70D;" />
                                         </Grid>
 
@@ -784,7 +776,7 @@
                                                                     <TextBlock
                                                                         Grid.Column="1"
                                                                         FontSize="12"
-                                                                        Foreground="{StaticResource CompactMutedBrush}"
+                                                                        Foreground="{ThemeResource CompactMutedBrush}"
                                                                         Text="{Binding DescriptionText}"
                                                                         TextTrimming="CharacterEllipsis" />
                                                                 </Grid>

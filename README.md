@@ -1,6 +1,6 @@
 # WinCalendar
 
-WinCalendar is a Windows calendar and planner app built with .NET 8 and WinUI. It combines a full weekly planning workspace with a compact tray calendar and a small taskbar overlay for quick access.
+WinCalendar is a Windows calendar and planner app built with .NET 8 and WinUI. It is a stronger replacement for the default Windows calendar, combining a full weekly planning workspace with a compact tray calendar and a small taskbar overlay for quick access.
 
 ![Main window](docs/screenshots/main-window.png)
 

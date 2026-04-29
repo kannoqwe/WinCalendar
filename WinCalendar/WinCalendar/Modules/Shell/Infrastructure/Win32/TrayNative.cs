@@ -54,6 +54,8 @@ internal static class TrayNative
     public const int HTRIGHT = 11;
     public const int HTBOTTOM = 15;
     public const int HTBOTTOMRIGHT = 17;
+    public const uint IMAGE_ICON = 1;
+    public const uint LR_LOADFROMFILE = 0x00000010;
     public const int MA_NOACTIVATE = 3;
     public const int IDI_APPLICATION = 32512;
     public const int VK_RETURN = 0x0D;
@@ -126,6 +128,19 @@ internal static class TrayNative
 
     [DllImport("user32.dll")]
     public static extern nint LoadIcon(nint hInstance, nint lpIconName);
+
+    [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    public static extern nint LoadImage(
+        nint hInst,
+        string name,
+        uint type,
+        int cx,
+        int cy,
+        uint fuLoad);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool DestroyIcon(nint hIcon);
 
     [DllImport("user32.dll", SetLastError = true)]
     public static extern nint CreatePopupMenu();

@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Runtime.InteropServices;
 using WinCalendar.Modules.Shell.Infrastructure.Win32;
 
@@ -17,6 +18,7 @@ public sealed class TrayIconHost : IDisposable
     private readonly string _windowClassName;
     private readonly uint _taskbarCreatedMessage;
     private readonly nint _moduleHandle;
+    private readonly nint _iconHandle;
     private nint _windowHandle;
     private bool _isDisposed;
 
@@ -28,6 +30,7 @@ public sealed class TrayIconHost : IDisposable
         _windowClassName = $"WinCalendar.TrayIcon.{Environment.ProcessId}";
         _taskbarCreatedMessage = TrayNative.RegisterWindowMessage("TaskbarCreated");
         _moduleHandle = TrayNative.GetModuleHandle(lpModuleName: null);
+        _iconHandle = LoadAppIcon();
 
         RegisterWindowClass();
         CreateMessageWindow();
@@ -41,7 +44,8 @@ public sealed class TrayIconHost : IDisposable
             cbSize = (uint)Marshal.SizeOf<TrayNative.WNDCLASSEX>(),
             lpfnWndProc = _windowProcedure,
             hInstance = _moduleHandle,
-            hIcon = TrayNative.LoadIcon(nint.Zero, new nint(TrayNative.IDI_APPLICATION)),
+            hIcon = GetIconHandle(),
+            hIconSm = GetIconHandle(),
             lpszClassName = _windowClassName
         };
 
@@ -85,11 +89,31 @@ public sealed class TrayIconHost : IDisposable
         uID = NotifyIconId,
         uFlags = TrayNative.NIF_MESSAGE | TrayNative.NIF_ICON | TrayNative.NIF_TIP,
         uCallbackMessage = TrayCallbackMessage,
-        hIcon = TrayNative.LoadIcon(nint.Zero, new nint(TrayNative.IDI_APPLICATION)),
+        hIcon = GetIconHandle(),
         szTip = "WinCalendar",
         szInfo = string.Empty,
         szInfoTitle = string.Empty
     };
+
+    private nint GetIconHandle() =>
+        _iconHandle != nint.Zero
+            ? _iconHandle
+            : TrayNative.LoadIcon(nint.Zero, new nint(TrayNative.IDI_APPLICATION));
+
+    private static nint LoadAppIcon()
+    {
+        string iconPath = Path.Combine(AppContext.BaseDirectory, "Assets", "AppIcon.ico");
+        if (!File.Exists(iconPath))
+            return nint.Zero;
+
+        return TrayNative.LoadImage(
+            nint.Zero,
+            iconPath,
+            TrayNative.IMAGE_ICON,
+            cx: 0,
+            cy: 0,
+            TrayNative.LR_LOADFROMFILE);
+    }
 
     private nint WindowProcedure(nint hWnd, uint msg, nuint wParam, nint lParam)
     {
@@ -188,6 +212,9 @@ public sealed class TrayIconHost : IDisposable
             TrayNative.DestroyWindow(_windowHandle);
             _windowHandle = nint.Zero;
         }
+
+        if (_iconHandle != nint.Zero)
+            TrayNative.DestroyIcon(_iconHandle);
 
         TrayNative.UnregisterClass(_windowClassName, _moduleHandle);
     }

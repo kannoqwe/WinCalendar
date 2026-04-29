@@ -33,7 +33,7 @@ public sealed class PlannerMonthDayViewModel : ObservableObject
         Color indicatorColor = allCompleted ? Colors.SeaGreen : AppAccentColor;
         IndicatorBrush = new SolidColorBrush(indicatorColor);
         CompactIndicatorBrush = new SolidColorBrush(isToday && !allCompleted ? Colors.White : indicatorColor);
-        DayTextBrush = new SolidColorBrush(isToday ? Colors.White : CompactTextColor);
+        DayTextBrush = new SolidColorBrush(isToday || PlannerTaskPalette.UseDarkPalette ? Colors.White : CompactTextColor);
     }
 
     public DateOnly Date { get; }

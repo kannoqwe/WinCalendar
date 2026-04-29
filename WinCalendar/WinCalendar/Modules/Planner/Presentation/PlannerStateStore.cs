@@ -832,6 +832,7 @@ public sealed class PlannerStateStore : ObservableObject
         bool timeFormatChanged = _appSettingsStore.TimeFormatPreference != _appliedTimeFormatPreference;
         _appliedTimeFormatPreference = _appSettingsStore.TimeFormatPreference;
         _appliedWeekStartPreference = _appSettingsStore.WeekStartPreference;
+        PlannerTaskPalette.UseDarkPalette = _appSettingsStore.IsDarkThemeEffective;
         PlannerDateTimeFormatter.TimeFormatPreference = _appliedTimeFormatPreference;
         RefreshWeekdayLabels();
         RefreshWeekTimelineHours(timeFormatChanged);
